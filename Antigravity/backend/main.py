@@ -58,10 +58,28 @@ app.add_middleware(
 
 VIEW = f"`{BQ_PROJECT}.{BQ_DATASET}.VW_VENTAS_DASHBOARD`"
 
+import time
+
+_query_cache = {}
+CACHE_TTL = 300  # 5 minutos de caché en memoria
+
 def run(sql: str) -> list[dict]:
-    """Ejecuta SQL y retorna lista de dicts."""
+    """Ejecuta SQL y retorna lista de dicts con caché básico."""
+    now = time.time()
+    
+    # 1. Verificar si la consulta está en caché y aún es válida
+    if sql in _query_cache:
+        result, timestamp = _query_cache[sql]
+        if now - timestamp < CACHE_TTL:
+            return result
+
+    # 2. Si no está o expiró, consultar a BigQuery
     rows = bq.query(sql).result()
-    return [dict(r) for r in rows]
+    result = [dict(r) for r in rows]
+    
+    # 3. Guardar en caché y retornar
+    _query_cache[sql] = (result, now)
+    return result
 
 # ══════════════════════════════════════════════════════════════════
 # VENTAS — KPIs
