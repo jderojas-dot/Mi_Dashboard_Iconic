@@ -59,12 +59,14 @@ app.add_middleware(
 VIEW = f"`{BQ_PROJECT}.{BQ_DATASET}.VW_VENTAS_DASHBOARD`"
 
 import time
+import threading
 
 _query_cache = {}
+_bq_lock = threading.Lock()
 CACHE_TTL = 300  # 5 minutos de caché en memoria
 
 def run(sql: str) -> list[dict]:
-    """Ejecuta SQL y retorna lista de dicts con caché básico."""
+    """Ejecuta SQL y retorna lista de dicts con caché básico y Lock para evitar saturación."""
     now = time.time()
     
     # 1. Verificar si la consulta está en caché y aún es válida
@@ -73,13 +75,20 @@ def run(sql: str) -> list[dict]:
         if now - timestamp < CACHE_TTL:
             return result
 
-    # 2. Si no está o expiró, consultar a BigQuery
-    rows = bq.query(sql).result()
-    result = [dict(r) for r in rows]
-    
-    # 3. Guardar en caché y retornar
-    _query_cache[sql] = (result, now)
-    return result
+    # 2. Si no está o expiró, consultar a BigQuery (usando un Lock para encolar consultas)
+    with _bq_lock:
+        # Doble verificación por si otro hilo ya actualizó la caché mientras esperábamos
+        if sql in _query_cache:
+            result, timestamp = _query_cache[sql]
+            if now - timestamp < CACHE_TTL:
+                return result
+                
+        rows = bq.query(sql).result()
+        result = [dict(r) for r in rows]
+        
+        # 3. Guardar en caché y retornar
+        _query_cache[sql] = (result, now)
+        return result
 
 # ══════════════════════════════════════════════════════════════════
 # VENTAS — KPIs
