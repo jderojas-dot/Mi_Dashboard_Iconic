@@ -26,13 +26,19 @@ async def lifespan(app: FastAPI):
         creds_json = json.loads(os.environ["GOOGLE_APPLICATION_CREDENTIALS_JSON"])
         creds = service_account.Credentials.from_service_account_info(
             creds_json,
-            scopes=["https://www.googleapis.com/auth/cloud-platform"],
+            scopes=[
+                "https://www.googleapis.com/auth/cloud-platform",
+                "https://www.googleapis.com/auth/drive"
+            ],
         )
         bq = bigquery.Client(project=BQ_PROJECT, credentials=creds)
     elif CREDENTIALS_PATH and Path(CREDENTIALS_PATH).exists():
         creds = service_account.Credentials.from_service_account_file(
             CREDENTIALS_PATH,
-            scopes=["https://www.googleapis.com/auth/cloud-platform"],
+            scopes=[
+                "https://www.googleapis.com/auth/cloud-platform",
+                "https://www.googleapis.com/auth/drive"
+            ],
         )
         bq = bigquery.Client(project=BQ_PROJECT, credentials=creds)
     else:
