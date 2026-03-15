@@ -282,12 +282,12 @@ def get_margenes_marca(anno: int | None = None):
     sql = f"""
     SELECT MARCA_PRODUCTO AS marca,
       ROUND(SUM(VENTA_NETA_MN),2) AS venta_neta,
-      ROUND(SUM(COSTO_MN),2) AS costo,
+      ROUND(SUM(COSTO_MN_TOTAL),2) AS costo,
       ROUND(SUM(MARGEN_MN),2) AS margen,
       ROUND(SAFE_DIVIDE(SUM(MARGEN_MN),SUM(VENTA_NETA_MN))*100,2) AS pct_margen,
       SUM(CANTIDAD) AS unidades
     FROM {VIEW}
-    WHERE MARCA_PRODUCTO IS NOT NULL AND COSTO_MN > 0 {where}
+    WHERE MARCA_PRODUCTO IS NOT NULL AND COSTO_MN_TOTAL > 0 {where}
     GROUP BY 1 ORDER BY pct_margen DESC LIMIT 12
     """
     return run(sql)
