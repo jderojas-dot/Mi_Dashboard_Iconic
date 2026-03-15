@@ -12,6 +12,7 @@ from contextlib import asynccontextmanager
 from google.cloud import bigquery
 from google.oauth2 import service_account
 import os, json
+import uvicorn
 from pathlib import Path
 from config import BQ_PROJECT, BQ_DATASET, CREDENTIALS_PATH, ALLOWED_ORIGINS
 
@@ -399,8 +400,18 @@ def get_forecast_productos():
 # ══════════════════════════════════════════════════════════════════
 frontend_path = Path(__file__).parent.parent / "frontend" / "public"
 if frontend_path.exists():
-    app.mount("/assets", StaticFiles(directory=str(frontend_path / "assets")), name="assets")
+    # Si tienes archivos estáticos extra (imágenes, css separados), crea la carpeta assets y descomenta esto:
+    # app.mount("/assets", StaticFiles(directory=str(frontend_path / "assets")), name="assets")
 
     @app.get("/{full_path:path}")
     def serve_frontend(full_path: str):
         return FileResponse(str(frontend_path / "index.html"))
+
+# ══════════════════════════════════════════════════════════════════
+# ARRANQUE PROGRAMÁTICO (Para Render)
+# ══════════════════════════════════════════════════════════════════
+if __name__ == "__main__":
+    import uvicorn
+    # Render asigna el puerto dinámicamente en la variable de entorno PORT
+    port = int(os.environ.get("PORT", 8000))
+    uvicorn.run("main:app", host="0.0.0.0", port=port, log_level="info")
