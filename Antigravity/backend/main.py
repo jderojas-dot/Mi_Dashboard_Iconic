@@ -127,10 +127,10 @@ def get_serie_mensual(anno: int | None = None):
       CAST(ANNO AS INT64)                                    AS anno,
       CAST(MES AS INT64)                                     AS mes,
       ROUND(SUM(VENTA_NETA_MN), 2)                          AS venta_neta,
-      ROUND(SUM(MARGEN_MN), 2)                               AS margen_neto,
+      ROUND(SUM(MARGEN_MN), 2)                               AS margen,
       ROUND(SAFE_DIVIDE(SUM(MARGEN_MN),SUM(VENTA_NETA_MN))*100, 2) AS pct_margen,
       SUM(CANTIDAD)                                          AS unidades,
-      COUNT(DISTINCT COD_VENTA)                              AS num_pedidos,
+      COUNT(DISTINCT COD_VENTA)                              AS pedidos,
       ROUND(SAFE_DIVIDE(SUM(VENTA_NETA_MN),COUNT(DISTINCT COD_VENTA)), 2) AS pedido_promedio
     FROM {VIEW} {where}
     GROUP BY 1,2,3
