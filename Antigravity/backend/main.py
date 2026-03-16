@@ -22,37 +22,33 @@ bq: bigquery.Client | None = None
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     global bq
+    scopes = [
+        "https://www.googleapis.com/auth/cloud-platform",
+        "https://www.googleapis.com/auth/drive"
+    ]
     if os.environ.get("GOOGLE_APPLICATION_CREDENTIALS_JSON"):
+        print("🔧 Iniciando BigQuery con credenciales de variable de entorno...")
         creds_json = json.loads(os.environ["GOOGLE_APPLICATION_CREDENTIALS_JSON"])
-        creds = service_account.Credentials.from_service_account_info(
-            creds_json,
-            scopes=[
-                "https://www.googleapis.com/auth/cloud-platform",
-                "https://www.googleapis.com/auth/drive"
-            ],
-        )
+        creds = service_account.Credentials.from_service_account_info(creds_json, scopes=scopes)
         bq = bigquery.Client(project=BQ_PROJECT, credentials=creds)
     elif CREDENTIALS_PATH and Path(CREDENTIALS_PATH).exists():
-        creds = service_account.Credentials.from_service_account_file(
-            CREDENTIALS_PATH,
-            scopes=[
-                "https://www.googleapis.com/auth/cloud-platform",
-                "https://www.googleapis.com/auth/drive"
-            ],
-        )
+        print(f"🔧 Iniciando BigQuery con archivo: {CREDENTIALS_PATH}")
+        creds = service_account.Credentials.from_service_account_file(CREDENTIALS_PATH, scopes=scopes)
         bq = bigquery.Client(project=BQ_PROJECT, credentials=creds)
     else:
-        bq = bigquery.Client(project=BQ_PROJECT)   # usa gcloud ADC
+        print("⚠️ Iniciando BigQuery sin credenciales explícitas (usando gcloud ADC)...")
+        bq = bigquery.Client(project=BQ_PROJECT)
     print(f"✅ BigQuery conectado → proyecto: {BQ_PROJECT}")
     yield
-    bq.close()
+    if bq: bq.close()
 
 app = FastAPI(title="Iconic Terroirs API", version="1.0.0", lifespan=lifespan)
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=ALLOWED_ORIGINS,
-    allow_methods=["GET"],
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
     allow_headers=["*"],
 )
 
@@ -66,29 +62,34 @@ _bq_lock = threading.Lock()
 CACHE_TTL = 300  # 5 minutos de caché en memoria
 
 def run(sql: str) -> list[dict]:
-    """Ejecuta SQL y retorna lista de dicts con caché básico y Lock para evitar saturación."""
+    """Ejecuta SQL y retorna lista de dicts con caché básico."""
     now = time.time()
     
-    # 1. Verificar si la consulta está en caché y aún es válida
+    # 1. Verificar caché
     if sql in _query_cache:
         result, timestamp = _query_cache[sql]
         if now - timestamp < CACHE_TTL:
             return result
 
-    # 2. Si no está o expiró, consultar a BigQuery (usando un Lock para encolar consultas)
-    with _bq_lock:
-        # Doble verificación por si otro hilo ya actualizó la caché mientras esperábamos
-        if sql in _query_cache:
-            result, timestamp = _query_cache[sql]
-            if now - timestamp < CACHE_TTL:
-                return result
-                
-        rows = bq.query(sql).result()
+    # 2. Consultar a BigQuery (sin Lock global para no bloquear todos los endpoints)
+    try:
+        query_brief = sql.strip().split("\n")[0][:100] + "..."
+        print(f"🔍 Ejecutando BigQuery: {query_brief}")
+        start_t = time.time()
+        
+        query_job = bq.query(sql)
+        rows = query_job.result(timeout=30)  # Timeout de 30 segundos
         result = [dict(r) for r in rows]
         
-        # 3. Guardar en caché y retornar
+        end_t = time.time()
+        print(f"✅ Query completada en {end_t - start_t:.2f}s ({len(result)} filas)")
+        
+        # 3. Guardar en caché
         _query_cache[sql] = (result, now)
         return result
+    except Exception as e:
+        print(f"❌ ERROR en BigQuery: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
 
 # ══════════════════════════════════════════════════════════════════
 # VENTAS — KPIs
@@ -99,11 +100,11 @@ def get_kpis(anno: int | None = None):
     sql = f"""
     SELECT
       ROUND(SUM(VENTA_NETA_MN), 2)                          AS venta_neta,
-      ROUND(SUM(MARGEN_MN), 2)                               AS margen_neto,
+      ROUND(SUM(MARGEN_MN), 2)                               AS margen,
       ROUND(SAFE_DIVIDE(SUM(MARGEN_MN),SUM(VENTA_NETA_MN))*100, 2) AS pct_margen,
       SUM(CANTIDAD)                                          AS unidades,
-      COUNT(DISTINCT CLIENTE)                                AS clientes_activos,
-      COUNT(DISTINCT COD_VENTA)                              AS num_pedidos,
+      COUNT(DISTINCT CLIENTE)                                AS clientes,
+      COUNT(DISTINCT COD_VENTA)                              AS pedidos,
       ROUND(SAFE_DIVIDE(SUM(VENTA_NETA_MN),COUNT(DISTINCT COD_VENTA)), 2) AS pedido_promedio
     FROM {VIEW} {where}
     """
@@ -136,8 +137,10 @@ def get_serie_mensual(anno: int | None = None):
     ORDER BY 1
     """
     rows = run(sql)
+    meses = {1:"Ene", 2:"Feb", 3:"Mar", 4:"Abr", 5:"May", 6:"Jun", 7:"Jul", 8:"Ago", 9:"Sep", 10:"Oct", 11:"Nov", 12:"Dic"}
     for r in rows:
         r["periodo"] = str(r["periodo"])
+        r["mes_label"] = f"{meses.get(r['mes'], '')} '{str(r['anno'])[-2:]}"
     return rows
 
 # ══════════════════════════════════════════════════════════════════
@@ -204,7 +207,7 @@ def get_por_marca(anno: int | None = None):
       SUM(CANTIDAD) AS unidades
     FROM {VIEW}
     WHERE MARCA_PRODUCTO IS NOT NULL {where}
-    GROUP BY 1 ORDER BY 2 DESC LIMIT 10
+    GROUP BY 1 ORDER BY 2 DESC
     """
     return run(sql)
 
@@ -241,7 +244,6 @@ def get_top_clientes(anno: int | None = None, limit: int = Query(default=20, le=
       END AS segmento_rfm
     FROM base b, total t
     ORDER BY venta_neta DESC
-    LIMIT {limit}
     """
     rows = run(sql)
     for r in rows:
@@ -269,7 +271,7 @@ def get_top_productos(anno: int | None = None, limit: int = Query(default=20, le
     SELECT b.*,
       ROUND(SAFE_DIVIDE(b.unidades, t.t)*100, 2) AS pct_uds_total
     FROM base b, total t
-    ORDER BY unidades DESC LIMIT {limit}
+    ORDER BY unidades DESC
     """
     return run(sql)
 
@@ -315,7 +317,7 @@ def get_margenes_marca(anno: int | None = None):
       SUM(CANTIDAD) AS unidades
     FROM {VIEW}
     WHERE MARCA_PRODUCTO IS NOT NULL AND COSTO_MN_TOTAL > 0 {where}
-    GROUP BY 1 ORDER BY pct_margen DESC LIMIT 12
+    GROUP BY 1 ORDER BY pct_margen DESC
     """
     return run(sql)
 
@@ -417,7 +419,12 @@ def _forecast_fallback():
 def get_forecast_productos():
     try:
         sql = f"""
-        SELECT producto, periodo, anno, mes, uds_real, fc_uds, fc_lo, fc_hi, mes_label, tipo
+        SELECT producto, periodo, anno, mes, 
+               CAST(ROUND(uds_real) AS INT64) AS uds_real, 
+               CAST(ROUND(fc_uds) AS INT64) AS fc_uds, 
+               CAST(ROUND(fc_lo) AS INT64) AS fc_lo, 
+               CAST(ROUND(fc_hi) AS INT64) AS fc_hi, 
+               mes_label, tipo
         FROM `{BQ_PROJECT}.{BQ_DATASET}.TB_FORECAST_PRODUCTOS`
         ORDER BY producto, periodo
         """
