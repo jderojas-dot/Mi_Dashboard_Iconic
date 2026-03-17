@@ -391,9 +391,11 @@ tr:hover td { background: var(--bg); }
 </main>
 
 <script>
-const API = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' || window.location.hostname === '') 
+const API = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') 
             ? 'http://localhost:8000' 
             : 'https://mi-dashboard-iconic.onrender.com';
+
+console.log('🚀 Dashboard inicializado. Usando API en:', API);
 
 let store = {
   year: 2025,
@@ -407,13 +409,13 @@ let store = {
 
 // --- INITIALIZATION ---
 async function init() {
+  console.log('📦 Cargando datos...');
   await loadData();
   hideLoader();
   render();
 }
 
 async function loadData() {
-  // Inicializa todo con 2025 por defecto
   await Promise.all([
     updateKPIs(2025),
     updateMainChart(2025),
@@ -429,8 +431,15 @@ async function loadData() {
 const fetchJson = async p => { 
   try {
     const r = await fetch(API + p);
-    return r.ok ? await r.json() : null;
-  } catch(e) { return null; }
+    if (!r.ok) {
+        console.error(`❌ Error en fetch ${p}: Status ${r.status}`);
+        return null;
+    }
+    return await r.json();
+  } catch(e) { 
+    console.error(`❌ Fallo crítico en fetch ${p}:`, e);
+    return null; 
+  }
 };
 
 async function updateKPIs(y, btn) {
