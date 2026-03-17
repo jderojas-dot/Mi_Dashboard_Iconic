@@ -9,8 +9,8 @@ BQ_DATASET   = "Mis_Tablas"
 
 # ── Credenciales ──
 from pathlib import Path
-# El archivo credentials.json está en la raíz del proyecto (fuera de Antigravity)
-CREDENTIALS_PATH = str(Path(__file__).parent.parent.parent / "credentials.json")
+# El archivo credentials.json está en la carpeta Antigravity (junto a backend y frontend)
+CREDENTIALS_PATH = str(Path(__file__).parent.parent / "credentials.json")
 # CREDENTIALS_PATH = "/ruta/a/tu/service-account.json"
 
 # ── CORS: orígenes permitidos ──
