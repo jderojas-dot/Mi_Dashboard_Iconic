@@ -1,0 +1,52 @@
+Necesito que la pagina web muestre 5 paginas para seleccionar:
+Pagina 1: Datos históricos: global
+Tarjetas con la siguiente información: Venta neta, margen neto, % margen, unidades, clientes activos, numero de pedidos, pedido promedio.
+
+Grafica de líneas con el histórico de la venta (Evolucion temporal)
+
+Graficas que muestran venta neta por país, por tipo de bebida, top de marcas están OK
+
+Clientes y productos: Mostrar todos los clientes (paginar) permitir filtrado por cliente y RFM
+
+Productos Más Vendidos: listar todos los productos (paginar) permitir filtrado por producto, tipo y márgenes
+
+Retirar la tabla de vendedores de la sección Vendedores · Precios · Rentabilidad
+En segmento por precio/botella alinear correctamente el mis para que pueda visualizarse como verás en la imagen esta  mal alineado
+
+En porcentaje de margen por marca mostrar todas las marcas (paginar) y mostrar el margen % en cada año. Puede cambiarse este grafico de barras por una matriz o selecciona el grafico que mejor se acomode.
+
+
+En Segmentación RFM muestra todos los clientes y agrega filtros por cliente, días, categoria de cliente.
+
+El índice de estacionalidad ok
+
+
+PAGINA 2: Comparativos del año actual y su evolución contra años pasados. Debe existir botones para seleccionar el año y automáticamente los valores se comparan contra el año anterior del año seleccionado. Por defecto el selector de año se encuentra en el año actual
+Tarjetas con la siguiente información: Venta neta, margen neto, % margen, unidades, clientes activos, numero de pedidos, pedido promedio. (Comparada contra el años actual, mostrar tendencia en la tarjeta y valores de comparación en S/ y %.
+
+Grafica de líneas con el histórico de la venta (evolución mensual y se grafican todos las ventas de los diferentes años)
+
+Graficas que muestran venta neta por país, por tipo de bebida, top de marcas están pero del año seleccionado en el selector de años.
+
+Clientes y productos: Mostrar todos los clientes (paginar) permitir filtrado por cliente y RFM __ del año seleccionado en el selector de años.
+
+Productos Más Vendidos: listar todos los productos (paginar) permitir filtrado por producto, tipo y márgenes -- del año seleccionado en el selector de años.
+
+Retirar la tabla de vendedores de la sección Vendedores · Precios · Rentabilidad
+En segmento por precio/botella alinear correctamente el mis para que pueda visualizarse como verás en la imagen esta  mal alineado mostrar data del año seleccionado en el selector de años.
+
+En porcentaje de margen por marca mostrar todas las marcas (paginar) y mostrar el margen % en cada año. Puede cambiarse este grafico de barras por una matriz o selecciona el grafico que mejor se acomode.
+
+
+En Segmentación RFM muestra todos los clientes y agrega filtros por cliente, días, categoria de cliente. del año seleccionado en el selector de años.
+
+Quitar El índice de estacionalidad
+
+Pagina 3: Clientes: Utilizar los mejores indicadores para evaluar clientes utilizados a nivel mundial
+Pagina 4: Productos: Utilizar todos los indicadores utilizados mundialmente para evaluar el desempeño en la venta de los productos de la cartera, rotación, etc.
+Pagina 5: Pronosticos
+Quitar esta sección:
+
+Mantener el pronostico de venta:
+
+El pronostico de ventas por producto que sea para todos no solo el top 5 y que tenga una sumatoria de las ventas de los 3 meses. Redondear las cifras a enteros porque el producto de venta es en botellas
