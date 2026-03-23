@@ -135,12 +135,23 @@ tr:hover td { background: var(--bg); }
 .heat-cell { height: 24px; border-radius: 2px; display: flex; align-items: center; justify-content: center; font-size: 9px; font-weight: 600; color: rgba(255,255,255,0.8); }
 
 /* ── LOADING ── */
-#loader { 
-  position: fixed; inset: 0; background: white; z-index: 1000;
+#loader {
+  position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+  background: white; z-index: 9999;
   display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 20px;
   transition: opacity 0.5s;
 }
-.spinner { width: 48px; height: 48px; border: 4px solid var(--bg); border-top-color: var(--primary); border-radius: 50%; animation: spin 0.8s linear infinite; }
+.loader-content { text-align: center; }
+.spinner { 
+  width: 56px; height: 56px; border: 4px solid #F1F5F9; 
+  border-top-color: var(--primary); border-radius: 50%; 
+  animation: spin 1s cubic-bezier(0.4, 0, 0.2, 1) infinite; 
+  margin: 0 auto 20px auto;
+}
+#loader-msg { 
+  font-size: 14px; font-weight: 500; color: var(--muted); 
+  min-width: 300px; transition: opacity 0.3s;
+}
 @keyframes spin { to { transform: rotate(360deg); } }
 
 </style>
@@ -148,7 +159,10 @@ tr:hover td { background: var(--bg); }
 <body>
 
 <div id="loader">
-  <div class="spinner"></div>
+  <div class="loader-content">
+    <div class="spinner"></div>
+    <div id="loader-msg">Estás a punto de ingresar al mundo de Iconic Terroirs</div>
+  </div>
 </div>
 
 <header>
@@ -340,10 +354,182 @@ tr:hover td { background: var(--bg); }
 
   <!-- PÁGINA 2: ANÁLISIS DE VENTAS -->
   <div id="page2" class="page active">
+
+    <!-- ★ KPIs YTD ★ -->
+    <div class="section-title">
+      Indicadores Acumulados del Año
+      <span id="ytd-label" style="margin-left:12px; font-size:12px; font-weight:400; color:var(--muted);">Cargando...</span>
+    </div>
+    <div class="kpi-grid" id="ytd-kpi-grid">
+      <div class="kpi-card" style="--c: var(--primary)">
+        <div class="kpi-label">Venta Neta YTD</div>
+        <div id="ytd-rev" class="kpi-value">S/ 0</div>
+        <div id="ytd-rev-d" class="kpi-delta delta-neu">—</div>
+      </div>
+      <div class="kpi-card" style="--c: var(--green)">
+        <div class="kpi-label">Margen Neto YTD</div>
+        <div id="ytd-mgn" class="kpi-value">S/ 0</div>
+        <div id="ytd-mgn-d" class="kpi-delta delta-neu">—</div>
+      </div>
+      <div class="kpi-card" style="--c: var(--purple)">
+        <div class="kpi-label">% Margen YTD</div>
+        <div id="ytd-pct" class="kpi-value">0%</div>
+        <div id="ytd-pct-d" class="kpi-delta delta-neu">—</div>
+      </div>
+      <div class="kpi-card" style="--c: var(--teal)">
+        <div class="kpi-label">Unidades YTD</div>
+        <div id="ytd-uds" class="kpi-value">0</div>
+        <div id="ytd-uds-d" class="kpi-delta delta-neu">—</div>
+      </div>
+      <div class="kpi-card" style="--c: var(--gold)">
+        <div class="kpi-label">Clientes Activos YTD</div>
+        <div id="ytd-cli" class="kpi-value">0</div>
+        <div id="ytd-cli-d" class="kpi-delta delta-neu">—</div>
+      </div>
+      <div class="kpi-card" style="--c: var(--primary)">
+        <div class="kpi-label">Nº Pedidos YTD</div>
+        <div id="ytd-ped" class="kpi-value">0</div>
+        <div id="ytd-ped-d" class="kpi-delta delta-neu">—</div>
+      </div>
+      <div class="kpi-card" style="--c: var(--red)">
+        <div class="kpi-label">Pedido Promedio YTD</div>
+        <div id="ytd-aov" class="kpi-value">S/ 0</div>
+        <div id="ytd-aov-d" class="kpi-delta delta-neu">—</div>
+      </div>
+    </div>
+
     <div class="section-title">Análisis de Ventas Histórico</div>
     <div class="card">
-      <div class="card-hdr"><div><div class="card-title">Evolución de Venta por Año</div><div class="card-sub">Comparativa mensual entre periodos (2022-2026)</div></div></div>
+      <div class="card-hdr">
+        <div>
+          <div class="card-title">Evolución de Venta por Año</div>
+          <div class="card-sub">Comparativa mensual entre periodos (2022-2026)</div>
+        </div>
+        <div class="ytabs" style="background: var(--bg);">
+          <button class="ytab active" onclick="setSalesMetric('venta_neta', this)">Venta Neta</button>
+          <button class="ytab" onclick="setSalesMetric('pct_margen', this)">% Margen</button>
+          <button class="ytab" onclick="setSalesMetric('pedidos', this)">Pedidos</button>
+          <button class="ytab" onclick="setSalesMetric('unidades', this)">Unidades</button>
+        </div>
+      </div>
       <div class="chart-container-lg"><canvas id="chart-yoy-line"></canvas></div>
+    </div>
+
+    <div class="section-title">Rentabilidad y Especialización por Origen</div>
+    <div class="grid-2">
+      <!-- 1. Rentabilidad por Origen -->
+      <div class="card">
+        <div class="card-hdr" style="margin-bottom:10px">
+          <div>
+            <div class="card-title">Índice de Rentabilidad por Origen</div>
+            <div class="card-sub">Margen Neto vs Volumen</div>
+          </div>
+          <select class="search-box" style="width: auto; padding: 2px 5px; font-size: 10px;" onchange="updateRentabilidadOrigen(this.value)">
+            <option value="2025">2025</option>
+            <option value="2026" selected>2026</option>
+            <option value="0">Total</option>
+          </select>
+        </div>
+        <div class="chart-container-sm"><canvas id="chart-rentabilidad-origen"></canvas></div>
+        <div class="tbl-wrap" style="margin-top:20px;">
+          <table id="tbl-rentabilidad-origen"><thead><tr><th>País</th><th class="col-num">Mg. Neto</th><th class="col-num">Unidades</th></tr></thead><tbody></tbody></table>
+        </div>
+      </div>
+      
+      <!-- 2. Participación de Mercado por Tipo de Vino -->
+      <div class="card">
+        <div class="card-hdr" style="margin-bottom:10px">
+          <div>
+            <div class="card-title">Participación por Tipo de Vino</div>
+            <div class="card-sub">Especialización de orígenes</div>
+          </div>
+          <select class="search-box" style="width: auto; padding: 2px 5px; font-size: 10px;" onchange="updateMarketShareTipo(this.value)">
+            <option value="2025">2025</option>
+            <option value="2026" selected>2026</option>
+            <option value="0">Total</option>
+          </select>
+        </div>
+        <div class="chart-container-sm" style="height:310px;"><canvas id="chart-market-share-tipo"></canvas></div>
+      </div>
+    </div>
+
+    <div class="section-title">Análisis de Marcas y Ajuste de Portafolio</div>
+    <div class="grid-2">
+      <!-- 3. Dependencia de Marca Ancla -->
+      <div class="card">
+        <div class="card-hdr" style="margin-bottom:10px">
+          <div>
+            <div class="card-title">Dependencia de Marca Ancla</div>
+            <div class="card-sub">Concentración del origen en su Top 1</div>
+          </div>
+          <select class="search-box" style="width: auto; padding: 2px 5px; font-size: 10px;" onchange="updateDependenciaMarca(this.value)">
+            <option value="2025">2025</option>
+            <option value="2026" selected>2026</option>
+            <option value="0">Total</option>
+          </select>
+        </div>
+        <div class="chart-container-sm"><canvas id="chart-dependencia-marca"></canvas></div>
+        <div class="tbl-wrap" style="margin-top:20px;">
+          <table id="tbl-dependencia-marca"><thead><tr><th>País</th><th>Marca Ancla</th><th class="col-num">Dependencia</th></tr></thead><tbody></tbody></table>
+        </div>
+      </div>
+
+      <!-- 4. Ajuste Marca-Tipo -->
+      <div class="card">
+        <div class="card-hdr" style="margin-bottom:10px">
+          <div>
+            <div class="card-title">Índice de Ajuste Marca-Tipo</div>
+            <div class="card-sub">Brand-Type Fit del Top Marcas</div>
+          </div>
+          <select class="search-box" style="width: auto; padding: 2px 5px; font-size: 10px;" onchange="updateBrandTypeFit(this.value)">
+            <option value="2025">2025</option>
+            <option value="2026" selected>2026</option>
+            <option value="0">Total</option>
+          </select>
+        </div>
+        <div class="chart-container-sm" style="height:310px;"><canvas id="chart-brand-type-fit"></canvas></div>
+      </div>
+    </div>
+
+    <!-- Clientes y Productos -->
+    <div class="section-title">Clientes y Productos</div>
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-hdr" style="margin-bottom:10px">
+          <div>
+            <div class="card-title">Top Clientes por Revenue</div>
+            <div class="card-sub">Paginación disponible · todos los clientes</div>
+          </div>
+          <span style="font-size:11px; color:var(--primary); font-weight:600" id="total-cli-p2"></span>
+        </div>
+        <div class="tbl-wrap">
+          <table id="tbl-top-cli-p2">
+            <thead><tr><th>#</th><th>Cliente</th><th>Pedidos</th><th>Venta Neta</th><th>Share %</th><th>Seg. RFM</th></tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+        <!-- Controles de paginación -->
+        <div style="display:flex; align-items:center; justify-content:space-between; margin-top:10px; padding-top:8px; border-top:1px solid var(--border);">
+          <button id="cli-p2-prev" onclick="cliPageNav(-1)" style="padding:4px 14px; border:1px solid var(--border); border-radius:6px; background:white; cursor:pointer; font-size:12px; color:var(--muted);">&#8592; Anterior</button>
+          <span id="cli-p2-info" style="font-size:12px; color:var(--muted);"></span>
+          <button id="cli-p2-next" onclick="cliPageNav(1)" style="padding:4px 14px; border:1px solid var(--border); border-radius:6px; background:white; cursor:pointer; font-size:12px; color:var(--primary); font-weight:600;">Siguiente &#8594;</button>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-hdr" style="margin-bottom:10px">
+          <div>
+            <div class="card-title">Productos Más Vendidos</div>
+            <div class="card-sub">Por unidades · sin año de anada · explorable</div>
+          </div>
+          <span style="font-size:11px; color:var(--purple); font-weight:600">Paginado</span>
+        </div>
+        <div class="tbl-wrap">
+          <table id="tbl-top-prd-p2">
+            <thead><tr><th>#</th><th>Producto</th><th>Tipo</th><th>Uds</th><th>% Total</th><th>Margen %</th></tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -391,53 +577,69 @@ tr:hover td { background: var(--bg); }
 </main>
 
 <script>
-const API = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') 
+const API = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' || window.location.protocol === 'file:') 
             ? 'http://localhost:8000' 
             : 'https://mi-dashboard-iconic.onrender.com';
 
 console.log('🚀 Dashboard inicializado. Usando API en:', API);
 
 let store = {
-  year: 2025,
+  year: 2026,
   page: 2,
+  salesMetric: 'venta_neta',
   data: {
     kpis: {}, serie: [], pais: [], tipo: [], marca: [], topCli: [], topPrd: [],
     sellers: [], segments: [], margins: [], rfm: [], heat: [],
-    fullCli: [], fullPrd: [], fcMain: [], fcPrds: []
+    fullCli: [], fullPrd: [], fcMain: [], fcPrds: [],
+    rentabilidadOrigen: [], marketShareTipo: [], dependenciaMarca: [], brandTypeFit: []
   }
 };
 
 // --- INITIALIZATION ---
 async function init() {
+  showLoader();
   console.log('📦 Cargando datos...');
   await loadData();
-  hideLoader();
+  // Breve delay opcional para que se vea el efecto si es muy rápido
+  setTimeout(hideLoader, 1500);
   render();
 }
 
 async function loadData() {
-  await Promise.all([
-    updateKPIs(2025),
-    updateMainChart(2025),
-    updateDimPais(2025),
-    updateDimTipo(2025),
-    updateDimMarca(2025),
-    updateTopCli(2025),
-    updateTopPrd(2025),
-    updateExtra()
-  ]);
+  console.log('⚡ Iniciando carga consolidada...');
+  const data = await fetchJson('/api/dashboard-init?anno=2025');
+  if (data) {
+    store.data.kpis = data.kpis;
+    store.data.serie = data.serie;
+    store.data.pais = data.pais;
+    store.data.tipo = data.tipo;
+    store.data.marca = data.marca;
+    store.data.topCli = data.top_cli;
+    store.data.fullCli = data.top_cli;
+    store.data.topPrd = data.top_prd;
+    store.data.fullPrd = data.top_prd;
+    store.data.sellers = data.vendedores;
+    store.data.segments = data.segmentos;
+    store.data.margins = data.margenes;
+    store.data.rfm = data.rfm;
+    store.data.heat = data.heat;
+    console.log('✅ Datos consolidados cargados.');
+  } else {
+    console.error('⚠️ Fallo en carga consolidada, intentando carga individual...');
+    await Promise.all([
+      updateKPIs(2025), updateMainChart(2025), updateDimPais(2025),
+      updateDimTipo(2025), updateDimMarca(2025), updateTopCli(2025),
+      updateTopPrd(2025), updateExtra()
+    ]);
+  }
 }
 
 const fetchJson = async p => { 
   try {
     const r = await fetch(API + p);
-    if (!r.ok) {
-        console.error(`❌ Error en fetch ${p}: Status ${r.status}`);
-        return null;
-    }
+    if (!r.ok) return null;
     return await r.json();
   } catch(e) { 
-    console.error(`❌ Fallo crítico en fetch ${p}:`, e);
     return null; 
   }
 };
@@ -525,6 +727,27 @@ async function updateExtra() {
   renderExtra();
 }
 
+async function updateRentabilidadOrigen(y) {
+  const yp = y == 0 ? '' : `?anno=${y}`;
+  const data = await fetchJson('/api/rentabilidad-origen' + yp);
+  if (data) { store.data.rentabilidadOrigen = data; renderRentabilidadOrigen(); }
+}
+async function updateMarketShareTipo(y) {
+  const yp = y == 0 ? '' : `?anno=${y}`;
+  const data = await fetchJson('/api/market-share-tipo' + yp);
+  if (data) { store.data.marketShareTipo = data; renderMarketShareTipo(); }
+}
+async function updateDependenciaMarca(y) {
+  const yp = y == 0 ? '' : `?anno=${y}`;
+  const data = await fetchJson('/api/dependencia-marca' + yp);
+  if (data) { store.data.dependenciaMarca = data; renderDependenciaMarca(); }
+}
+async function updateBrandTypeFit(y) {
+  const yp = y == 0 ? '' : `?anno=${y}`;
+  const data = await fetchJson('/api/brand-type-fit' + yp);
+  if (data) { store.data.brandTypeFit = data; renderBrandTypeFit(); }
+}
+
 function toggleActive(btn) {
   const parent = btn.parentElement;
   parent.querySelectorAll('.ytab').forEach(b => b.classList.remove('active'));
@@ -534,8 +757,13 @@ function toggleActive(btn) {
 const fmt = n => n >= 1e6 ? (n/1e6).toFixed(1)+'M' : n >= 1e3 ? (n/1e3).toFixed(1)+'K' : Math.round(n).toLocaleString('es-PE');
 
 function render() {
-  // Ya no se usa render centralizado para la página 1, cada update llama a su render
-  if (store.page === 2) renderPage2();
+  if (store.page === 2) {
+    renderYTDKPIs();
+    renderMainChart();
+    renderPage2NewIndicators();
+    renderTopCliP2();
+    renderTopPrdP2();
+  }
   if (store.page === 3) renderPage3();
   if (store.page === 4) renderPage4();
   if (store.page === 5) renderPage5();
@@ -552,6 +780,88 @@ function render() {
 }
 
 // --- RENDERS POR COMPONENTE ---
+
+async function renderPage2NewIndicators() {
+  if (!store.data.rentabilidadOrigen || store.data.rentabilidadOrigen.length === 0) {
+    await Promise.all([
+      updateRentabilidadOrigen(store.year),
+      updateMarketShareTipo(store.year),
+      updateDependenciaMarca(store.year),
+      updateBrandTypeFit(store.year)
+    ]);
+  } else {
+    renderRentabilidadOrigen();
+    renderMarketShareTipo();
+    renderDependenciaMarca();
+    renderBrandTypeFit();
+  }
+}
+
+function renderRentabilidadOrigen() {
+  const data = store.data.rentabilidadOrigen || [];
+  const chartData = {
+    labels: data.slice(0, 8).map(d => d.pais),
+    datasets: [{ label: 'Margen Neto S/', data: data.slice(0, 8).map(d => d.margen_neto), backgroundColor: '#10B981' }]
+  };
+  renderChart('chart-rentabilidad-origen', 'bar', chartData, { indexAxis: 'y' });
+  const tbody = document.querySelector('#tbl-rentabilidad-origen tbody');
+  if (tbody) tbody.innerHTML = data.slice(0, 8).map(d => `
+    <tr><td><b>${d.pais}</b></td><td class="col-num">S/ ${fmt(d.margen_neto)}</td><td class="col-num">${fmt(d.unidades)}</td></tr>
+  `).join('');
+}
+
+function renderMarketShareTipo() {
+  const raw = store.data.marketShareTipo || [];
+  const paises = [...new Set(raw.map(d => d.pais))].slice(0, 8);
+  const tipos = [...new Set(raw.map(d => d.tipo))];
+  const colors = ['#2563EB', '#10B981', '#F59E0B', '#8B5CF6', '#EC4899', '#3B82F6'];
+  const datasets = tipos.map((t, i) => ({
+    label: t,
+    data: paises.map(p => {
+      const item = raw.find(r => r.pais === p && r.tipo === t);
+      return item ? item.share_pct : 0;
+    }),
+    backgroundColor: colors[i % colors.length]
+  }));
+  renderChart('chart-market-share-tipo', 'bar', { labels: paises, datasets }, {
+    indexAxis: 'y',
+    scales: { x: { stacked: true, max: 100 }, y: { stacked: true } },
+    plugins: { tooltip: { callbacks: { label: (ctx) => `${ctx.dataset.label}: ${ctx.raw}%` } } }
+  });
+}
+
+function renderDependenciaMarca() {
+  const data = store.data.dependenciaMarca || [];
+  const chartData = {
+    labels: data.slice(0, 8).map(d => d.pais),
+    datasets: [{ label: '% Dependencia', data: data.slice(0, 8).map(d => d.dependencia_pct), backgroundColor: '#F59E0B' }]
+  };
+  renderChart('chart-dependencia-marca', 'bar', chartData, { indexAxis: 'y' });
+  const tbody = document.querySelector('#tbl-dependencia-marca tbody');
+  if (tbody) tbody.innerHTML = data.slice(0, 8).map(d => `
+    <tr><td><b>${d.pais}</b></td><td>${d.marca_ancla}</td><td class="col-num" style="color:var(--primary);font-weight:600">${d.dependencia_pct}%</td></tr>
+  `).join('');
+}
+
+function renderBrandTypeFit() {
+  const raw = store.data.brandTypeFit || [];
+  const marcas = [...new Set(raw.map(d => d.marca))].slice(0, 10);
+  const tipos = [...new Set(raw.map(d => d.tipo))];
+  const colors = ['#2563EB', '#10B981', '#F59E0B', '#8B5CF6', '#EC4899', '#3B82F6'];
+  const datasets = tipos.map((t, i) => ({
+    label: t,
+    data: marcas.map(m => {
+      const item = raw.find(r => r.marca === m && r.tipo === t);
+      return item ? item.share_pct : 0;
+    }),
+    backgroundColor: colors[i % colors.length]
+  }));
+  renderChart('chart-brand-type-fit', 'bar', { labels: marcas, datasets }, {
+    indexAxis: 'x',
+    scales: { x: { stacked: true }, y: { stacked: true, max: 100 } },
+    plugins: { tooltip: { callbacks: { label: (ctx) => `${ctx.dataset.label}: ${ctx.raw}%` } } }
+  });
+}
 
 function renderKPIs() {
   const k = store.data.kpis?.current || {};
@@ -580,43 +890,204 @@ function renderKPIs() {
   setDelta(k.pedido_promedio, p?.pedido_promedio, 'kpi-aov-d');
 }
 
+async function renderYTDKPIs() {
+  if (!store.data.ytd) {
+    const data = await fetchJson('/api/kpis-ytd');
+    if (!data) return;
+    store.data.ytd = data;
+  }
+  const k = store.data.ytd.current || {};
+  const p = store.data.ytd.previous;
+  const upTo = store.data.ytd.up_to;
+
+  const year = upTo ? upTo.substring(0, 4) : new Date().getFullYear();
+  const day  = upTo ? upTo.substring(5).replace('-', '/') : '';
+  const labelEl = document.getElementById('ytd-label');
+  if (labelEl) labelEl.textContent = `01 Ene ${year} → ${day}  |  vs mismo periodo ${Number(year) - 1}`;
+
+  document.getElementById('ytd-rev').textContent = 'S/ ' + fmt(k.venta_neta || 0);
+  document.getElementById('ytd-mgn').textContent = 'S/ ' + fmt(k.margen || 0);
+  document.getElementById('ytd-pct').textContent = (k.pct_margen || 0) + '%';
+  document.getElementById('ytd-uds').textContent = fmt(k.unidades || 0);
+  document.getElementById('ytd-cli').textContent = fmt(k.clientes || 0);
+  document.getElementById('ytd-ped').textContent = fmt(k.pedidos || 0);
+  document.getElementById('ytd-aov').textContent = 'S/ ' + fmt(k.pedido_promedio || 0);
+
+  const setDeltaYTD = (cur, prev, id) => {
+    const el = document.getElementById(id);
+    if (!prev || prev === 0) { el.className = 'kpi-delta delta-neu'; el.textContent = '—'; return; }
+    const diff = ((cur - prev) / prev * 100).toFixed(1);
+    el.className = 'kpi-delta ' + (cur >= prev ? 'delta-up' : 'delta-dn');
+    el.textContent = (cur >= prev ? '▲' : '▼') + Math.abs(diff) + `% vs ${Number(year) - 1}`;
+  };
+  setDeltaYTD(k.venta_neta, p?.venta_neta, 'ytd-rev-d');
+  setDeltaYTD(k.margen, p?.margen, 'ytd-mgn-d');
+  setDeltaYTD(k.pct_margen, p?.pct_margen, 'ytd-pct-d');
+  setDeltaYTD(k.unidades, p?.unidades, 'ytd-uds-d');
+  setDeltaYTD(k.clientes, p?.clientes, 'ytd-cli-d');
+  setDeltaYTD(k.pedidos, p?.pedidos, 'ytd-ped-d');
+  setDeltaYTD(k.pedido_promedio, p?.pedido_promedio, 'ytd-aov-d');
+}
+
 function renderMainChart() {
-  renderChart('chart-main-line', 'line', {
+  const id = store.page === 1 ? 'chart-main-line' : 'chart-yoy-line';
+  if (store.page === 2) { renderPage2(); return; }
+  renderChart(id, 'line', {
     labels: store.data.serie.map(d => d.mes_label),
     datasets: [{ label: 'Venta S/', data: store.data.serie.map(d => d.venta_neta), borderColor: '#2563EB', backgroundColor: 'rgba(37, 99, 235, 0.1)', fill: true, tension: 0.4 }]
   });
 }
 
 function renderDimPais() {
-  renderChart('chart-dim-pais', 'bar', {
+  const id = store.page === 1 ? 'chart-dim-pais' : 'chart-dim-pais-p2';
+  const data = {
     labels: store.data.pais.slice(0, 6).map(d => d.pais),
     datasets: [{ data: store.data.pais.slice(0, 6).map(d => d.venta_neta), backgroundColor: '#3B82F6' }]
-  }, { indexAxis: 'y' });
+  };
+  renderChart(id, 'bar', data, { indexAxis: 'y' });
 }
 
 function renderDimTipo() {
-  renderChart('chart-dim-tipo', 'doughnut', {
+  const id = store.page === 1 ? 'chart-dim-tipo' : 'chart-dim-tipo-p2';
+  const data = {
     labels: store.data.tipo.map(d => d.tipo),
     datasets: [{ data: store.data.tipo.map(d => d.venta_neta), backgroundColor: ['#2563EB', '#10B981', '#F59E0B', '#8B5CF6', '#EC4899'] }]
-  });
+  };
+  renderChart(id, 'doughnut', data);
 }
 
 function renderDimMarca() {
-  renderChart('chart-dim-marca', 'bar', {
+  const id = store.page === 1 ? 'chart-dim-marca' : 'chart-dim-marca-p2';
+  const data = {
     labels: store.data.marca.slice(0, 8).map(d => d.marca),
     datasets: [{ data: store.data.marca.slice(0, 8).map(d => d.venta_neta), backgroundColor: '#1E293B' }]
-  }, { indexAxis: 'y' });
+  };
+  renderChart(id, 'bar', data, { indexAxis: 'y' });
 }
 
 function renderTopCli() {
-  document.querySelector('#tbl-top-cli tbody').innerHTML = store.data.topCli.slice(0, 6).map((c, i) => `
+  const tbody = document.querySelector('#tbl-top-cli tbody');
+  if (!tbody) return;
+  tbody.innerHTML = store.data.topCli.slice(0, 6).map((c, i) => `
     <tr><td>${i+1}</td><td><b>${c.cliente}</b></td><td class="col-num">${c.pedidos}</td><td class="col-num">S/ ${fmt(c.venta_neta)}</td><td><span class="chip" style="color:var(--primary)">${c.segmento_rfm}</span></td></tr>
   `).join('');
 }
 
+let cliPageP2 = 0;
+const CLI_PAGE_SIZE = 6;
+
+function rfmBadge(c) {
+  const dias = c.dias_sin_compra ?? 999;
+  const venta = c.venta_neta ?? 0;
+  const pedidos = c.pedidos ?? 0;
+  if (dias <= 60 && venta > 150000) return { label: '&#127942; VIP',    color: '#F59E0B' };
+  if (dias <= 90 && pedidos >= 80)  return { label: '&#11088; Leal',   color: '#3B82F6' };
+  if (dias <= 120)                  return { label: '&#129001; Activo', color: '#10B981' };
+  if (dias <= 180)                  return { label: '&#128993; En riesgo', color: '#F97316' };
+  return                                   { label: '&#128308; Inactivo', color: '#EF4444' };
+}
+
+function cliPageNav(dir) {
+  const total = (store.data.topCliYear || []).length;
+  const maxPage = Math.ceil(total / CLI_PAGE_SIZE) - 1;
+  cliPageP2 = Math.max(0, Math.min(maxPage, cliPageP2 + dir));
+  renderTopCliP2();
+}
+
+const RFM_PRIORITY = { 'VIP': 0, 'Leal': 1, 'Activo': 2, 'En riesgo': 3, 'Inactivo': 4 };
+
+function rfmKey(c) {
+  const dias = c.dias_sin_compra ?? 999;
+  const venta = c.venta_neta ?? 0;
+  const pedidos = c.pedidos ?? 0;
+  if (dias <= 60 && venta > 150000) return 'VIP';
+  if (dias <= 90 && pedidos >= 80)  return 'Leal';
+  if (dias <= 120)                  return 'Activo';
+  if (dias <= 180)                  return 'En riesgo';
+  return 'Inactivo';
+}
+
+async function renderTopCliP2() {
+  const tbody = document.querySelector('#tbl-top-cli-p2 tbody');
+  if (!tbody) return;
+
+  // Fetch solo si no está en caché
+  if (!store.data.topCliYear) {
+    const currentYear = new Date().getFullYear();
+    const data = await fetchJson(`/api/top-clientes-year?anno=${currentYear}`);
+    if (!data || data.length === 0) return;
+
+    // Ordenar: RFM priority primero, luego venta_neta descendente
+    data.forEach(c => c._rfmKey = rfmKey(c));
+    data.sort((a, b) =>
+      (RFM_PRIORITY[a._rfmKey] - RFM_PRIORITY[b._rfmKey]) ||
+      (b.venta_neta - a.venta_neta)
+    );
+    store.data.topCliYear = data;
+    cliPageP2 = 0; // Reset a primera página al cargar nuevos datos
+  }
+
+  const all = store.data.topCliYear;
+  const total = all.length;
+  const totalVenta = all.reduce((s, c) => s + (c.venta_neta || 0), 0);
+  const maxPage = Math.ceil(total / CLI_PAGE_SIZE) - 1;
+  cliPageP2 = Math.max(0, Math.min(maxPage, cliPageP2));
+
+  const start = cliPageP2 * CLI_PAGE_SIZE;
+  const page  = all.slice(start, start + CLI_PAGE_SIZE);
+
+  // Cabecera
+  const el = document.getElementById('total-cli-p2');
+  if (el) el.textContent = total + ' total';
+
+  // Controles paginación
+  const info = document.getElementById('cli-p2-info');
+  if (info) info.textContent = `Página ${cliPageP2 + 1} de ${maxPage + 1}`;
+  const prev = document.getElementById('cli-p2-prev');
+  const next = document.getElementById('cli-p2-next');
+  if (prev) prev.style.opacity = cliPageP2 === 0 ? '0.35' : '1';
+  if (next) next.style.opacity = cliPageP2 >= maxPage ? '0.35' : '1';
+
+  tbody.innerHTML = page.map((c, i) => {
+    const rank  = start + i + 1;
+    const share = totalVenta > 0 ? ((c.venta_neta / totalVenta) * 100).toFixed(1) : '-';
+    const rfm   = rfmBadge(c);
+    return `
+    <tr>
+      <td>${rank}</td>
+      <td><b>${c.cliente}</b></td>
+      <td class="col-num">${c.pedidos}</td>
+      <td class="col-num">S/ ${fmt(c.venta_neta)}</td>
+      <td class="col-num" style="color:var(--primary);font-weight:600">${share}%</td>
+      <td><span style="
+        display:inline-flex; align-items:center; gap:4px;
+        background:${rfm.color}18; color:${rfm.color}; font-weight:700;
+        border-radius:20px; padding:2px 10px; font-size:11px; white-space:nowrap;
+      ">${rfm.label}</span></td>
+    </tr>`;
+  }).join('');
+}
+
 function renderTopPrd() {
-  document.querySelector('#tbl-top-prd tbody').innerHTML = store.data.topPrd.slice(0, 6).map((p, i) => `
+  const tbody = document.querySelector('#tbl-top-prd tbody');
+  if (!tbody) return;
+  tbody.innerHTML = store.data.topPrd.slice(0, 6).map((p, i) => `
     <tr><td>${i+1}</td><td><b>${p.producto}</b></td><td>${p.nombre_tipo_bebida || p.tipo || ''}</td><td class="col-num">${fmt(p.unidades)}</td><td class="col-num">${p.margen_pct || p.pct_margen || 0}%</td></tr>
+  `).join('');
+}
+
+function renderTopPrdP2() {
+  const tbody = document.querySelector('#tbl-top-prd-p2 tbody');
+  if (!tbody) return;
+  tbody.innerHTML = store.data.topPrd.slice(0, 6).map((p, i) => `
+    <tr>
+      <td>${i+1}</td>
+      <td><b>${p.producto}</b></td>
+      <td><span style="color:${p.nombre_tipo_bebida?.toLowerCase().includes('tinto')||p.tipo?.toLowerCase().includes('tinto')?'#7C3AED':'#3B82F6'};font-weight:600">${p.nombre_tipo_bebida || p.tipo || ''}</span></td>
+      <td class="col-num">${fmt(p.unidades)}</td>
+      <td class="col-num" style="color:var(--primary);font-weight:600">${p.pct_venta ? p.pct_venta.toFixed(1) : '-'}%</td>
+      <td class="col-num" style="color:var(--red);font-weight:700">${p.margen_pct || p.pct_margen || 0}%</td>
+    </tr>
   `).join('');
 }
 
@@ -655,72 +1126,46 @@ function renderExtra() {
   });
 }
 
-async function renderPage2() {
-  const data = await fetchJson('/api/serie-mensual'); // Fetch all years
-  if (!data) return;
+async function setSalesMetric(m, btn) {
+  store.salesMetric = m;
+  toggleActive(btn);
+  showLoader();
+  await renderPage2();
+  hideLoader();
+}
 
+async function renderPage2() {
+  const data = await fetchJson('/api/serie-mensual');
+  if (!data) return;
   const monthLabels = ["Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dic"];
   const years = [2022, 2023, 2024, 2025, 2026];
-  const colors = {
-    2022: '#94A3B8',
-    2023: '#64748B',
-    2024: '#334155',
-    2025: '#2563EB',
-    2026: '#0F172A'
+  const colors = { 2022: '#94A3B8', 2023: '#64748B', 2024: '#334155', 2025: '#2563EB', 2026: '#0F172A' };
+  const metricMap = {
+    'venta_neta': { label: 'Venta S/', key: 'venta_neta', fmt: v => 'S/ ' + fmt(v) },
+    'pct_margen': { label: '% Margen', key: 'pct_margen', fmt: v => v.toFixed(1) + '%' },
+    'pedidos': { label: 'Pedidos', key: 'pedidos', fmt: v => fmt(v) },
+    'unidades': { label: 'Unidades', key: 'unidades', fmt: v => fmt(v) }
   };
-
+  const m = metricMap[store.salesMetric];
   const datasets = years.map(y => {
-    // Filtrar datos para este año y asegurar que estén en orden del 1 al 12
     const yearData = new Array(12).fill(null);
     data.filter(d => d.anno == y).forEach(d => {
-      if (d.mes >= 1 && d.mes <= 12) yearData[d.mes - 1] = d.venta_neta;
-    });
-
-    return {
-      label: 'Año ' + y,
-      data: yearData,
-      borderColor: colors[y],
-      backgroundColor: colors[y],
-      borderWidth: y >= 2025 ? 3 : 2,
-      tension: 0.4,
-      fill: false,
-      spanGaps: true,
-      datalabels: {
-        display: y === 2026,
-        align: 'top',
-        anchor: 'end',
-        offset: 4,
-        color: colors[y],
-        font: { weight: 'bold', size: 10 },
-        formatter: (v) => v ? fmt(v) : ''
+      if (d.mes >= 1 && d.mes <= 12) {
+        let val = d[m.key];
+        if (store.salesMetric === 'pct_margen' && val === undefined) val = (d.margen / d.venta_neta) * 100;
+        yearData[d.mes - 1] = val;
       }
+    });
+    return {
+      label: 'Año ' + y, data: yearData, borderColor: colors[y], backgroundColor: colors[y],
+      borderWidth: y >= 2025 ? 3 : 2, tension: 0.4, fill: false, spanGaps: true,
+      datalabels: { display: y === 2026, align: 'top', anchor: 'end', offset: 4, color: colors[y], font: { weight: 'bold', size: 10 }, formatter: (v) => v ? m.fmt(v) : '' }
     };
   });
-
-  renderChart('chart-yoy-line', 'line', {
-    labels: monthLabels,
-    datasets: datasets
-  }, {
-    interaction: {
-      mode: 'index',
-      intersect: false
-    },
-    plugins: {
-      legend: { display: true, position: 'top' },
-      tooltip: {
-        mode: 'index',
-        intersect: false
-      },
-      datalabels: {
-        // Configuraciones globales para datalabels si hicieran falta
-      }
-    },
-    scales: {
-      y: {
-        beginAtZero: true,
-        ticks: { callback: v => 'S/ ' + fmt(v) }
-      }
-    }
+  renderChart('chart-yoy-line', 'line', { labels: monthLabels, datasets }, {
+    interaction: { mode: 'index', intersect: false },
+    plugins: { legend: { display: true, position: 'top' }, tooltip: { mode: 'index', intersect: false, callbacks: { label: (ctx) => `${ctx.dataset.label}: ${m.fmt(ctx.raw)}` } } },
+    scales: { y: { beginAtZero: true, ticks: { callback: v => m.fmt(v) } } }
   }, [ChartDataLabels]);
 }
 
@@ -745,7 +1190,6 @@ async function renderPage5() {
     store.data.fcMain = await fetch(API+'/api/forecast-total').then(r=>r.json()).catch(()=>[]);
     store.data.fcPrds = await fetch(API+'/api/forecast-productos').then(r=>r.json()).catch(()=>[]);
   }
-
   renderChart('chart-forecast-main', 'line', {
     labels: store.data.fcMain.map(d => d.periodo.substring(0,7)),
     datasets: [
@@ -754,14 +1198,10 @@ async function renderPage5() {
       { label: 'Confianza', data: store.data.fcMain.map(d => d.fc_hi), borderColor: 'rgba(245,158,11,0.1)', backgroundColor: 'rgba(245,158,11,0.1)', fill: '-1', pointRadius: 0 }
     ]
   });
-
-  // Group forecast by product
   const group = {};
   store.data.fcPrds.forEach(r => {
     if(!group[r.producto]) group[r.producto] = { name: r.producto, f:0, lo:0, hi:0 };
-    group[r.producto].f += r.fc_uds;
-    group[r.producto].lo += r.fc_lo;
-    group[r.producto].hi += r.fc_hi;
+    group[r.producto].f += r.fc_uds; group[r.producto].lo += r.fc_lo; group[r.producto].hi += r.fc_hi;
   });
   document.querySelector('#tbl-forecast-prd tbody').innerHTML = Object.values(group).sort((a,b)=>b.f-a.f).slice(0, 20).map(p => `
     <tr><td><b>${p.name}</b></td><td class="col-num">${Math.round(p.f)} uds</td><td>${Math.round(p.lo)} - ${Math.round(p.hi)}</td><td>ARIMA+</td></tr>
@@ -775,27 +1215,14 @@ function renderChart(id, type, data, options = {}, plugins = []) {
   if (charts[id]) charts[id].destroy();
   const ctx = document.getElementById(id);
   if (!ctx) return;
-
   const defaultPlugins = {
-    legend: { 
-      display: type === 'doughnut', 
-      position: 'bottom', 
-      labels: { boxWidth: 10, font: { size: 10 } } 
-    }
+    legend: { display: type === 'doughnut', position: 'bottom', labels: { boxWidth: 10, font: { size: 10 } } }
   };
-
   charts[id] = new Chart(ctx, {
-    type, 
-    data, 
-    plugins,
+    type, data, plugins,
     options: { 
-      responsive: true, 
-      maintainAspectRatio: false, 
-      ...options,
-      plugins: {
-        ...defaultPlugins,
-        ...(options.plugins || {})
-      }
+      responsive: true, maintainAspectRatio: false, ...options,
+      plugins: { ...defaultPlugins, ...(options.plugins || {}) }
     }
   });
 }
@@ -818,8 +1245,32 @@ async function setYear(y, btn) {
 function handleSearchCli() { renderPage3(); }
 function handleSearchPrd() { renderPage4(); }
 
-function showLoader() { document.getElementById('loader').style.opacity = '1'; document.getElementById('loader').style.pointerEvents = 'all'; }
-function hideLoader() { document.getElementById('loader').style.opacity = '0'; document.getElementById('loader').style.pointerEvents = 'none'; }
+let loaderInterval;
+const loaderMsgs = [
+  "Estás a punto de ingresar al mundo de Iconic Terroirs",
+  "Este dashboard ha sido creado para mostrarte la evolución de nuestra compañía",
+  "Espera un momento por favor, en breve ingresarás a este nuevo mundo"
+];
+
+function showLoader() {
+  const ldr = document.getElementById('loader');
+  ldr.style.opacity = '1'; ldr.style.pointerEvents = 'all';
+  let idx = 0;
+  const msgEl = document.getElementById('loader-msg');
+  msgEl.innerText = loaderMsgs[0];
+  if (loaderInterval) clearInterval(loaderInterval);
+  loaderInterval = setInterval(() => {
+    idx = (idx + 1) % loaderMsgs.length;
+    msgEl.style.opacity = 0;
+    setTimeout(() => { msgEl.innerText = loaderMsgs[idx]; msgEl.style.opacity = 1; }, 300);
+  }, 4000);
+}
+
+function hideLoader() {
+  const ldr = document.getElementById('loader');
+  ldr.style.opacity = '0'; ldr.style.pointerEvents = 'none';
+  if (loaderInterval) clearInterval(loaderInterval);
+}
 
 document.addEventListener('DOMContentLoaded', init);
 </script>

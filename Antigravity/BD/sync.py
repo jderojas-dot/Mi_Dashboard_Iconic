@@ -6,29 +6,29 @@ from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
 import os
 
-CREDENTIALS = r"C:\Dashboard_Iconic\BD\credentials.json"
+CREDENTIALS = r"C:\Dashboard_Iconic\Antigravity\BD\credentials.json"
 
 # ============================================================
 #  CONFIGURACIÓN - Agrega aquí todos tus archivos
 # ============================================================
 ARCHIVOS = [
     {
-        "excel":      r"C:\Dashboard_Iconic\BD\Ventas\TB_Ventas_Cabecera.xlsx",
+        "excel":      r"C:\Dashboard_Iconic\Antigravity\BD\Ventas\TB_Ventas_Cabecera.xlsx",
         "sheet_id":   "1g2ySPgLKN1O6ep3UuLzyx1YPycLE6IFzmljFw_GCWfQ",
         "hoja":       "Hoja 1"
     },
     {
-        "excel":      r"C:\Dashboard_Iconic\BD\Ventas\TB_Ventas_Detalle.xlsx",
+        "excel":      r"C:\Dashboard_Iconic\Antigravity\BD\Ventas\TB_Ventas_Detalle.xlsx",
         "sheet_id":   "18TrvK6wDfzgJ1Ke3C8ushitUcPDZzUMmNTolaDxnZ3g",
         "hoja":       "Hoja 1"
     },
     {
-        "excel":      r"C:\Dashboard_Iconic\BD\Inventario\TB_mov_inventario.xlsx",
+        "excel":      r"C:\Dashboard_Iconic\Antigravity\BD\Inventario\TB_mov_inventario.xlsx",
         "sheet_id":   "1RaT0Vdx4rt0x-QnfhS0_FMVpTse_kljVrHPN8sQ-ZcQ",
         "hoja":       "Hoja 1"
     },
     {
-        "excel":      r"C:\Dashboard_Iconic\BD\Productos\TB_Productos.xlsx",
+        "excel":      r"C:\Dashboard_Iconic\Antigravity\BD\Productos\TB_Productos.xlsx",
         "sheet_id":   "1a0zFpAbe48W0-JqITFFCNAlx0JQlDDNCiOCaCLWM7gU",
         "hoja":       "Hoja 1"
     },

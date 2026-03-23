@@ -1,0 +1,4 @@
+# Ignorar credenciales en esta subcarpeta
+credentials.json
+venv/
+__pycache__/
