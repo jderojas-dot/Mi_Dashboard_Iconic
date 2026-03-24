@@ -3,1276 +3,490 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Iconic Terroirs · Dashboard Ejecutivo</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
+<title>Iconic Terroirs · Dashboard v3</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
 :root {
-  --bg: #F8F9FC;
-  --card: #FFFFFF;
-  --header: #0F172A;
-  --border: #E2E8F0;
-  --text: #1E293B;
-  --muted: #64748B;
-  --muted-lt: #94A3B8;
-  --primary: #2563EB;
-  --accent: #0F172A;
-  --gold: #B45309;
-  --green: #10B981;
-  --red: #EF4444;
-  --purple: #8B5CF6;
-  --teal: #0D9488;
-  --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.05), 0 2px 4px -2px rgb(0 0 0 / 0.05);
-  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.07), 0 4px 6px -4px rgb(0 0 0 / 0.07);
+  --color-background-primary: #FFFFFF;
+  --color-background-secondary: #F8F9FA;
+  --color-border-tertiary: #E9ECEF;
+  --color-border-secondary: #DEE2E6;
+  --color-text-primary: #212529;
+  --color-text-secondary: #6C757D;
+  --font-sans: 'Inter', sans-serif;
+  --border-radius-lg: 12px;
+  --border-radius-md: 8px;
 }
-
 * { box-sizing: border-box; margin: 0; padding: 0; }
-body { 
-  background: var(--bg); color: var(--text); font-family: 'Inter', sans-serif; 
-  min-height: 100vh; line-height: 1.5; -webkit-font-smoothing: antialiased;
-}
+body { font-family: var(--font-sans); background-color: #FAFAFA; color: var(--color-text-primary); padding: 20px; }
+.dash { max-width: 1400px; margin: 0 auto; background: white; padding: 24px; border-radius: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+.header-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+.header-top h1 { font-size: 20px; font-weight: 600; }
+.year-filter { padding: 6px 12px; border-radius: 6px; border: 1px solid var(--color-border-secondary); font-family: var(--font-sans); }
 
-/* ── HEADER ── */
-header {
-  background: var(--header); color: white; padding: 12px 32px;
-  display: flex; align-items: center; justify-content: space-between;
-  box-shadow: var(--shadow); position: sticky; top: 0; z-index: 100;
-}
-.logo { display: flex; align-items: center; gap: 12px; }
-.logo-icon { 
-  width: 32px; height: 32px; background: linear-gradient(135deg, #3B82F6, #1D4ED8); 
-  border-radius: 8px; display: flex; align-items: center; justify-content: center;
-  font-weight: bold; color: white; font-size: 18px;
-}
-.logo-text { font-family: 'Playfair Display', serif; font-size: 20px; letter-spacing: -0.5px; }
-.logo-sub { font-size: 10px; color: #94A3B8; text-transform: uppercase; letter-spacing: 1.5px; margin-top: -2px; }
+.section-title { font-size: 13px; font-weight: 500; color: var(--color-text-secondary); text-transform: uppercase; letter-spacing: 0.06em; margin: 1.5rem 0 0.75rem; }
+.kpi-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+.kpi { background: var(--color-background-secondary); border-radius: var(--border-radius-md); padding: 0.85rem 1rem; position: relative; }
+.kpi-label { font-size: 11px; color: var(--color-text-secondary); margin-bottom: 4px; }
+.kpi-value { font-size: 22px; font-weight: 600; color: var(--color-text-primary); }
+.kpi-sub { font-size: 11px; color: var(--color-text-secondary); margin-top: 2px; }
+.kpi-up { color: #3B6D11; }
+.kpi-down { color: #A32D2D; }
 
-.hdr-r { display: flex; align-items: center; gap: 20px; }
-.ytabs { display: flex; background: rgba(255,255,255,0.05); padding: 3px; border-radius: 8px; }
-.ytab { 
-  background: transparent; border: none; color: #94A3B8; padding: 6px 14px;
-  font-size: 11px; font-weight: 500; cursor: pointer; border-radius: 6px; transition: all 0.2s;
-}
-.ytab:hover { color: white; }
-.ytab.active { background: #1E293B; color: white; box-shadow: var(--shadow); }
+.charts-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 16px; }
+.charts-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; margin-top: 16px; }
+.card { background: var(--color-background-primary); border: 1px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); padding: 1.25rem; box-shadow: 0 1px 3px rgba(0,0,0,0.02); }
+.card-title { font-size: 13px; font-weight: 600; color: var(--color-text-secondary); margin-bottom: 12px; }
+.ch-wrap { position: relative; width: 100%; }
 
-/* ── NAVIGATION ── */
-nav { 
-  background: white; border-bottom: 1px solid var(--border); padding: 0 32px;
-  display: flex; gap: 32px;
-}
-.nav-btn {
-  background: transparent; border: none; border-bottom: 3px solid transparent;
-  color: var(--muted); padding: 16px 0; font-size: 12px; font-weight: 600;
-  cursor: pointer; transition: all 0.2s; text-transform: uppercase; letter-spacing: 0.5px;
-}
-.nav-btn:hover { color: var(--primary); }
-.nav-btn.active { color: var(--primary); border-bottom-color: var(--primary); }
+.tab-row { display: flex; gap: 8px; margin-bottom: 1.5rem; flex-wrap: wrap; border-bottom: 1px solid var(--color-border-tertiary); padding-bottom: 12px; }
+.tab { font-size: 13px; font-weight: 500; padding: 8px 16px; border: 1px solid transparent; border-radius: var(--border-radius-md); cursor: pointer; background: transparent; color: var(--color-text-secondary); transition: all 0.2s; }
+.tab.active { background: #EEF2FF; color: #4F46E5; font-weight: 600; border-color: #C7D2FE; }
+.tab:hover:not(.active) { background: var(--color-background-secondary); }
 
-/* ── LAYOUT ── */
-main { padding: 24px 32px; max-width: 1600px; margin: 0 auto; }
-.page { display: none; }
-.page.active { display: block; animation: fadeIn 0.4s ease-out; }
-@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+.legend { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 10px; font-size: 11px; color: var(--color-text-secondary); }
+.legend span { display: flex; align-items: center; gap: 4px; }
+.lsq { width: 10px; height: 10px; border-radius: 2px; display: inline-block; }
 
-/* ── SECTION TITLES ── */
-.section-title { 
-  font-size: 11px; font-weight: 700; color: var(--muted); text-transform: uppercase;
-  letter-spacing: 1.5px; margin: 24px 0 16px 0; display: flex; align-items: center; gap: 10px;
-}
-.section-title::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+.table-wrap { overflow-x: auto; }
+table { width: 100%; font-size: 12px; border-collapse: collapse; }
+th { text-align: left; padding: 8px 10px; color: var(--color-text-secondary); font-weight: 600; border-bottom: 1px solid var(--color-border-tertiary); text-transform: uppercase; font-size: 10px; }
+td { padding: 8px 10px; border-bottom: 1px solid var(--color-border-tertiary); color: var(--color-text-primary); }
+tr:last-child td { border-bottom: none; }
+tr:hover td { background-color: #F8F9FA; }
 
-/* ── KPI GRID ── */
-.kpi-grid { 
-  display: grid; grid-template-columns: repeat(7, 1fr); gap: 16px; margin-bottom: 24px;
-}
-.kpi-card {
-  background: white; border: 1px solid var(--border); border-radius: 12px; padding: 16px;
-  box-shadow: var(--shadow); position: relative; overflow: hidden;
-}
-.kpi-card::before {
-  content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 4px; background: var(--c, var(--primary));
-}
-.kpi-label { font-size: 10px; font-weight: 700; color: var(--muted); text-transform: uppercase; margin-bottom: 4px; }
-.kpi-value { font-size: 24px; font-weight: 700; color: var(--text); letter-spacing: -0.5px; margin-bottom: 2px; }
-.kpi-delta { font-size: 11px; font-weight: 600; display: flex; align-items: center; gap: 4px; }
-.delta-up { color: var(--green); }
-.delta-dn { color: var(--red); }
-.delta-neu { color: var(--muted); }
+.badge { display: inline-block; font-size: 10px; padding: 3px 8px; border-radius: 12px; font-weight: 600; }
+.b-green { background: #ECFDF5; color: #059669; }
+.b-amber { background: #FFFBEB; color: #D97706; }
+.b-red { background: #FEF2F2; color: #DC2626; }
+.b-blue { background: #EFF6FF; color: #2563EB; }
+.b-purple { background: #F5F3FF; color: #7C3AED; }
 
-/* ── CARDS & GRIDS ── */
-.card { background: white; border: 1px solid var(--border); border-radius: 12px; box-shadow: var(--shadow); padding: 20px; }
-.card-hdr { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px; }
-.card-title { font-size: 14px; font-weight: 700; color: var(--text); }
-.card-sub { font-size: 11px; color: var(--muted); }
+.bar-horiz { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; font-size: 11px; }
+.bar-label { width: 120px; text-align: right; color: var(--color-text-secondary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight: 500; }
+.bar-track { flex: 1; height: 12px; background: var(--color-background-secondary); border-radius: 6px; overflow: hidden; }
+.bar-fill { height: 100%; border-radius: 6px; transition: width 0.5s ease; }
+.bar-val { width: 60px; color: var(--color-text-secondary); font-weight: 600; }
+.section-desc { font-size: 13px; color: var(--color-text-secondary); margin-bottom: 1rem; line-height: 1.5; }
 
-.grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 16px; }
-.grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-bottom: 16px; }
-
-/* ── CHARTS ── */
-.chart-container { position: relative; height: 260px; width: 100%; }
-.chart-container-sm { position: relative; height: 180px; width: 100%; }
-.chart-container-lg { position: relative; height: 320px; width: 100%; }
-
-/* ── TABLES ── */
-.tbl-wrap { overflow-x: auto; }
-table { width: 100%; border-collapse: collapse; font-size: 12px; }
-th { text-align: left; padding: 12px 8px; font-weight: 700; color: var(--muted); text-transform: uppercase; font-size: 10px; border-bottom: 2px solid var(--bg); }
-td { padding: 10px 8px; border-bottom: 1px solid var(--bg); }
-tr:hover td { background: var(--bg); }
-.col-num { font-variant-numeric: tabular-nums; font-family: 'Inter', sans-serif; font-weight: 500; }
-.chip { padding: 2px 8px; border-radius: 12px; font-size: 10px; font-weight: 700; border: 1px solid currentColor; }
-
-/* ── UTILS ── */
-.search-box { 
-  background: var(--bg); border: 1px solid var(--border); padding: 8px 12px;
-  border-radius: 8px; font-size: 12px; outline: none; width: 240px; transition: border-color 0.2s;
-}
-.search-box:focus { border-color: var(--primary); }
-
-.heat-grid { display: grid; grid-template-columns: 40px repeat(12, 1fr); gap: 2px; }
-.heat-cell { height: 24px; border-radius: 2px; display: flex; align-items: center; justify-content: center; font-size: 9px; font-weight: 600; color: rgba(255,255,255,0.8); }
-
-/* ── LOADING ── */
-#loader {
-  position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-  background: white; z-index: 9999;
-  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 20px;
-  transition: opacity 0.5s;
-}
-.loader-content { text-align: center; }
-.spinner { 
-  width: 56px; height: 56px; border: 4px solid #F1F5F9; 
-  border-top-color: var(--primary); border-radius: 50%; 
-  animation: spin 1s cubic-bezier(0.4, 0, 0.2, 1) infinite; 
-  margin: 0 auto 20px auto;
-}
-#loader-msg { 
-  font-size: 14px; font-weight: 500; color: var(--muted); 
-  min-width: 300px; transition: opacity 0.3s;
-}
+/* Loader */
+#loader { position: fixed; inset: 0; background: rgba(255,255,255,0.9); z-index: 1000; display: flex; align-items: center; justify-content: center; flex-direction: column; font-weight: 500; color: #4F46E5; }
+.spinner { width: 40px; height: 40px; border: 3px solid #E0E7FF; border-top-color: #4F46E5; border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 16px; }
 @keyframes spin { to { transform: rotate(360deg); } }
-
 </style>
 </head>
 <body>
 
 <div id="loader">
-  <div class="loader-content">
-    <div class="spinner"></div>
-    <div id="loader-msg">Estás a punto de ingresar al mundo de Iconic Terroirs</div>
+  <div class="spinner"></div>
+  <div>Sincronizando con Iconic Terroirs...</div>
+</div>
+
+<div class="dash">
+  <div class="header-top">
+    <h1>Iconic Terroirs · Executive Intelligence</h1>
+    <select id="sel-year" class="year-filter" onchange="changeYear()">
+      <option value="2026" selected>Año 2026</option>
+      <option value="2025">Año 2025</option>
+      <option value="2024">Año 2024</option>
+    </select>
+  </div>
+
+  <div class="tab-row" id="main-tabs">
+    <button class="tab active" onclick="showTab('overview', this)">Resumen Ejecutivo</button>
+    <button class="tab" onclick="showTab('clients', this)">Clientes & RFM</button>
+    <button class="tab" onclick="showTab('products', this)">Productos & Mix</button>
+    <button class="tab" onclick="showTab('margins', this)">Márgenes & Países</button>
+    <button class="tab" onclick="showTab('retention', this)">Retención</button>
+    <button class="tab" onclick="showTab('competition', this)">Competencia & Estrategia</button>
+  </div>
+
+  <!-- OVERVIEW -->
+  <div id="tab-overview" class="tab-content">
+    <div class="kpi-grid">
+      <div class="kpi"><div class="kpi-label">Ventas Netas (S/)</div><div class="kpi-value" id="k-rev"></div><div class="kpi-sub" id="k-rev-d"></div></div>
+      <div class="kpi"><div class="kpi-label">Margen Neto (S/)</div><div class="kpi-value" id="k-mgn"></div><div class="kpi-sub" id="k-mgn-d"></div></div>
+      <div class="kpi"><div class="kpi-label">Margen Bruto %</div><div class="kpi-value" id="k-pct"></div><div class="kpi-sub">Sobre precio venta</div></div>
+      <div class="kpi"><div class="kpi-label">Unidades</div><div class="kpi-value" id="k-u"></div><div class="kpi-sub" id="k-u-d"></div></div>
+      <div class="kpi"><div class="kpi-label">Clientes Activos</div><div class="kpi-value" id="k-cli"></div><div class="kpi-sub" id="k-cli-d"></div></div>
+      <div class="kpi"><div class="kpi-label">Pedidos Totales</div><div class="kpi-value" id="k-ped"></div><div class="kpi-sub" id="k-ped-d"></div></div>
+      <div class="kpi"><div class="kpi-label">Ticket Promedio</div><div class="kpi-value" id="k-aov"></div><div class="kpi-sub">Por pedido</div></div>
+      <div class="kpi"><div class="kpi-label">Proyección Fin de Año</div><div class="kpi-value" id="k-proj">Analizando...</div><div class="kpi-sub">ARIMA+</div></div>
+    </div>
+
+    <p class="section-title">Evolución de Ventas (S/)</p>
+    <div class="card">
+      <div class="ch-wrap" style="height:240px"><canvas id="c-sales-yr"></canvas></div>
+    </div>
+
+    <div class="charts-2">
+      <div class="card">
+        <div class="card-title">Estacionalidad Mensual</div>
+        <div class="ch-wrap" style="height:200px"><canvas id="c-seasonal"></canvas></div>
+      </div>
+      <div class="card">
+        <div class="card-title">Mix por Tipo de Vino (Valor S/)</div>
+        <div class="ch-wrap" style="height:200px"><canvas id="c-type-mix"></canvas></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CLIENTS -->
+  <div id="tab-clients" class="tab-content" style="display:none">
+    <p class="section-desc">Segmentación RFM (Recencia · Frecuencia · Valor) — clasificación automatizada para accionar clientes.</p>
+    <div class="charts-2">
+      <div class="card">
+        <div class="card-title">Distribución por Frecuencia de Compra</div>
+        <div class="ch-wrap" style="height:200px"><canvas id="c-freq"></canvas></div>
+      </div>
+      <div class="card">
+        <div class="card-title">Segmentos RFM Clientes Top (Valor S/)</div>
+        <div class="ch-wrap" style="height:200px"><canvas id="c-rfm-val"></canvas></div>
+      </div>
+    </div>
+
+    <p class="section-title" style="margin-top:2rem">Directorio de Clientes Top</p>
+    <div class="card">
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>#</th><th>Cliente</th><th>Venta Neta (S/)</th><th>Pedidos</th><th>Última Compra</th><th>Días Ausente</th><th>Status RFM</th></tr></thead>
+          <tbody id="top-cli-table"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- PRODUCTS -->
+  <div id="tab-products" class="tab-content" style="display:none">
+    <div class="charts-2">
+      <div class="card">
+        <div class="card-title">Top Productos (Valor)</div>
+        <div id="top-prod-bars"></div>
+      </div>
+      <div class="card">
+        <div class="card-title">Top Marcas (Valor)</div>
+        <div id="top-brand-bars"></div>
+      </div>
+    </div>
+
+    <p class="section-title" style="margin-top:2rem">Mix por País de Origen & Rentabilidad</p>
+    <div class="card">
+      <div class="ch-wrap" style="height:240px"><canvas id="c-country-sales"></canvas></div>
+    </div>
+  </div>
+
+  <!-- MARGINS -->
+  <div id="tab-margins" class="tab-content" style="display:none">
+    <p class="section-desc">Márgenes operativos por país de origen. Permite priorizar la estrategia de portafolio.</p>
+
+    <div class="charts-2">
+      <div class="card">
+        <div class="card-title">Margen Neto % por País</div>
+        <div class="ch-wrap" style="height:240px"><canvas id="c-margin-pct"></canvas></div>
+      </div>
+      <div class="card">
+        <div class="card-title">Rendimiento Detallado por Origen</div>
+        <div class="table-wrap">
+          <table style="margin-top:10px">
+            <thead><tr><th>País</th><th>Venta (S/)</th><th>Mgn Neto (S/)</th><th>Margen %</th><th>Unidades</th></tr></thead>
+            <tbody id="tbl-rentabilidad-origen"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- RETENTION -->
+  <div id="tab-retention" class="tab-content" style="display:none">
+    <p class="section-desc">Dinámica de pérdida y adquisición de clientes por año histórico (basado en año vs año anterior).</p>
+    
+    <div class="charts-2">
+      <div class="card">
+        <div class="card-title">Dinámica de Clientes (Nuevos vs Perdidos)</div>
+        <div class="ch-wrap" style="height:250px"><canvas id="c-retention"></canvas></div>
+      </div>
+      <div class="card">
+        <div class="card-title">Pérdida Económica por Clientes Inactivos (S/)</div>
+        <div class="ch-wrap" style="height:250px"><canvas id="c-ret-loss"></canvas></div>
+      </div>
+    </div>
+    
+    <div class="card" style="margin-top:16px;">
+      <div class="card-title">Resumen de Retención Anual</div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Año</th><th>Total Activos</th><th>Retenidos (vs A-1)</th><th>Nuevos</th><th>Perdidos (de A-1)</th><th>Lucro Cesante</th></tr></thead>
+          <tbody id="tbl-retencion"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- COMPETITION (AI) -->
+  <div id="tab-competition" class="tab-content" style="display:none">
+    <p class="section-desc">Análisis inteligente del mercado y estrategias recomendadas basadas en los indicadores de rendimiento.</p>
+
+    <p class="section-title">Panorama Competitivo (Mercado Alta Gama y Volúmenes)</p>
+    <div class="card" style="margin-bottom:24px">
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Competidor</th><th>Enfoque</th><th>Fortaleza</th><th>Amenaza Estimada</th></tr></thead>
+          <tbody id="tbl-ai-competencia"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <p class="section-title">10 Estrategias Recomendadas para Crecimiento</p>
+    <div class="card">
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>#</th><th>Estrategia</th><th>Data Pivot</th><th>Impacto Proyectado</th></tr></thead>
+          <tbody id="tbl-ai-estrategias"></tbody>
+        </table>
+      </div>
+    </div>
   </div>
 </div>
 
-<header>
-  <div class="logo">
-    <div class="logo-icon">I</div>
-    <div>
-      <div class="logo-text">Iconic Terroirs</div>
-      <div class="logo-sub">Executive Intelligence</div>
-    </div>
-  </div>
-  <div class="hdr-r">
-    <div class="logo-sub">Iconic Terroirs Dashboard v2.0</div>
-  </div>
-</header>
-
-<nav>
-  <button class="nav-btn active" onclick="navPage(2, this)">Análisis de Ventas</button>
-  <button class="nav-btn" onclick="navPage(3, this)">Directorio Clientes</button>
-  <button class="nav-btn" onclick="navPage(4, this)">Catálogo Productos</button>
-  <button class="nav-btn" onclick="navPage(5, this)">Pronósticos ML</button>
-  <button class="nav-btn" onclick="navPage(1, this)">Información Histórica</button>
-</nav>
-
-<main>
-  <!-- PÁGINA 1: INFORMACIÓN HISTÓRICA -->
-  <div id="page1" class="page">
-    
-    <div class="section-title">
-      Indicadores Clave
-      <div class="ytabs" style="margin-left: auto; background: white; border: 1px solid var(--border);">
-        <button class="ytab active" onclick="updateKPIs(2025, this)">2025</button>
-        <button class="ytab" onclick="updateKPIs(2026, this)">2026</button>
-        <button class="ytab" onclick="updateKPIs(0, this)">Total</button>
-      </div>
-    </div>
-    <div class="kpi-grid">
-      <div class="kpi-card" style="--c: var(--primary)">
-        <div class="kpi-label">Venta Neta</div>
-        <div id="kpi-rev" class="kpi-value">S/ 0</div>
-        <div id="kpi-rev-d" class="kpi-delta delta-neu">—</div>
-      </div>
-      <div class="kpi-card" style="--c: var(--green)">
-        <div class="kpi-label">Margen Neto</div>
-        <div id="kpi-mgn" class="kpi-value">S/ 0</div>
-        <div id="kpi-mgn-d" class="kpi-delta delta-neu">—</div>
-      </div>
-      <div class="kpi-card" style="--c: var(--purple)">
-        <div class="kpi-label">% Margen Bruto</div>
-        <div id="kpi-pct" class="kpi-value">0%</div>
-        <div id="kpi-pct-d" class="kpi-delta delta-neu">—</div>
-      </div>
-      <div class="kpi-card" style="--c: var(--teal)">
-        <div class="kpi-label">Unidades</div>
-        <div id="kpi-uds" class="kpi-value">0</div>
-        <div id="kpi-uds-d" class="kpi-delta delta-neu">—</div>
-      </div>
-      <div class="kpi-card" style="--c: var(--gold)">
-        <div class="kpi-label">Clientes Activos</div>
-        <div id="kpi-cli" class="kpi-value">0</div>
-        <div id="kpi-cli-d" class="kpi-delta delta-neu">—</div>
-      </div>
-      <div class="kpi-card" style="--c: var(--primary)">
-        <div class="kpi-label">Nº Pedidos</div>
-        <div id="kpi-ped" class="kpi-value">0</div>
-        <div id="kpi-ped-d" class="kpi-delta delta-neu">—</div>
-      </div>
-      <div class="kpi-card" style="--c: var(--red)">
-        <div class="kpi-label">Pedido Promedio</div>
-        <div id="kpi-aov" class="kpi-value">S/ 0</div>
-        <div id="kpi-aov-d" class="kpi-delta delta-neu">—</div>
-      </div>
-    </div>
-
-    <div class="section-title">Evolución Temporal</div>
-    <div class="card" style="margin-bottom: 24px;">
-      <div class="card-hdr">
-        <div><div class="card-title">Venta Neta por Mes</div><div class="card-sub">Histórico acumulado y tendencia</div></div>
-        <div class="ytabs" style="background: var(--bg);">
-          <button class="ytab active" onclick="updateMainChart(2025, this)">2025</button>
-          <button class="ytab" onclick="updateMainChart(2026, this)">2026</button>
-          <button class="ytab" onclick="updateMainChart(0, this)">Total</button>
-        </div>
-      </div>
-      <div class="chart-container-lg"><canvas id="chart-main-line"></canvas></div>
-    </div>
-
-    <div class="section-title">Análisis por Dimensión de Producto</div>
-    <div class="grid-3">
-      <div class="card">
-        <div class="card-hdr" style="margin-bottom:10px">
-          <div class="card-title">Venta por País</div>
-          <select class="search-box" style="width: auto; padding: 2px 5px; font-size: 10px;" onchange="updateDimPais(this.value)">
-            <option value="2025">2025</option>
-            <option value="2026">2026</option>
-            <option value="0">Total</option>
-          </select>
-        </div>
-        <div class="chart-container-sm"><canvas id="chart-dim-pais"></canvas></div>
-      </div>
-      <div class="card">
-        <div class="card-hdr" style="margin-bottom:10px">
-          <div class="card-title">Por Tipo</div>
-          <select class="search-box" style="width: auto; padding: 2px 5px; font-size: 10px;" onchange="updateDimTipo(this.value)">
-            <option value="2025">2025</option>
-            <option value="2026">2026</option>
-            <option value="0">Total</option>
-          </select>
-        </div>
-        <div class="chart-container-sm"><canvas id="chart-dim-tipo"></canvas></div>
-      </div>
-      <div class="card">
-        <div class="card-hdr" style="margin-bottom:10px">
-          <div class="card-title">Top 8 Marcas</div>
-          <select class="search-box" style="width: auto; padding: 2px 5px; font-size: 10px;" onchange="updateDimMarca(this.value)">
-            <option value="2025">2025</option>
-            <option value="2026">2026</option>
-            <option value="0">Total</option>
-          </select>
-        </div>
-        <div class="chart-container-sm"><canvas id="chart-dim-marca"></canvas></div>
-      </div>
-    </div>
-
-    <div class="section-title">Clientes y Productos</div>
-    <div class="grid-2">
-      <div class="card">
-        <div class="card-hdr" style="margin-bottom:10px">
-          <div class="card-title">Top Clientes por Revenue</div>
-          <select class="search-box" style="width: auto; padding: 2px 5px; font-size: 10px;" onchange="updateTopCli(this.value)">
-            <option value="2025">2025</option>
-            <option value="2026">2026</option>
-            <option value="0">Total</option>
-          </select>
-        </div>
-        <div class="tbl-wrap">
-          <table id="tbl-top-cli"><thead><tr><th>#</th><th>Cliente</th><th>Pedidos</th><th>Venta Neta</th><th>Share</th></tr></thead><tbody></tbody></table>
-        </div>
-      </div>
-      <div class="card">
-        <div class="card-hdr" style="margin-bottom:10px">
-          <div class="card-title">Productos Más Vendidos</div>
-          <select class="search-box" style="width: auto; padding: 2px 5px; font-size: 10px;" onchange="updateTopPrd(this.value)">
-            <option value="2025">2025</option>
-            <option value="2026">2026</option>
-            <option value="0">Total</option>
-          </select>
-        </div>
-        <div class="tbl-wrap">
-          <table id="tbl-top-prd"><thead><tr><th>#</th><th>Producto</th><th>Tipo</th><th>Unidades</th><th>Mgn %</th></tr></thead><tbody></tbody></table>
-        </div>
-      </div>
-    </div>
-
-    <div class="section-title">Vendedores, Segmentos y Márgenes</div>
-    <div class="grid-3">
-      <div class="card">
-        <div class="card-title" style="margin-bottom:12px">Desempeño Vendedores</div>
-        <div class="tbl-wrap">
-          <table id="tbl-vendedores"><thead><tr><th>Vendedor</th><th>S/ Venta</th><th>Ped.</th><th>Share</th></tr></thead><tbody></tbody></table>
-        </div>
-      </div>
-      <div class="card">
-        <div class="card-title" style="margin-bottom:12px">Segmentos por Precio/Botella</div>
-        <div class="chart-container-sm" style="height:150px"><canvas id="chart-segments"></canvas></div>
-      </div>
-      <div class="card">
-        <div class="card-title" style="margin-bottom:12px">Margen % por Marca</div>
-        <div class="chart-container-sm" style="height:150px"><canvas id="chart-margins"></canvas></div>
-      </div>
-    </div>
-
-    <div class="section-title">Segmentación RFM y Estacionalidad</div>
-    <div class="grid-2">
-      <div class="card">
-        <div class="card-title" style="margin-bottom:12px">Segmentación RFM de Clientes</div>
-        <div class="tbl-wrap">
-          <table id="tbl-rfm-summary"><thead><tr><th>Cliente</th><th>Inact.</th><th>RFM</th><th>Valor M.</th></tr></thead><tbody></tbody></table>
-        </div>
-      </div>
-      <div class="card">
-        <div class="card-title" style="margin-bottom:10px">Índice de Estacionalidad</div>
-        <div id="estacionalidad-container">
-          <div class="heat-grid" id="heat-grid-header"><div></div><div>Ene</div><div>Feb</div><div>Mar</div><div>Abr</div><div>May</div><div>Jun</div><div>Jul</div><div>Ago</div><div>Sep</div><div>Oct</div><div>Nov</div><div>Dic</div></div>
-          <div id="heat-grid-body"></div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- PÁGINA 2: ANÁLISIS DE VENTAS -->
-  <div id="page2" class="page active">
-
-    <!-- ★ KPIs YTD ★ -->
-    <div class="section-title">
-      Indicadores Acumulados del Año
-      <span id="ytd-label" style="margin-left:12px; font-size:12px; font-weight:400; color:var(--muted);">Cargando...</span>
-    </div>
-    <div class="kpi-grid" id="ytd-kpi-grid">
-      <div class="kpi-card" style="--c: var(--primary)">
-        <div class="kpi-label">Venta Neta YTD</div>
-        <div id="ytd-rev" class="kpi-value">S/ 0</div>
-        <div id="ytd-rev-d" class="kpi-delta delta-neu">—</div>
-      </div>
-      <div class="kpi-card" style="--c: var(--green)">
-        <div class="kpi-label">Margen Neto YTD</div>
-        <div id="ytd-mgn" class="kpi-value">S/ 0</div>
-        <div id="ytd-mgn-d" class="kpi-delta delta-neu">—</div>
-      </div>
-      <div class="kpi-card" style="--c: var(--purple)">
-        <div class="kpi-label">% Margen YTD</div>
-        <div id="ytd-pct" class="kpi-value">0%</div>
-        <div id="ytd-pct-d" class="kpi-delta delta-neu">—</div>
-      </div>
-      <div class="kpi-card" style="--c: var(--teal)">
-        <div class="kpi-label">Unidades YTD</div>
-        <div id="ytd-uds" class="kpi-value">0</div>
-        <div id="ytd-uds-d" class="kpi-delta delta-neu">—</div>
-      </div>
-      <div class="kpi-card" style="--c: var(--gold)">
-        <div class="kpi-label">Clientes Activos YTD</div>
-        <div id="ytd-cli" class="kpi-value">0</div>
-        <div id="ytd-cli-d" class="kpi-delta delta-neu">—</div>
-      </div>
-      <div class="kpi-card" style="--c: var(--primary)">
-        <div class="kpi-label">Nº Pedidos YTD</div>
-        <div id="ytd-ped" class="kpi-value">0</div>
-        <div id="ytd-ped-d" class="kpi-delta delta-neu">—</div>
-      </div>
-      <div class="kpi-card" style="--c: var(--red)">
-        <div class="kpi-label">Pedido Promedio YTD</div>
-        <div id="ytd-aov" class="kpi-value">S/ 0</div>
-        <div id="ytd-aov-d" class="kpi-delta delta-neu">—</div>
-      </div>
-    </div>
-
-    <div class="section-title">Análisis de Ventas Histórico</div>
-    <div class="card">
-      <div class="card-hdr">
-        <div>
-          <div class="card-title">Evolución de Venta por Año</div>
-          <div class="card-sub">Comparativa mensual entre periodos (2022-2026)</div>
-        </div>
-        <div class="ytabs" style="background: var(--bg);">
-          <button class="ytab active" onclick="setSalesMetric('venta_neta', this)">Venta Neta</button>
-          <button class="ytab" onclick="setSalesMetric('pct_margen', this)">% Margen</button>
-          <button class="ytab" onclick="setSalesMetric('pedidos', this)">Pedidos</button>
-          <button class="ytab" onclick="setSalesMetric('unidades', this)">Unidades</button>
-        </div>
-      </div>
-      <div class="chart-container-lg"><canvas id="chart-yoy-line"></canvas></div>
-    </div>
-
-    <div class="section-title">Rentabilidad y Especialización por Origen</div>
-    <div class="grid-2">
-      <!-- 1. Rentabilidad por Origen -->
-      <div class="card">
-        <div class="card-hdr" style="margin-bottom:10px">
-          <div>
-            <div class="card-title">Índice de Rentabilidad por Origen</div>
-            <div class="card-sub">Margen Neto vs Volumen</div>
-          </div>
-          <select class="search-box" style="width: auto; padding: 2px 5px; font-size: 10px;" onchange="updateRentabilidadOrigen(this.value)">
-            <option value="2025">2025</option>
-            <option value="2026" selected>2026</option>
-            <option value="0">Total</option>
-          </select>
-        </div>
-        <div class="chart-container-sm"><canvas id="chart-rentabilidad-origen"></canvas></div>
-        <div class="tbl-wrap" style="margin-top:20px;">
-          <table id="tbl-rentabilidad-origen"><thead><tr><th>País</th><th class="col-num">Mg. Neto</th><th class="col-num">Unidades</th></tr></thead><tbody></tbody></table>
-        </div>
-      </div>
-      
-      <!-- 2. Participación de Mercado por Tipo de Vino -->
-      <div class="card">
-        <div class="card-hdr" style="margin-bottom:10px">
-          <div>
-            <div class="card-title">Participación por Tipo de Vino</div>
-            <div class="card-sub">Especialización de orígenes</div>
-          </div>
-          <select class="search-box" style="width: auto; padding: 2px 5px; font-size: 10px;" onchange="updateMarketShareTipo(this.value)">
-            <option value="2025">2025</option>
-            <option value="2026" selected>2026</option>
-            <option value="0">Total</option>
-          </select>
-        </div>
-        <div class="chart-container-sm" style="height:310px;"><canvas id="chart-market-share-tipo"></canvas></div>
-      </div>
-    </div>
-
-    <div class="section-title">Análisis de Marcas y Ajuste de Portafolio</div>
-    <div class="grid-2">
-      <!-- 3. Dependencia de Marca Ancla -->
-      <div class="card">
-        <div class="card-hdr" style="margin-bottom:10px">
-          <div>
-            <div class="card-title">Dependencia de Marca Ancla</div>
-            <div class="card-sub">Concentración del origen en su Top 1</div>
-          </div>
-          <select class="search-box" style="width: auto; padding: 2px 5px; font-size: 10px;" onchange="updateDependenciaMarca(this.value)">
-            <option value="2025">2025</option>
-            <option value="2026" selected>2026</option>
-            <option value="0">Total</option>
-          </select>
-        </div>
-        <div class="chart-container-sm"><canvas id="chart-dependencia-marca"></canvas></div>
-        <div class="tbl-wrap" style="margin-top:20px;">
-          <table id="tbl-dependencia-marca"><thead><tr><th>País</th><th>Marca Ancla</th><th class="col-num">Dependencia</th></tr></thead><tbody></tbody></table>
-        </div>
-      </div>
-
-      <!-- 4. Ajuste Marca-Tipo -->
-      <div class="card">
-        <div class="card-hdr" style="margin-bottom:10px">
-          <div>
-            <div class="card-title">Índice de Ajuste Marca-Tipo</div>
-            <div class="card-sub">Brand-Type Fit del Top Marcas</div>
-          </div>
-          <select class="search-box" style="width: auto; padding: 2px 5px; font-size: 10px;" onchange="updateBrandTypeFit(this.value)">
-            <option value="2025">2025</option>
-            <option value="2026" selected>2026</option>
-            <option value="0">Total</option>
-          </select>
-        </div>
-        <div class="chart-container-sm" style="height:310px;"><canvas id="chart-brand-type-fit"></canvas></div>
-      </div>
-    </div>
-
-    <!-- Clientes y Productos -->
-    <div class="section-title">Clientes y Productos</div>
-    <div class="grid-2">
-      <div class="card">
-        <div class="card-hdr" style="margin-bottom:10px">
-          <div>
-            <div class="card-title">Top Clientes por Revenue</div>
-            <div class="card-sub">Paginación disponible · todos los clientes</div>
-          </div>
-          <span style="font-size:11px; color:var(--primary); font-weight:600" id="total-cli-p2"></span>
-        </div>
-        <div class="tbl-wrap">
-          <table id="tbl-top-cli-p2">
-            <thead><tr><th>#</th><th>Cliente</th><th>Pedidos</th><th>Venta Neta</th><th>Share %</th><th>Seg. RFM</th></tr></thead>
-            <tbody></tbody>
-          </table>
-        </div>
-        <!-- Controles de paginación -->
-        <div style="display:flex; align-items:center; justify-content:space-between; margin-top:10px; padding-top:8px; border-top:1px solid var(--border);">
-          <button id="cli-p2-prev" onclick="cliPageNav(-1)" style="padding:4px 14px; border:1px solid var(--border); border-radius:6px; background:white; cursor:pointer; font-size:12px; color:var(--muted);">&#8592; Anterior</button>
-          <span id="cli-p2-info" style="font-size:12px; color:var(--muted);"></span>
-          <button id="cli-p2-next" onclick="cliPageNav(1)" style="padding:4px 14px; border:1px solid var(--border); border-radius:6px; background:white; cursor:pointer; font-size:12px; color:var(--primary); font-weight:600;">Siguiente &#8594;</button>
-        </div>
-      </div>
-      <div class="card">
-        <div class="card-hdr" style="margin-bottom:10px">
-          <div>
-            <div class="card-title">Productos Más Vendidos</div>
-            <div class="card-sub">Por unidades · sin año de anada · explorable</div>
-          </div>
-          <span style="font-size:11px; color:var(--purple); font-weight:600">Paginado</span>
-        </div>
-        <div class="tbl-wrap">
-          <table id="tbl-top-prd-p2">
-            <thead><tr><th>#</th><th>Producto</th><th>Tipo</th><th>Uds</th><th>% Total</th><th>Margen %</th></tr></thead>
-            <tbody></tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- PÁGINA 3: CLIENTES -->
-  <div id="page3" class="page">
-    <div class="section-title">Catálogo Completo de Clientes</div>
-    <div class="card">
-      <div class="card-hdr">
-        <input type="text" class="search-box" id="cli-search" placeholder="🔍 Buscar por nombre..." oninput="handleSearchCli()">
-      </div>
-      <div class="tbl-wrap">
-        <table id="tbl-full-cli"><thead><tr><th>Cliente</th><th class="col-num">Revenue</th><th class="col-num">Pedidos</th><th>RFM</th><th>Última Compra</th></tr></thead><tbody></tbody></table>
-      </div>
-    </div>
-  </div>
-
-  <!-- PÁGINA 4: PRODUCTOS -->
-  <div id="page4" class="page">
-    <div class="section-title">Catálogo Completo de Productos</div>
-    <div class="card">
-      <div class="card-hdr">
-        <input type="text" class="search-box" id="prd-search" placeholder="🔍 Buscar por nombre o marca..." oninput="handleSearchPrd()">
-      </div>
-      <div class="tbl-wrap">
-        <table id="tbl-full-prd"><thead><tr><th>Producto</th><th>Marca</th><th>Tipo</th><th class="col-num">Venta</th><th class="col-num">Unidades</th><th class="col-num">% Margen</th></tr></thead><tbody></tbody></table>
-      </div>
-    </div>
-  </div>
-
-  <!-- PÁGINA 5: PRONÓSTICOS -->
-  <div id="page5" class="page">
-    <div class="section-title">AI Forecasting (ARIMA+)</div>
-    <div class="card" style="margin-bottom: 24px; border-left: 4px solid var(--primary)">
-      <div class="card-title">Pronóstico de Ventas Totales</div>
-      <div class="chart-container-lg"><canvas id="chart-forecast-main"></canvas></div>
-    </div>
-    <div class="card">
-      <div class="card-title" style="margin-bottom: 12px">Pronóstico por Producto (Próximos 3 meses)</div>
-      <div class="tbl-wrap">
-        <table id="tbl-forecast-prd"><thead><tr><th>Producto</th><th>Pronosticado (3M)</th><th>Intervalo (80%)</th><th>Base</th></tr></thead><tbody></tbody></table>
-      </div>
-    </div>
-  </div>
-
-</main>
-
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <script>
+// --- CORE & STATE ---
 const API = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' || window.location.protocol === 'file:') 
             ? 'http://localhost:8000' 
             : 'https://mi-dashboard-iconic.onrender.com';
 
-console.log('🚀 Dashboard inicializado. Usando API en:', API);
-
-let store = {
+let state = {
   year: 2026,
-  page: 2,
-  salesMetric: 'venta_neta',
-  data: {
-    kpis: {}, serie: [], pais: [], tipo: [], marca: [], topCli: [], topPrd: [],
-    sellers: [], segments: [], margins: [], rfm: [], heat: [],
-    fullCli: [], fullPrd: [], fcMain: [], fcPrds: [],
-    rentabilidadOrigen: [], marketShareTipo: [], dependenciaMarca: [], brandTypeFit: []
-  }
+  data: {}
 };
 
-// --- INITIALIZATION ---
-async function init() {
-  showLoader();
-  console.log('📦 Cargando datos...');
-  await loadData();
-  // Breve delay opcional para que se vea el efecto si es muy rápido
-  setTimeout(hideLoader, 1500);
-  render();
-}
-
-async function loadData() {
-  console.log('⚡ Iniciando carga consolidada...');
-  const data = await fetchJson('/api/dashboard-init?anno=2025');
-  if (data) {
-    store.data.kpis = data.kpis;
-    store.data.serie = data.serie;
-    store.data.pais = data.pais;
-    store.data.tipo = data.tipo;
-    store.data.marca = data.marca;
-    store.data.topCli = data.top_cli;
-    store.data.fullCli = data.top_cli;
-    store.data.topPrd = data.top_prd;
-    store.data.fullPrd = data.top_prd;
-    store.data.sellers = data.vendedores;
-    store.data.segments = data.segmentos;
-    store.data.margins = data.margenes;
-    store.data.rfm = data.rfm;
-    store.data.heat = data.heat;
-    console.log('✅ Datos consolidados cargados.');
-  } else {
-    console.error('⚠️ Fallo en carga consolidada, intentando carga individual...');
-    await Promise.all([
-      updateKPIs(2025), updateMainChart(2025), updateDimPais(2025),
-      updateDimTipo(2025), updateDimMarca(2025), updateTopCli(2025),
-      updateTopPrd(2025), updateExtra()
-    ]);
-  }
-}
-
-const fetchJson = async p => { 
-  try {
-    const r = await fetch(API + p);
-    if (!r.ok) return null;
-    return await r.json();
-  } catch(e) { 
-    return null; 
-  }
-};
-
-async function updateKPIs(y, btn) {
-  if (btn) toggleActive(btn);
-  const yp = y === 0 ? '' : `?anno=${y}`;
-  const data = await fetchJson('/api/kpis' + yp);
-  if (data) {
-    store.data.kpis = data;
-    renderKPIs();
-  }
-}
-
-async function updateMainChart(y, btn) {
-  if (btn) toggleActive(btn);
-  const yp = y === 0 ? '' : `?anno=${y}`;
-  const data = await fetchJson('/api/serie-mensual' + yp);
-  if (data) {
-    store.data.serie = data || [];
-    renderMainChart();
-  }
-}
-
-async function updateDimPais(y) {
-  const yp = y == 0 ? '' : `?anno=${y}`;
-  const data = await fetchJson('/api/por-pais' + yp);
-  if (data) {
-    store.data.pais = data || [];
-    renderDimPais();
-  }
-}
-
-async function updateDimTipo(y) {
-  const yp = y == 0 ? '' : `?anno=${y}`;
-  const data = await fetchJson('/api/por-tipo' + yp);
-  if (data) {
-    store.data.tipo = data || [];
-    renderDimTipo();
-  }
-}
-
-async function updateDimMarca(y) {
-  const yp = y == 0 ? '' : `?anno=${y}`;
-  const data = await fetchJson('/api/por-marca' + yp);
-  if (data) {
-    store.data.marca = data || [];
-    renderDimMarca();
-  }
-}
-
-async function updateTopCli(y) {
-  const yp = y == 0 ? '' : `?anno=${y}`;
-  const data = await fetchJson('/api/top-clientes' + yp);
-  if (data) {
-    store.data.topCli = data || [];
-    store.data.fullCli = data || [];
-    renderTopCli();
-  }
-}
-
-async function updateTopPrd(y) {
-  const yp = y == 0 ? '' : `?anno=${y}`;
-  const data = await fetchJson('/api/top-productos' + yp);
-  if (data) {
-    store.data.topPrd = data || [];
-    store.data.fullPrd = data || [];
-    renderTopPrd();
-  }
-}
-
-async function updateExtra() {
-  const [sell, seg, marg, rfm, heat] = await Promise.all([
-    fetchJson('/api/vendedores'),
-    fetchJson('/api/segmentos-precio'),
-    fetchJson('/api/margenes-marca'),
-    fetchJson('/api/rfm'),
-    fetchJson('/api/estacionalidad')
-  ]);
-  store.data.sellers = sell || [];
-  store.data.segments = seg || [];
-  store.data.margins = marg || [];
-  store.data.rfm = rfm || [];
-  store.data.heat = heat || [];
-  renderExtra();
-}
-
-async function updateRentabilidadOrigen(y) {
-  const yp = y == 0 ? '' : `?anno=${y}`;
-  const data = await fetchJson('/api/rentabilidad-origen' + yp);
-  if (data) { store.data.rentabilidadOrigen = data; renderRentabilidadOrigen(); }
-}
-async function updateMarketShareTipo(y) {
-  const yp = y == 0 ? '' : `?anno=${y}`;
-  const data = await fetchJson('/api/market-share-tipo' + yp);
-  if (data) { store.data.marketShareTipo = data; renderMarketShareTipo(); }
-}
-async function updateDependenciaMarca(y) {
-  const yp = y == 0 ? '' : `?anno=${y}`;
-  const data = await fetchJson('/api/dependencia-marca' + yp);
-  if (data) { store.data.dependenciaMarca = data; renderDependenciaMarca(); }
-}
-async function updateBrandTypeFit(y) {
-  const yp = y == 0 ? '' : `?anno=${y}`;
-  const data = await fetchJson('/api/brand-type-fit' + yp);
-  if (data) { store.data.brandTypeFit = data; renderBrandTypeFit(); }
-}
-
-function toggleActive(btn) {
-  const parent = btn.parentElement;
-  parent.querySelectorAll('.ytab').forEach(b => b.classList.remove('active'));
+function showTab(name, btn) {
+  document.querySelectorAll('.tab-content').forEach(d => d.style.display = 'none');
+  document.querySelectorAll('.tab').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + name).style.display = '';
   btn.classList.add('active');
 }
 
-const fmt = n => n >= 1e6 ? (n/1e6).toFixed(1)+'M' : n >= 1e3 ? (n/1e3).toFixed(1)+'K' : Math.round(n).toLocaleString('es-PE');
-
-function render() {
-  if (store.page === 2) {
-    renderYTDKPIs();
-    renderMainChart();
-    renderPage2NewIndicators();
-    renderTopCliP2();
-    renderTopPrdP2();
-  }
-  if (store.page === 3) renderPage3();
-  if (store.page === 4) renderPage4();
-  if (store.page === 5) renderPage5();
-  if (store.page === 1) {
-    renderKPIs();
-    renderMainChart();
-    renderDimPais();
-    renderDimTipo();
-    renderDimMarca();
-    renderTopCli();
-    renderTopPrd();
-    renderExtra();
-  }
+async function changeYear() {
+  state.year = parseInt(document.getElementById('sel-year').value);
+  await init();
 }
 
-// --- RENDERS POR COMPONENTE ---
-
-async function renderPage2NewIndicators() {
-  if (!store.data.rentabilidadOrigen || store.data.rentabilidadOrigen.length === 0) {
-    await Promise.all([
-      updateRentabilidadOrigen(store.year),
-      updateMarketShareTipo(store.year),
-      updateDependenciaMarca(store.year),
-      updateBrandTypeFit(store.year)
-    ]);
-  } else {
-    renderRentabilidadOrigen();
-    renderMarketShareTipo();
-    renderDependenciaMarca();
-    renderBrandTypeFit();
-  }
+async function fetchJson(p) {
+  try { const r = await fetch(API + p); return r.ok ? await r.json() : null; } 
+  catch(e) { return null; }
 }
 
-function renderRentabilidadOrigen() {
-  const data = store.data.rentabilidadOrigen || [];
-  const chartData = {
-    labels: data.slice(0, 8).map(d => d.pais),
-    datasets: [{ label: 'Margen Neto S/', data: data.slice(0, 8).map(d => d.margen_neto), backgroundColor: '#10B981' }]
-  };
-  renderChart('chart-rentabilidad-origen', 'bar', chartData, { indexAxis: 'y' });
-  const tbody = document.querySelector('#tbl-rentabilidad-origen tbody');
-  if (tbody) tbody.innerHTML = data.slice(0, 8).map(d => `
-    <tr><td><b>${d.pais}</b></td><td class="col-num">S/ ${fmt(d.margen_neto)}</td><td class="col-num">${fmt(d.unidades)}</td></tr>
-  `).join('');
-}
-
-function renderMarketShareTipo() {
-  const raw = store.data.marketShareTipo || [];
-  const paises = [...new Set(raw.map(d => d.pais))].slice(0, 8);
-  const tipos = [...new Set(raw.map(d => d.tipo))];
-  const colors = ['#2563EB', '#10B981', '#F59E0B', '#8B5CF6', '#EC4899', '#3B82F6'];
-  const datasets = tipos.map((t, i) => ({
-    label: t,
-    data: paises.map(p => {
-      const item = raw.find(r => r.pais === p && r.tipo === t);
-      return item ? item.share_pct : 0;
-    }),
-    backgroundColor: colors[i % colors.length]
-  }));
-  renderChart('chart-market-share-tipo', 'bar', { labels: paises, datasets }, {
-    indexAxis: 'y',
-    scales: { x: { stacked: true, max: 100 }, y: { stacked: true } },
-    plugins: { tooltip: { callbacks: { label: (ctx) => `${ctx.dataset.label}: ${ctx.raw}%` } } }
-  });
-}
-
-function renderDependenciaMarca() {
-  const data = store.data.dependenciaMarca || [];
-  const chartData = {
-    labels: data.slice(0, 8).map(d => d.pais),
-    datasets: [{ label: '% Dependencia', data: data.slice(0, 8).map(d => d.dependencia_pct), backgroundColor: '#F59E0B' }]
-  };
-  renderChart('chart-dependencia-marca', 'bar', chartData, { indexAxis: 'y' });
-  const tbody = document.querySelector('#tbl-dependencia-marca tbody');
-  if (tbody) tbody.innerHTML = data.slice(0, 8).map(d => `
-    <tr><td><b>${d.pais}</b></td><td>${d.marca_ancla}</td><td class="col-num" style="color:var(--primary);font-weight:600">${d.dependencia_pct}%</td></tr>
-  `).join('');
-}
-
-function renderBrandTypeFit() {
-  const raw = store.data.brandTypeFit || [];
-  const marcas = [...new Set(raw.map(d => d.marca))].slice(0, 10);
-  const tipos = [...new Set(raw.map(d => d.tipo))];
-  const colors = ['#2563EB', '#10B981', '#F59E0B', '#8B5CF6', '#EC4899', '#3B82F6'];
-  const datasets = tipos.map((t, i) => ({
-    label: t,
-    data: marcas.map(m => {
-      const item = raw.find(r => r.marca === m && r.tipo === t);
-      return item ? item.share_pct : 0;
-    }),
-    backgroundColor: colors[i % colors.length]
-  }));
-  renderChart('chart-brand-type-fit', 'bar', { labels: marcas, datasets }, {
-    indexAxis: 'x',
-    scales: { x: { stacked: true }, y: { stacked: true, max: 100 } },
-    plugins: { tooltip: { callbacks: { label: (ctx) => `${ctx.dataset.label}: ${ctx.raw}%` } } }
-  });
-}
-
-function renderKPIs() {
-  const k = store.data.kpis?.current || {};
-  const p = store.data.kpis?.previous;
-  document.getElementById('kpi-rev').textContent = 'S/ ' + fmt(k.venta_neta || 0);
-  document.getElementById('kpi-mgn').textContent = 'S/ ' + fmt(k.margen || 0);
-  document.getElementById('kpi-pct').textContent = (k.pct_margen || 0) + '%';
-  document.getElementById('kpi-uds').textContent = fmt(k.unidades || 0);
-  document.getElementById('kpi-cli').textContent = fmt(k.clientes || 0);
-  document.getElementById('kpi-ped').textContent = fmt(k.pedidos || 0);
-  document.getElementById('kpi-aov').textContent = 'S/ ' + fmt(k.pedido_promedio || 0);
-
-  const setDelta = (cur, prev, id) => {
-    const el = document.getElementById(id);
-    if (!prev) { el.className = 'kpi-delta delta-neu'; el.textContent = '—'; return; }
-    const diff = ((cur - prev)/prev * 100).toFixed(1);
-    el.className = 'kpi-delta ' + (cur >= prev ? 'delta-up' : 'delta-dn');
-    el.textContent = (cur >= prev ? '▲' : '▼') + Math.abs(diff) + '% vs y-1';
-  };
-  setDelta(k.venta_neta, p?.venta_neta, 'kpi-rev-d');
-  setDelta(k.margen, p?.margen, 'kpi-mgn-d');
-  setDelta(k.pct_margen, p?.pct_margen, 'kpi-pct-d');
-  setDelta(k.unidades, p?.unidades, 'kpi-uds-d');
-  setDelta(k.clientes, p?.clientes, 'kpi-cli-d');
-  setDelta(k.pedidos, p?.pedidos, 'kpi-ped-d');
-  setDelta(k.pedido_promedio, p?.pedido_promedio, 'kpi-aov-d');
-}
-
-async function renderYTDKPIs() {
-  if (!store.data.ytd) {
-    const data = await fetchJson('/api/kpis-ytd');
-    if (!data) return;
-    store.data.ytd = data;
-  }
-  const k = store.data.ytd.current || {};
-  const p = store.data.ytd.previous;
-  const upTo = store.data.ytd.up_to;
-
-  const year = upTo ? upTo.substring(0, 4) : new Date().getFullYear();
-  const day  = upTo ? upTo.substring(5).replace('-', '/') : '';
-  const labelEl = document.getElementById('ytd-label');
-  if (labelEl) labelEl.textContent = `01 Ene ${year} → ${day}  |  vs mismo periodo ${Number(year) - 1}`;
-
-  document.getElementById('ytd-rev').textContent = 'S/ ' + fmt(k.venta_neta || 0);
-  document.getElementById('ytd-mgn').textContent = 'S/ ' + fmt(k.margen || 0);
-  document.getElementById('ytd-pct').textContent = (k.pct_margen || 0) + '%';
-  document.getElementById('ytd-uds').textContent = fmt(k.unidades || 0);
-  document.getElementById('ytd-cli').textContent = fmt(k.clientes || 0);
-  document.getElementById('ytd-ped').textContent = fmt(k.pedidos || 0);
-  document.getElementById('ytd-aov').textContent = 'S/ ' + fmt(k.pedido_promedio || 0);
-
-  const setDeltaYTD = (cur, prev, id) => {
-    const el = document.getElementById(id);
-    if (!prev || prev === 0) { el.className = 'kpi-delta delta-neu'; el.textContent = '—'; return; }
-    const diff = ((cur - prev) / prev * 100).toFixed(1);
-    el.className = 'kpi-delta ' + (cur >= prev ? 'delta-up' : 'delta-dn');
-    el.textContent = (cur >= prev ? '▲' : '▼') + Math.abs(diff) + `% vs ${Number(year) - 1}`;
-  };
-  setDeltaYTD(k.venta_neta, p?.venta_neta, 'ytd-rev-d');
-  setDeltaYTD(k.margen, p?.margen, 'ytd-mgn-d');
-  setDeltaYTD(k.pct_margen, p?.pct_margen, 'ytd-pct-d');
-  setDeltaYTD(k.unidades, p?.unidades, 'ytd-uds-d');
-  setDeltaYTD(k.clientes, p?.clientes, 'ytd-cli-d');
-  setDeltaYTD(k.pedidos, p?.pedidos, 'ytd-ped-d');
-  setDeltaYTD(k.pedido_promedio, p?.pedido_promedio, 'ytd-aov-d');
-}
-
-function renderMainChart() {
-  const id = store.page === 1 ? 'chart-main-line' : 'chart-yoy-line';
-  if (store.page === 2) { renderPage2(); return; }
-  renderChart(id, 'line', {
-    labels: store.data.serie.map(d => d.mes_label),
-    datasets: [{ label: 'Venta S/', data: store.data.serie.map(d => d.venta_neta), borderColor: '#2563EB', backgroundColor: 'rgba(37, 99, 235, 0.1)', fill: true, tension: 0.4 }]
-  });
-}
-
-function renderDimPais() {
-  const id = store.page === 1 ? 'chart-dim-pais' : 'chart-dim-pais-p2';
-  const data = {
-    labels: store.data.pais.slice(0, 6).map(d => d.pais),
-    datasets: [{ data: store.data.pais.slice(0, 6).map(d => d.venta_neta), backgroundColor: '#3B82F6' }]
-  };
-  renderChart(id, 'bar', data, { indexAxis: 'y' });
-}
-
-function renderDimTipo() {
-  const id = store.page === 1 ? 'chart-dim-tipo' : 'chart-dim-tipo-p2';
-  const data = {
-    labels: store.data.tipo.map(d => d.tipo),
-    datasets: [{ data: store.data.tipo.map(d => d.venta_neta), backgroundColor: ['#2563EB', '#10B981', '#F59E0B', '#8B5CF6', '#EC4899'] }]
-  };
-  renderChart(id, 'doughnut', data);
-}
-
-function renderDimMarca() {
-  const id = store.page === 1 ? 'chart-dim-marca' : 'chart-dim-marca-p2';
-  const data = {
-    labels: store.data.marca.slice(0, 8).map(d => d.marca),
-    datasets: [{ data: store.data.marca.slice(0, 8).map(d => d.venta_neta), backgroundColor: '#1E293B' }]
-  };
-  renderChart(id, 'bar', data, { indexAxis: 'y' });
-}
-
-function renderTopCli() {
-  const tbody = document.querySelector('#tbl-top-cli tbody');
-  if (!tbody) return;
-  tbody.innerHTML = store.data.topCli.slice(0, 6).map((c, i) => `
-    <tr><td>${i+1}</td><td><b>${c.cliente}</b></td><td class="col-num">${c.pedidos}</td><td class="col-num">S/ ${fmt(c.venta_neta)}</td><td><span class="chip" style="color:var(--primary)">${c.segmento_rfm}</span></td></tr>
-  `).join('');
-}
-
-let cliPageP2 = 0;
-const CLI_PAGE_SIZE = 6;
-
-function rfmBadge(c) {
-  const dias = c.dias_sin_compra ?? 999;
-  const venta = c.venta_neta ?? 0;
-  const pedidos = c.pedidos ?? 0;
-  if (dias <= 60 && venta > 150000) return { label: '&#127942; VIP',    color: '#F59E0B' };
-  if (dias <= 90 && pedidos >= 80)  return { label: '&#11088; Leal',   color: '#3B82F6' };
-  if (dias <= 120)                  return { label: '&#129001; Activo', color: '#10B981' };
-  if (dias <= 180)                  return { label: '&#128993; En riesgo', color: '#F97316' };
-  return                                   { label: '&#128308; Inactivo', color: '#EF4444' };
-}
-
-function cliPageNav(dir) {
-  const total = (store.data.topCliYear || []).length;
-  const maxPage = Math.ceil(total / CLI_PAGE_SIZE) - 1;
-  cliPageP2 = Math.max(0, Math.min(maxPage, cliPageP2 + dir));
-  renderTopCliP2();
-}
-
-const RFM_PRIORITY = { 'VIP': 0, 'Leal': 1, 'Activo': 2, 'En riesgo': 3, 'Inactivo': 4 };
-
-function rfmKey(c) {
-  const dias = c.dias_sin_compra ?? 999;
-  const venta = c.venta_neta ?? 0;
-  const pedidos = c.pedidos ?? 0;
-  if (dias <= 60 && venta > 150000) return 'VIP';
-  if (dias <= 90 && pedidos >= 80)  return 'Leal';
-  if (dias <= 120)                  return 'Activo';
-  if (dias <= 180)                  return 'En riesgo';
-  return 'Inactivo';
-}
-
-async function renderTopCliP2() {
-  const tbody = document.querySelector('#tbl-top-cli-p2 tbody');
-  if (!tbody) return;
-
-  // Fetch solo si no está en caché
-  if (!store.data.topCliYear) {
-    const currentYear = new Date().getFullYear();
-    const data = await fetchJson(`/api/top-clientes-year?anno=${currentYear}`);
-    if (!data || data.length === 0) return;
-
-    // Ordenar: RFM priority primero, luego venta_neta descendente
-    data.forEach(c => c._rfmKey = rfmKey(c));
-    data.sort((a, b) =>
-      (RFM_PRIORITY[a._rfmKey] - RFM_PRIORITY[b._rfmKey]) ||
-      (b.venta_neta - a.venta_neta)
-    );
-    store.data.topCliYear = data;
-    cliPageP2 = 0; // Reset a primera página al cargar nuevos datos
-  }
-
-  const all = store.data.topCliYear;
-  const total = all.length;
-  const totalVenta = all.reduce((s, c) => s + (c.venta_neta || 0), 0);
-  const maxPage = Math.ceil(total / CLI_PAGE_SIZE) - 1;
-  cliPageP2 = Math.max(0, Math.min(maxPage, cliPageP2));
-
-  const start = cliPageP2 * CLI_PAGE_SIZE;
-  const page  = all.slice(start, start + CLI_PAGE_SIZE);
-
-  // Cabecera
-  const el = document.getElementById('total-cli-p2');
-  if (el) el.textContent = total + ' total';
-
-  // Controles paginación
-  const info = document.getElementById('cli-p2-info');
-  if (info) info.textContent = `Página ${cliPageP2 + 1} de ${maxPage + 1}`;
-  const prev = document.getElementById('cli-p2-prev');
-  const next = document.getElementById('cli-p2-next');
-  if (prev) prev.style.opacity = cliPageP2 === 0 ? '0.35' : '1';
-  if (next) next.style.opacity = cliPageP2 >= maxPage ? '0.35' : '1';
-
-  tbody.innerHTML = page.map((c, i) => {
-    const rank  = start + i + 1;
-    const share = totalVenta > 0 ? ((c.venta_neta / totalVenta) * 100).toFixed(1) : '-';
-    const rfm   = rfmBadge(c);
-    return `
-    <tr>
-      <td>${rank}</td>
-      <td><b>${c.cliente}</b></td>
-      <td class="col-num">${c.pedidos}</td>
-      <td class="col-num">S/ ${fmt(c.venta_neta)}</td>
-      <td class="col-num" style="color:var(--primary);font-weight:600">${share}%</td>
-      <td><span style="
-        display:inline-flex; align-items:center; gap:4px;
-        background:${rfm.color}18; color:${rfm.color}; font-weight:700;
-        border-radius:20px; padding:2px 10px; font-size:11px; white-space:nowrap;
-      ">${rfm.label}</span></td>
-    </tr>`;
-  }).join('');
-}
-
-function renderTopPrd() {
-  const tbody = document.querySelector('#tbl-top-prd tbody');
-  if (!tbody) return;
-  tbody.innerHTML = store.data.topPrd.slice(0, 6).map((p, i) => `
-    <tr><td>${i+1}</td><td><b>${p.producto}</b></td><td>${p.nombre_tipo_bebida || p.tipo || ''}</td><td class="col-num">${fmt(p.unidades)}</td><td class="col-num">${p.margen_pct || p.pct_margen || 0}%</td></tr>
-  `).join('');
-}
-
-function renderTopPrdP2() {
-  const tbody = document.querySelector('#tbl-top-prd-p2 tbody');
-  if (!tbody) return;
-  tbody.innerHTML = store.data.topPrd.slice(0, 6).map((p, i) => `
-    <tr>
-      <td>${i+1}</td>
-      <td><b>${p.producto}</b></td>
-      <td><span style="color:${p.nombre_tipo_bebida?.toLowerCase().includes('tinto')||p.tipo?.toLowerCase().includes('tinto')?'#7C3AED':'#3B82F6'};font-weight:600">${p.nombre_tipo_bebida || p.tipo || ''}</span></td>
-      <td class="col-num">${fmt(p.unidades)}</td>
-      <td class="col-num" style="color:var(--primary);font-weight:600">${p.pct_venta ? p.pct_venta.toFixed(1) : '-'}%</td>
-      <td class="col-num" style="color:var(--red);font-weight:700">${p.margen_pct || p.pct_margen || 0}%</td>
-    </tr>
-  `).join('');
-}
-
-function renderExtra() {
-  document.querySelector('#tbl-vendedores tbody').innerHTML = store.data.sellers.slice(0, 5).map(v => `
-    <tr><td><b>${v.vendedor}</b></td><td class="col-num">S/ ${fmt(v.venta_neta)}</td><td class="col-num">${v.pedidos}</td><td class="col-num">${v.share_pct}%</td></tr>
-  `).join('');
-
-  renderChart('chart-segments', 'bar', {
-    labels: store.data.segments.map(d => d.segmento),
-    datasets: [{ label: '% Vol', data: store.data.segments.map(d => d.pct_volumen), backgroundColor: '#0D9488' }]
-  }, { indexAxis: 'y' });
-
-  renderChart('chart-margins', 'bar', {
-    labels: store.data.margins.slice(0, 6).map(d => d.marca),
-    datasets: [{ label: '% Mgn', data: store.data.margins.slice(0, 6).map(d => d.pct_margen), backgroundColor: '#10B981' }]
-  }, { indexAxis: 'y' });
-
-  document.querySelector('#tbl-rfm-summary tbody').innerHTML = store.data.rfm.slice(0, 8).map(r => `
-    <tr><td><b>${r.cliente}</b></td><td class="col-num">${r.dias_sin_compra}d</td><td><span class="chip" style="color:${r.segmento_rfm==='VIP'?'#F59E0B':r.segmento_rfm==='Leal'?'#3B82F6':'#94A3B8'}">${r.segmento_rfm}</span></td><td class="col-num">S/ ${fmt(r.valor_monetario)}</td></tr>
-  `).join('');
-
-  const heatBody = document.getElementById('heat-grid-body');
-  heatBody.innerHTML = '';
-  const annos = [...new Set(store.data.heat.map(h => h.anno))].sort().reverse();
-  annos.forEach(a => {
-    const row = document.createElement('div'); row.className = 'heat-grid'; row.style.marginBottom = '2px';
-    row.innerHTML = `<div style="font-size:10px; font-weight:700; color:var(--muted)">${a}</div>`;
-    for(let m=1; m<=12; m++) {
-      const d = store.data.heat.find(h => h.anno == a && h.mes == m);
-      const val = d ? d.indice_estacional : 0;
-      const col = val > 115 ? '#1E3A8A' : val > 100 ? '#3B82F6' : val > 85 ? '#93C5FD' : val > 0 ? '#FCA5A5' : '#F1F5F9';
-      row.innerHTML += `<div class="heat-cell" style="background:${col}" title="${val}%">${val ? val : '-'}</div>`;
-    }
-    heatBody.appendChild(row);
-  });
-}
-
-async function setSalesMetric(m, btn) {
-  store.salesMetric = m;
-  toggleActive(btn);
-  showLoader();
-  await renderPage2();
-  hideLoader();
-}
-
-async function renderPage2() {
-  const data = await fetchJson('/api/serie-mensual');
-  if (!data) return;
-  const monthLabels = ["Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dic"];
-  const years = [2022, 2023, 2024, 2025, 2026];
-  const colors = { 2022: '#94A3B8', 2023: '#64748B', 2024: '#334155', 2025: '#2563EB', 2026: '#0F172A' };
-  const metricMap = {
-    'venta_neta': { label: 'Venta S/', key: 'venta_neta', fmt: v => 'S/ ' + fmt(v) },
-    'pct_margen': { label: '% Margen', key: 'pct_margen', fmt: v => v.toFixed(1) + '%' },
-    'pedidos': { label: 'Pedidos', key: 'pedidos', fmt: v => fmt(v) },
-    'unidades': { label: 'Unidades', key: 'unidades', fmt: v => fmt(v) }
-  };
-  const m = metricMap[store.salesMetric];
-  const datasets = years.map(y => {
-    const yearData = new Array(12).fill(null);
-    data.filter(d => d.anno == y).forEach(d => {
-      if (d.mes >= 1 && d.mes <= 12) {
-        let val = d[m.key];
-        if (store.salesMetric === 'pct_margen' && val === undefined) val = (d.margen / d.venta_neta) * 100;
-        yearData[d.mes - 1] = val;
-      }
-    });
-    return {
-      label: 'Año ' + y, data: yearData, borderColor: colors[y], backgroundColor: colors[y],
-      borderWidth: y >= 2025 ? 3 : 2, tension: 0.4, fill: false, spanGaps: true,
-      datalabels: { display: y === 2026, align: 'top', anchor: 'end', offset: 4, color: colors[y], font: { weight: 'bold', size: 10 }, formatter: (v) => v ? m.fmt(v) : '' }
-    };
-  });
-  renderChart('chart-yoy-line', 'line', { labels: monthLabels, datasets }, {
-    interaction: { mode: 'index', intersect: false },
-    plugins: { legend: { display: true, position: 'top' }, tooltip: { mode: 'index', intersect: false, callbacks: { label: (ctx) => `${ctx.dataset.label}: ${m.fmt(ctx.raw)}` } } },
-    scales: { y: { beginAtZero: true, ticks: { callback: v => m.fmt(v) } } }
-  }, [ChartDataLabels]);
-}
-
-function renderPage3() {
-  const q = document.getElementById('cli-search').value.toLowerCase();
-  const filtered = store.data.fullCli.filter(c => c.cliente.toLowerCase().includes(q));
-  document.querySelector('#tbl-full-cli tbody').innerHTML = filtered.slice(0, 50).map(c => `
-    <tr><td><b>${c.cliente}</b></td><td class="col-num">S/ ${c.venta_neta.toLocaleString()}</td><td class="col-num">${c.pedidos}</td><td>${c.segmento_rfm}</td><td>${c.ultima_compra}</td></tr>
-  `).join('');
-}
-
-function renderPage4() {
-  const q = document.getElementById('prd-search').value.toLowerCase();
-  const filtered = store.data.fullPrd.filter(p => p.producto.toLowerCase().includes(q) || (p.marca_producto && p.marca_producto.toLowerCase().includes(q)));
-  document.querySelector('#tbl-full-prd tbody').innerHTML = filtered.slice(0, 50).map(p => `
-    <tr><td><b>${p.producto}</b></td><td>${p.marca_producto || ''}</td><td>${p.nombre_tipo_bebida || p.tipo || ''}</td><td class="col-num">S/ ${p.venta_neta.toLocaleString()}</td><td class="col-num">${p.unidades}</td><td class="col-num">${p.margen_pct || p.pct_margen || 0}%</td></tr>
-  `).join('');
-}
-
-async function renderPage5() {
-  if (store.data.fcMain.length === 0) {
-    store.data.fcMain = await fetch(API+'/api/forecast-total').then(r=>r.json()).catch(()=>[]);
-    store.data.fcPrds = await fetch(API+'/api/forecast-productos').then(r=>r.json()).catch(()=>[]);
-  }
-  renderChart('chart-forecast-main', 'line', {
-    labels: store.data.fcMain.map(d => d.periodo.substring(0,7)),
-    datasets: [
-      { label: 'Real', data: store.data.fcMain.map(d => d.venta_real), borderColor: '#2563EB', backgroundColor: '#2563EB', fill: false },
-      { label: 'Forecast', data: store.data.fcMain.map(d => d.forecast), borderColor: '#F59E0B', borderDash: [5,5], fill: false },
-      { label: 'Confianza', data: store.data.fcMain.map(d => d.fc_hi), borderColor: 'rgba(245,158,11,0.1)', backgroundColor: 'rgba(245,158,11,0.1)', fill: '-1', pointRadius: 0 }
-    ]
-  });
-  const group = {};
-  store.data.fcPrds.forEach(r => {
-    if(!group[r.producto]) group[r.producto] = { name: r.producto, f:0, lo:0, hi:0 };
-    group[r.producto].f += r.fc_uds; group[r.producto].lo += r.fc_lo; group[r.producto].hi += r.fc_hi;
-  });
-  document.querySelector('#tbl-forecast-prd tbody').innerHTML = Object.values(group).sort((a,b)=>b.f-a.f).slice(0, 20).map(p => `
-    <tr><td><b>${p.name}</b></td><td class="col-num">${Math.round(p.f)} uds</td><td>${Math.round(p.lo)} - ${Math.round(p.hi)}</td><td>ARIMA+</td></tr>
-  `).join('');
-}
-
-// --- CORE UTILS ---
+const fmt = n => n ? Math.round(n).toLocaleString('es-PE') : '0';
+const fmtK = n => n > 1000 ? (n/1000).toFixed(1)+'K' : Math.round(n);
 
 let charts = {};
-function renderChart(id, type, data, options = {}, plugins = []) {
+function mkChart(id, type, data, opts) {
   if (charts[id]) charts[id].destroy();
   const ctx = document.getElementById(id);
   if (!ctx) return;
-  const defaultPlugins = {
-    legend: { display: type === 'doughnut', position: 'bottom', labels: { boxWidth: 10, font: { size: 10 } } }
+  charts[id] = new Chart(ctx, { type, data, options: { responsive: true, maintainAspectRatio: false, ...opts } });
+}
+
+// --- DATA LOADING ---
+async function init() {
+  document.getElementById('loader').style.display = 'flex';
+  const anno = state.year;
+  
+  // Launch all queries
+  const [
+    kpis, serie, actCli, actPrd, rentOri, typeMix, 
+    marcaMix, freq, retencion, aiStrats
+  ] = await Promise.all([
+    fetchJson(`/api/kpis?anno=${anno}`),
+    fetchJson(`/api/serie-mensual`), // get all series for chart 1
+    fetchJson(`/api/top-clientes-year?anno=${anno}&limit=20`),
+    fetchJson(`/api/por-marca?anno=${anno}`), // using as brand proxy
+    fetchJson(`/api/rentabilidad-origen?anno=${anno}`),
+    fetchJson(`/api/por-tipo?anno=${anno}`),
+    fetchJson(`/api/por-marca?anno=${anno}`),
+    fetchJson(`/api/frecuencia-compra?anno=${anno}`),
+    fetchJson(`/api/retencion`),
+    fetchJson(`/api/estrategias-ia`)
+  ]);
+
+  state.data = { kpis, serie, actCli, actPrd, rentOri, typeMix, marcaMix, freq, retencion, aiStrats };
+  
+  // Also get top productos for specific year
+  const rawTopPrd = await fetchJson(`/api/top-productos?anno=${anno}&limit=20`);
+  state.data.topPrd = rawTopPrd || [];
+
+  renderAll();
+  document.getElementById('loader').style.display = 'none';
+}
+
+// --- RENDERING ROUTINES ---
+function renderAll() {
+  renderOverview();
+  renderClients();
+  renderProducts();
+  renderMargins();
+  renderRetention();
+  renderAI();
+}
+
+function renderOverview() {
+  // KPIs
+  const k = state.data.kpis?.current || {};
+  const p = state.data.kpis?.previous || {};
+  document.getElementById('k-rev').innerText = 'S/ ' + fmt(k.venta_neta);
+  document.getElementById('k-mgn').innerText = 'S/ ' + fmt(k.margen);
+  document.getElementById('k-pct').innerText = (k.pct_margen || 0) + '%';
+  document.getElementById('k-u').innerText = fmt(k.unidades);
+  document.getElementById('k-cli').innerText = fmt(k.clientes);
+  document.getElementById('k-ped').innerText = fmt(k.pedidos);
+  document.getElementById('k-aov').innerText = 'S/ ' + fmt(k.pedido_promedio);
+  
+  const setD = (id, cur, prev) => {
+    const el = document.getElementById(id);
+    if (!prev || prev==0) { el.innerText='-'; el.className='kpi-sub'; return; }
+    const pct = ((cur-prev)/prev*100).toFixed(1);
+    el.innerText = (cur >= prev ? '▲ ' : '▼ ') + Math.abs(pct) + '% vs a-1';
+    el.className = 'kpi-sub ' + (cur >= prev ? 'kpi-up' : 'kpi-down');
   };
-  charts[id] = new Chart(ctx, {
-    type, data, plugins,
-    options: { 
-      responsive: true, maintainAspectRatio: false, ...options,
-      plugins: { ...defaultPlugins, ...(options.plugins || {}) }
-    }
+  setD('k-rev-d', k.venta_neta, p.venta_neta);
+  setD('k-mgn-d', k.margen, p.margen);
+  setD('k-u-d', k.unidades, p.unidades);
+  setD('k-cli-d', k.clientes, p.clientes);
+  setD('k-ped-d', k.pedidos, p.pedidos);
+
+  // Evolucion Ventas Chart (All history)
+  const years = [2023, 2024, 2025, 2026];
+  const yearColors = ['#9ca3af', '#6b7280', '#3b82f6', '#111827'];
+  const mSeries = state.data.serie || [];
+  const ds = years.map((y, i) => {
+    let d = new Array(12).fill(null);
+    mSeries.filter(r => parseInt(r.anno) === y).forEach(r => d[r.mes-1] = r.venta_neta);
+    return { label: y.toString(), data: d, borderColor: yearColors[i], tension: 0.3, fill: false };
+  });
+  mkChart('c-sales-yr', 'line', { labels: ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'], datasets: ds });
+  
+  // Seasonal
+  if (state.data.serie) {
+     const curr = new Array(12).fill(0);
+     mSeries.filter(r => parseInt(r.anno) === state.year).forEach(r => curr[r.mes-1] = r.venta_neta);
+     mkChart('c-seasonal', 'line', { labels: ['E','F','M','A','M','J','J','A','S','O','N','D'], datasets: [{label: 'Vta', data: curr, borderColor: '#4F46E5', backgroundColor: 'rgba(79,70,229,0.1)', fill: true, tension: 0.4}] }, { plugins: {legend:{display:false}} });
+  }
+
+  // Type Mix
+  const tMix = state.data.typeMix || [];
+  mkChart('c-type-mix', 'doughnut', {
+    labels: tMix.map(d => d.tipo), 
+    datasets: [{ data: tMix.map(d => d.venta_neta), backgroundColor: ['#4F46E5','#10B981','#F59E0B','#EF4444','#8B5CF6','#6B7280'] }]
   });
 }
 
-function navPage(n, btn) {
-  store.page = n;
-  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
-  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-  document.getElementById('page'+n).classList.add('active');
-  render();
+function renderClients() {
+  // RFM Table & Frequency
+  const tCli = state.data.actCli || [];
+  document.getElementById('top-cli-table').innerHTML = tCli.slice(0, 15).map((c, i) => {
+    let bd = 'b-blue'; let st = 'Activo';
+    if(c.dias_sin_compra > 180) {bd = 'b-red'; st='Perdido';}
+    else if(c.dias_sin_compra > 90) {bd = 'b-amber'; st='En Riesgo';}
+    else if(c.venta_neta > 50000) {bd = 'b-purple'; st='VIP';}
+    else if(c.pedidos > 20) {bd = 'b-green'; st='Leal';}
+    return `<tr><td>${i+1}</td><td><b>${c.cliente}</b></td><td>S/ ${fmt(c.venta_neta)}</td><td>${c.pedidos}</td><td>${c.ultima_compra || '-'}</td><td>${c.dias_sin_compra} d</td><td><span class="badge ${bd}">${st}</span></td></tr>`;
+  }).join('');
+
+  const fq = state.data.freq || [];
+  mkChart('c-freq', 'bar', {
+    labels: fq.map(d => d.rango_frecuencia),
+    datasets: [{ label: 'Clientes', data: fq.map(d => d.cantidad_clientes), backgroundColor: '#4F46E5', borderRadius: 4 }]
+  });
+
+  // Calculate generic RFM value distribution for chart
+  const rfmVal = { 'VIP': 0, 'Leal': 0, 'Activo': 0, 'En Riesgo': 0, 'Perdido': 0 };
+  tCli.forEach(c => {
+    let st = 'Activo';
+    if(c.dias_sin_compra > 180) st='Perdido';
+    else if(c.dias_sin_compra > 90) st='En Riesgo';
+    else if(c.venta_neta > 50000) st='VIP';
+    else if(c.pedidos > 20) st='Leal';
+    rfmVal[st] += c.venta_neta;
+  });
+  mkChart('c-rfm-val', 'bar', {
+    labels: Object.keys(rfmVal),
+    datasets: [{ label: 'Valor S/', data: Object.values(rfmVal), backgroundColor: ['#8B5CF6','#10B981','#3B82F6','#F59E0B','#EF4444'], borderRadius: 4 }]
+  }, { plugins: {legend:{display:false}} });
 }
 
-async function setYear(y, btn) {
-  store.year = y;
-  document.querySelectorAll('.ytab').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active'); showLoader(); await loadData(); hideLoader(); render();
+function renderProducts() {
+  const prd = state.data.topPrd || [];
+  const maxP = prd.length > 0 ? prd[0].venta_neta : 1;
+  document.getElementById('top-prod-bars').innerHTML = prd.slice(0,10).map(p => `
+    <div class="bar-horiz"><div class="bar-label">${p.producto}</div><div class="bar-track"><div class="bar-fill" style="width:${Math.max(1, (p.venta_neta/maxP)*100)}%;background:#4F46E5"></div></div><div class="bar-val">S/${fmtK(p.venta_neta)}</div></div>
+  `).join('');
+
+  const b = state.data.marcaMix || [];
+  const maxB = b.length > 0 ? b[0].venta_neta : 1;
+  const bc = ['#D85A30','#1D9E75','#EF9F27','#534AB7','#3266ad','#888780','#E24B4A','#0C447C','#BA7517','#D85A30'];
+  document.getElementById('top-brand-bars').innerHTML = b.slice(0,10).map((p,i) => `
+    <div class="bar-horiz"><div class="bar-label">${p.marca}</div><div class="bar-track"><div class="bar-fill" style="width:${Math.max(1, (p.venta_neta/maxB)*100)}%;background:${bc[i%bc.length]}"></div></div><div class="bar-val">S/${fmtK(p.venta_neta)}</div></div>
+  `).join('');
+
+  const pOri = state.data.rentOri || [];
+  mkChart('c-country-sales', 'bar', {
+    labels: pOri.map(d => d.pais).slice(0,6),
+    datasets: [{ label: 'Venta S/', data: pOri.map(d => d.venta_neta).slice(0,6), backgroundColor: ['#4F46E5','#10B981','#F59E0B','#EF4444','#8B5CF6','#6B7280'] }]
+  }, { indexAxis: 'y' });
 }
 
-function handleSearchCli() { renderPage3(); }
-function handleSearchPrd() { renderPage4(); }
+function renderMargins() {
+  const pOri = state.data.rentOri || [];
+  document.getElementById('tbl-rentabilidad-origen').innerHTML = pOri.map(d => {
+    let color = 'b-blue';
+    const pct = d.venta_neta > 0 ? (d.margen_neto/d.venta_neta*100) : 0;
+    if(pct >= 65) color = 'b-green'; else if(pct <= 55) color = 'b-red'; else color = 'b-amber';
+    return `<tr><td><b>${d.pais}</b></td><td>S/ ${fmt(d.venta_neta)}</td><td>S/ ${fmt(d.margen_neto)}</td><td><span class="badge ${color}">${pct.toFixed(1)}%</span></td><td>${fmt(d.unidades)}</td></tr>`;
+  }).join('');
 
-let loaderInterval;
-const loaderMsgs = [
-  "Estás a punto de ingresar al mundo de Iconic Terroirs",
-  "Este dashboard ha sido creado para mostrarte la evolución de nuestra compañía",
-  "Espera un momento por favor, en breve ingresarás a este nuevo mundo"
-];
-
-function showLoader() {
-  const ldr = document.getElementById('loader');
-  ldr.style.opacity = '1'; ldr.style.pointerEvents = 'all';
-  let idx = 0;
-  const msgEl = document.getElementById('loader-msg');
-  msgEl.innerText = loaderMsgs[0];
-  if (loaderInterval) clearInterval(loaderInterval);
-  loaderInterval = setInterval(() => {
-    idx = (idx + 1) % loaderMsgs.length;
-    msgEl.style.opacity = 0;
-    setTimeout(() => { msgEl.innerText = loaderMsgs[idx]; msgEl.style.opacity = 1; }, 300);
-  }, 4000);
+  mkChart('c-margin-pct', 'bar', {
+    labels: pOri.map(d => d.pais),
+    datasets: [{ label: 'Margen %', data: pOri.map(d => (d.margen_neto/d.venta_neta*100).toFixed(1)), backgroundColor: '#10B981', borderRadius: 4 }]
+  });
 }
 
-function hideLoader() {
-  const ldr = document.getElementById('loader');
-  ldr.style.opacity = '0'; ldr.style.pointerEvents = 'none';
-  if (loaderInterval) clearInterval(loaderInterval);
+function renderRetention() {
+  const ret = state.data.retencion || [];
+  document.getElementById('tbl-retencion').innerHTML = ret.map(d => {
+    return `<tr><td><b>${d.anno}</b></td><td>${d.clientes_actuales}</td><td><span style="color:#059669;font-weight:600">${d.retenidos}</span></td><td><span style="color:#2563EB;font-weight:600">+${d.nuevos}</span></td><td><span style="color:#DC2626;font-weight:600">-${d.perdidos}</span></td><td>S/ ${fmt(d.perdida_usd)}</td></tr>`;
+  }).join('');
+  
+  if(ret.length > 0) {
+    mkChart('c-retention', 'bar', {
+      labels: ret.map(d => d.anno),
+      datasets: [
+        { label: 'Retenidos', data: ret.map(d => d.retenidos), backgroundColor: '#10B981', stack: 'Stack 0' },
+        { label: 'Nuevos', data: ret.map(d => d.nuevos), backgroundColor: '#3B82F6', stack: 'Stack 0' },
+        { label: 'Perdidos (-)', data: ret.map(d => -d.perdidos), backgroundColor: '#EF4444', stack: 'Stack 0' }
+      ]
+    }, { scales: { x: { stacked: true }, y: { stacked: true } } });
+    
+    mkChart('c-ret-loss', 'bar', {
+      labels: ret.map(d => d.anno),
+      datasets: [{ label: 'Pérdida (S/)', data: ret.map(d => d.perdida_usd), backgroundColor: '#DC2626', borderRadius: 4 }]
+    });
+  }
 }
 
-document.addEventListener('DOMContentLoaded', init);
+function renderAI() {
+  const ia = state.data.aiStrats || { competencia: [], estrategias: [] };
+  
+  document.getElementById('tbl-ai-competencia').innerHTML = ia.competencia.map(c => `
+    <tr><td><b>${c.competidor}</b></td><td>${c.enfoque}</td><td>${c.fortaleza}</td><td><span class="badge b-${c.color}">${c.amenaza}</span></td></tr>
+  `).join('');
+
+  document.getElementById('tbl-ai-estrategias').innerHTML = ia.estrategias.map(e => `
+    <tr><td>${e.id}</td><td><b>${e.nombre}</b><br><span style="font-size:10px;color:gray">${e.desc}</span></td><td>${e.palanca}</td><td><span class="badge b-${e.color}">${e.impacto}</span></td></tr>
+  `).join('');
+}
+
+window.onload = () => { init(); };
 </script>
 </body>
 </html>
