@@ -3,350 +3,1045 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Iconic Terroirs · Dashboard v3</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<title>Iconic Terroirs · Executive Dashboard (Unificado)</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
+<script src="https://unpkg.com/lucide@latest"></script>
 <style>
+/* CSS PREMIUM GLASSMORPHISM */
 :root {
-  --color-background-primary: #FFFFFF;
-  --color-background-secondary: #F8F9FA;
-  --color-border-tertiary: #E9ECEF;
-  --color-border-secondary: #DEE2E6;
-  --color-text-primary: #212529;
-  --color-text-secondary: #6C757D;
-  --font-sans: 'Inter', sans-serif;
-  --border-radius-lg: 12px;
-  --border-radius-md: 8px;
+  --bg: #f8fafc;
+  --bg-gradient: radial-gradient(circle at top right, #f1f5f9, #f8fafc);
+  --card-bg: rgba(255, 255, 255, 0.8);
+  --card-border: rgba(255, 255, 255, 0.5);
+  --primary: #6366f1;
+  --primary-hover: #4f46e5;
+  --accent: #d97706; /* Gold Amber */
+  --text-main: #0f172a;
+  --text-muted: #64748b;
+  --border: #e2e8f0;
+  --success: #10b981;
+  --danger: #ef4444;
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.1);
+  --shadow-md: 0 10px 15px -3px rgba(0,0,0,0.05), 0 4px 6px -2px rgba(0,0,0,0.02);
+  --shadow-lg: 0 20px 25px -5px rgba(0,0,0,0.08), 0 10px 10px -5px rgba(0,0,0,0.03);
+  --radius: 16px;
 }
+
 * { box-sizing: border-box; margin: 0; padding: 0; }
-body { font-family: var(--font-sans); background-color: #FAFAFA; color: var(--color-text-primary); padding: 20px; }
-.dash { max-width: 1400px; margin: 0 auto; background: white; padding: 24px; border-radius: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
-.header-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-.header-top h1 { font-size: 20px; font-weight: 600; }
-.year-filter { padding: 6px 12px; border-radius: 6px; border: 1px solid var(--color-border-secondary); font-family: var(--font-sans); }
+body { 
+  font-family: 'Outfit', sans-serif; 
+  background: var(--bg-gradient); 
+  color: var(--text-main); 
+  min-height: 100vh;
+  padding: 32px 20px;
+  -webkit-font-smoothing: antialiased;
+}
 
-.section-title { font-size: 13px; font-weight: 500; color: var(--color-text-secondary); text-transform: uppercase; letter-spacing: 0.06em; margin: 1.5rem 0 0.75rem; }
-.kpi-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
-.kpi { background: var(--color-background-secondary); border-radius: var(--border-radius-md); padding: 0.85rem 1rem; position: relative; }
-.kpi-label { font-size: 11px; color: var(--color-text-secondary); margin-bottom: 4px; }
-.kpi-value { font-size: 22px; font-weight: 600; color: var(--color-text-primary); }
-.kpi-sub { font-size: 11px; color: var(--color-text-secondary); margin-top: 2px; }
-.kpi-up { color: #3B6D11; }
-.kpi-down { color: #A32D2D; }
+/* Animations */
+@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+.fade-in { animation: fadeIn 0.5s ease-out forwards; }
 
-.charts-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 16px; }
-.charts-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; margin-top: 16px; }
-.card { background: var(--color-background-primary); border: 1px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); padding: 1.25rem; box-shadow: 0 1px 3px rgba(0,0,0,0.02); }
-.card-title { font-size: 13px; font-weight: 600; color: var(--color-text-secondary); margin-bottom: 12px; }
-.ch-wrap { position: relative; width: 100%; }
+.dash { 
+  max-width: 1500px; 
+  margin: 0 auto; 
+  background: var(--card-bg); 
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  padding: 32px; 
+  border-radius: 24px; 
+  border: 1px solid var(--card-border);
+  box-shadow: var(--shadow-lg); 
+}
 
-.tab-row { display: flex; gap: 8px; margin-bottom: 1.5rem; flex-wrap: wrap; border-bottom: 1px solid var(--color-border-tertiary); padding-bottom: 12px; }
-.tab { font-size: 13px; font-weight: 500; padding: 8px 16px; border: 1px solid transparent; border-radius: var(--border-radius-md); cursor: pointer; background: transparent; color: var(--color-text-secondary); transition: all 0.2s; }
-.tab.active { background: #EEF2FF; color: #4F46E5; font-weight: 600; border-color: #C7D2FE; }
-.tab:hover:not(.active) { background: var(--color-background-secondary); }
+.header-top { 
+  display: flex; 
+  justify-content: space-between; 
+  align-items: center; 
+  margin-bottom: 32px; 
+  padding-bottom: 20px;
+  border-bottom: 1px solid var(--border);
+}
+.header-top h1 { 
+  font-family: 'Playfair Display', serif; 
+  font-size: 26px; 
+  font-weight: 700; 
+  color: var(--text-main);
+  letter-spacing: -0.02em;
+}
 
-.legend { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 10px; font-size: 11px; color: var(--color-text-secondary); }
-.legend span { display: flex; align-items: center; gap: 4px; }
-.lsq { width: 10px; height: 10px; border-radius: 2px; display: inline-block; }
+/* Year Filter Custom Styling */
+.year-filter-wrapper { position: relative; display: flex; align-items: center; gap: 8px; }
+.year-filter { 
+  appearance: none;
+  background: white;
+  padding: 8px 36px 8px 16px; 
+  border-radius: 12px; 
+  border: 1px solid var(--border); 
+  font-family: 'Outfit'; 
+  font-weight: 500;
+  color: var(--text-main);
+  cursor: pointer;
+  box-shadow: var(--shadow-sm);
+  transition: all 0.2s;
+}
+.year-filter:hover { border-color: var(--primary); }
 
-.table-wrap { overflow-x: auto; }
-table { width: 100%; font-size: 12px; border-collapse: collapse; }
-th { text-align: left; padding: 8px 10px; color: var(--color-text-secondary); font-weight: 600; border-bottom: 1px solid var(--color-border-tertiary); text-transform: uppercase; font-size: 10px; }
-td { padding: 8px 10px; border-bottom: 1px solid var(--color-border-tertiary); color: var(--color-text-primary); }
+/* Navigation Tabs */
+.tab-row { 
+  display: flex; 
+  gap: 6px; 
+  margin-bottom: 2rem; 
+  flex-wrap: wrap; 
+  background: rgba(0,0,0,0.03); 
+  padding: 6px; 
+  border-radius: 14px;
+}
+.tab { 
+  font-size: 14px; 
+  font-weight: 500; 
+  padding: 10px 20px; 
+  border: none; 
+  border-radius: 10px; 
+  cursor: pointer; 
+  background: transparent; 
+  color: var(--text-muted); 
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.tab.active { 
+  background: white; 
+  color: var(--primary); 
+  font-weight: 600;
+  box-shadow: var(--shadow-md);
+}
+.tab:hover:not(.active) { color: var(--primary); background: rgba(255,255,255,0.5); }
+.tab-divider { width: 1px; background: rgba(0,0,0,0.1); margin: 6px 4px; }
+
+/* Sections */
+.section-title { 
+  font-size: 14px; 
+  font-weight: 600; 
+  color: var(--text-muted); 
+  text-transform: uppercase; 
+  letter-spacing: 0.1em; 
+  margin: 2rem 0 1rem; 
+  display: flex; 
+  align-items: center; 
+  gap: 10px;
+}
+.section-title::after { content: ""; flex: 1; height: 1px; background: var(--border); }
+
+/* NEW KPI CARDS */
+.kpi-grid { 
+  display: grid; 
+  grid-template-columns: repeat(8, 1fr); 
+  gap: 12px; 
+  margin-bottom: 24px; 
+}
+.kpi { 
+  background: white; 
+  border-radius: 16px; 
+  padding: 16px 12px; 
+  border: 1px solid var(--border); 
+  box-shadow: var(--shadow-sm);
+  transition: transform 0.3s, box-shadow 0.3s;
+  position: relative;
+  overflow: hidden;
+  text-align: center;
+}
+.kpi:hover { transform: translateY(-4px); box-shadow: var(--shadow-md); }
+.kpi-icon { 
+  position: absolute; 
+  right: -8px; 
+  top: -8px; 
+  opacity: 0.12; 
+  transform: rotate(-15deg); 
+  width: 50px !important;
+  height: 50px !important;
+  transition: opacity 0.3s;
+}
+.kpi:hover .kpi-icon { opacity: 0.25; }
+.kpi-label { font-size: 10px; font-weight: 600; color: var(--text-muted); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.05em; white-space: nowrap; }
+.kpi-value { font-size: 18px; font-weight: 700; color: var(--text-main); margin-bottom: 2px; white-space: nowrap; }
+.kpi-sub { font-size: 10px; font-weight: 500; display: flex; align-items: center; justify-content: center; gap: 3px; white-space: nowrap; }
+.kpi-up { color: var(--success); }
+.kpi-down { color: var(--danger); }
+
+/* CARDS & CHARTS */
+.card { 
+  background: white; 
+  border: 1px solid var(--border); 
+  border-radius: 20px; 
+  padding: 24px; 
+  box-shadow: var(--shadow-sm); 
+  display: flex;
+  flex-direction: column;
+}
+.card-title { font-size: 16px; font-weight: 600; color: var(--text-main); margin-bottom: 20px; display: flex; align-items: center; gap: 8px; }
+
+/* Grid Layouts */
+.charts-2 { 
+  display: grid; 
+  grid-template-columns: repeat(auto-fit, minmax(450px, 1fr)); 
+  gap: 24px; 
+  margin-bottom: 24px; 
+}
+
+@media (max-width: 1024px) {
+  .charts-2 { grid-template-columns: 1fr; }
+}
+
+/* TABLES */
+.table-wrap { overflow-x: auto; border-radius: 12px; border: 1px solid var(--border); }
+table { width: 100%; border-collapse: collapse; background: white; }
+th { 
+  background: #f8fafc; 
+  text-align: left; 
+  padding: 10px 12px; 
+  font-weight: 600; 
+  color: var(--text-muted); 
+  text-transform: uppercase; 
+  font-size: 11px; 
+  letter-spacing: 0.05em; 
+}
+td { 
+  padding: 8px 12px; 
+  border-bottom: 1px solid var(--border); 
+  font-size: 13px; 
+  color: var(--text-main); 
+  vertical-align: middle;
+  height: 52px; /* Fixed height for row alignment */
+}
 tr:last-child td { border-bottom: none; }
-tr:hover td { background-color: #F8F9FA; }
+tr:hover td { background: #f8fafc; }
 
-.badge { display: inline-block; font-size: 10px; padding: 3px 8px; border-radius: 12px; font-weight: 600; }
-.b-green { background: #ECFDF5; color: #059669; }
-.b-amber { background: #FFFBEB; color: #D97706; }
-.b-red { background: #FEF2F2; color: #DC2626; }
-.b-blue { background: #EFF6FF; color: #2563EB; }
-.b-purple { background: #F5F3FF; color: #7C3AED; }
+/* BADGES */
+.badge { 
+  padding: 2px 8px; 
+  border-radius: 6px; 
+  font-size: 10px; 
+  font-weight: 600; 
+  display: inline-flex; 
+  align-items: center; 
+  gap: 4px;
+  line-height:1;
+}
+.b-blue { background: #e0e7ff; color: #4338ca; }
+.b-green { background: #dcfce7; color: #15803d; }
+.b-amber { background: #fef3c7; color: #b45309; }
+.b-red { background: #fee2e2; color: #b91c1c; }
+.b-purple { background: #f3e8ff; color: #7e22ce; }
 
-.bar-horiz { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; font-size: 11px; }
-.bar-label { width: 120px; text-align: right; color: var(--color-text-secondary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight: 500; }
-.bar-track { flex: 1; height: 12px; background: var(--color-background-secondary); border-radius: 6px; overflow: hidden; }
-.bar-fill { height: 100%; border-radius: 6px; transition: width 0.5s ease; }
-.bar-val { width: 60px; color: var(--color-text-secondary); font-weight: 600; }
-.section-desc { font-size: 13px; color: var(--color-text-secondary); margin-bottom: 1rem; line-height: 1.5; }
+/* UTILS */
+.col-num { font-variant-numeric: tabular-nums; font-family: 'Inter', sans-serif; font-weight: 500; }
+.search-box { 
+  background: #f8fafc; 
+  border: 1px solid var(--border); 
+  padding: 10px 16px; 
+  border-radius: 12px; 
+  font-size: 14px; 
+  outline: none; 
+  transition: all 0.2s; 
+  width: 100%;
+  max-width: 320px;
+}
+.search-box:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1); background: white; }
 
-/* Loader */
-#loader { position: fixed; inset: 0; background: rgba(255,255,255,0.9); z-index: 1000; display: flex; align-items: center; justify-content: center; flex-direction: column; font-weight: 500; color: #4F46E5; }
-.spinner { width: 40px; height: 40px; border: 3px solid #E0E7FF; border-top-color: #4F46E5; border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 16px; }
+/* PAGINATION */
+.pag-row { display: flex; justify-content: center; align-items: center; gap: 8px; margin-top: auto; padding-top: 24px; }
+.pag-btn { 
+  padding: 8px 16px; 
+  border: 1px solid var(--border); 
+  background: white; 
+  border-radius: 10px; 
+  cursor: pointer; 
+  font-size: 13px; 
+  font-weight: 600; 
+  transition: all 0.2s; 
+  color: var(--text-muted); 
+}
+.pag-btn:hover:not(:disabled) { border-color: var(--primary); color: var(--primary); background: #f5f3ff; }
+.pag-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+
+#loader { 
+  position: fixed; 
+  inset: 0; 
+  background: rgba(255,255,255,0.9); 
+  backdrop-filter: blur(8px);
+  z-index: 2000; 
+  display: flex; 
+  align-items: center; 
+  justify-content: center; 
+  flex-direction: column; 
+}
+.spinner { 
+  width: 50px; 
+  height: 50px; 
+  border: 4px solid #e2e8f0; 
+  border-top-color: var(--primary); 
+  border-radius: 50%; 
+  animation: spin 1s cubic-bezier(0.5, 0.1, 0.4, 0.9) infinite; 
+  margin-bottom: 20px; 
+}
 @keyframes spin { to { transform: rotate(360deg); } }
+
+/* Mini tabs para gráficas */
+.ytabs { 
+  display: flex; 
+  gap: 4px; 
+  background: rgba(0,0,0,0.03); 
+  padding: 4px; 
+  border-radius: 12px; 
+}
+.ytab { 
+  font-size: 11px; 
+  font-weight: 500; 
+  padding: 6px 12px; 
+  border: none; 
+  border-radius: 8px; 
+  cursor: pointer; 
+  background: transparent; 
+  color: var(--text-muted); 
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+.ytab.active { 
+  background: white; 
+  color: var(--primary); 
+  font-weight: 700;
+  box-shadow: var(--shadow-sm);
+}
+.ytab:hover:not(.active) { 
+  color: var(--primary); 
+  background: rgba(255,255,255,0.4); 
+}
+</style>
+
 </style>
 </head>
 <body>
 
-<div id="loader">
-  <div class="spinner"></div>
-  <div>Sincronizando con Iconic Terroirs...</div>
-</div>
+<div id="loader"><div class="spinner"></div><div>Sincronizando con Iconic Terroirs...</div></div>
 
-<div class="dash">
+<div class="dash fade-in">
   <div class="header-top">
-    <h1>Iconic Terroirs · Executive Intelligence</h1>
-    <select id="sel-year" class="year-filter" onchange="changeYear()">
-      <option value="2026" selected>Año 2026</option>
-      <option value="2025">Año 2025</option>
-      <option value="2024">Año 2024</option>
-    </select>
+    <h1>Iconic Terroirs · <span style="color:var(--primary)">Executive Intelligence</span></h1>
+    <div class="year-filter-wrapper">
+      <i data-lucide="calendar" style="width:18px; color:var(--primary)"></i>
+      <select id="sel-year" class="year-filter" onchange="changeYear()">
+        <option value="2026" selected>Año 2026</option>
+        <option value="2025">Año 2025</option>
+        <option value="2024">Año 2024</option>
+        <option value="2023">Año 2023</option>
+        <option value="2022">Año 2022</option>
+        <option value="0">Histórico Total</option>
+      </select>
+    </div>
   </div>
 
   <div class="tab-row" id="main-tabs">
+    <!-- Nuevas -->
     <button class="tab active" onclick="showTab('overview', this)">Resumen Ejecutivo</button>
     <button class="tab" onclick="showTab('clients', this)">Clientes & RFM</button>
+    <button class="tab" onclick="showTab('retention', this)">Retención</button>
     <button class="tab" onclick="showTab('products', this)">Productos & Mix</button>
     <button class="tab" onclick="showTab('margins', this)">Márgenes & Países</button>
-    <button class="tab" onclick="showTab('retention', this)">Retención</button>
     <button class="tab" onclick="showTab('competition', this)">Competencia & Estrategia</button>
+    
+    <div class="tab-divider"></div>
+    
+    <!-- Legado -->
+    <button class="tab" onclick="showTab('old-p5', this)">Pronósticos ML</button>
   </div>
 
-  <!-- OVERVIEW -->
+  <!-- TAB OVERVIEW (NEW) -->
   <div id="tab-overview" class="tab-content">
     <div class="kpi-grid">
-      <div class="kpi"><div class="kpi-label">Ventas Netas (S/)</div><div class="kpi-value" id="k-rev"></div><div class="kpi-sub" id="k-rev-d"></div></div>
-      <div class="kpi"><div class="kpi-label">Margen Neto (S/)</div><div class="kpi-value" id="k-mgn"></div><div class="kpi-sub" id="k-mgn-d"></div></div>
-      <div class="kpi"><div class="kpi-label">Margen Bruto %</div><div class="kpi-value" id="k-pct"></div><div class="kpi-sub">Sobre precio venta</div></div>
-      <div class="kpi"><div class="kpi-label">Unidades</div><div class="kpi-value" id="k-u"></div><div class="kpi-sub" id="k-u-d"></div></div>
-      <div class="kpi"><div class="kpi-label">Clientes Activos</div><div class="kpi-value" id="k-cli"></div><div class="kpi-sub" id="k-cli-d"></div></div>
-      <div class="kpi"><div class="kpi-label">Pedidos Totales</div><div class="kpi-value" id="k-ped"></div><div class="kpi-sub" id="k-ped-d"></div></div>
-      <div class="kpi"><div class="kpi-label">Ticket Promedio</div><div class="kpi-value" id="k-aov"></div><div class="kpi-sub">Por pedido</div></div>
-      <div class="kpi"><div class="kpi-label">Proyección Fin de Año</div><div class="kpi-value" id="k-proj">Analizando...</div><div class="kpi-sub">ARIMA+</div></div>
+      <div class="kpi">
+        <i data-lucide="trending-up" class="kpi-icon" style="color:var(--primary)"></i>
+        <div class="kpi-label">Ventas Netas</div>
+        <div class="kpi-value" id="k-rev">S/ 0</div>
+        <div class="kpi-sub" id="k-rev-d">Cargando...</div>
+      </div>
+      <div class="kpi">
+        <i data-lucide="pie-chart" class="kpi-icon" style="color:var(--success)"></i>
+        <div class="kpi-label">Margen Neto</div>
+        <div class="kpi-value" id="k-mgn">S/ 0</div>
+        <div class="kpi-sub" id="k-mgn-d">Cargando...</div>
+      </div>
+      <div class="kpi">
+        <i data-lucide="percent" class="kpi-icon" style="color:var(--accent)"></i>
+        <div class="kpi-label">Margen Bruto %</div>
+        <div class="kpi-value" id="k-pct">0%</div>
+        <div class="kpi-sub">Sobre venta</div>
+      </div>
+      <div class="kpi">
+        <i data-lucide="package" class="kpi-icon" style="color:#0ea5e9"></i>
+        <div class="kpi-label">Unidades</div>
+        <div class="kpi-value" id="k-u">0</div>
+        <div class="kpi-sub" id="k-u-d">Cargando...</div>
+      </div>
+      <div class="kpi">
+        <i data-lucide="users" class="kpi-icon" style="color:#8b5cf6"></i>
+        <div class="kpi-label">Clientes Activos</div>
+        <div class="kpi-value" id="k-cli">0</div>
+        <div class="kpi-sub" id="k-cli-d">Cargando...</div>
+      </div>
+      <div class="kpi">
+        <i data-lucide="shopping-cart" class="kpi-icon" style="color:#06b6d4"></i>
+        <div class="kpi-label">Pedidos Totales</div>
+        <div class="kpi-value" id="k-ped">0</div>
+        <div class="kpi-sub" id="k-ped-d">Cargando...</div>
+      </div>
+      <div class="kpi">
+        <i data-lucide="ticket" class="kpi-icon" style="color:#f43f5e"></i>
+        <div class="kpi-label">Ticket Promedio</div>
+        <div class="kpi-value" id="k-aov">S/ 0</div>
+        <div class="kpi-sub">Por pedido</div>
+      </div>
+      <div class="kpi" style="background: linear-gradient(135deg, #4f46e5, #6366f1); color: white;">
+        <i data-lucide="sparkles" class="kpi-icon" style="opacity:0.3; color:white"></i>
+        <div class="kpi-label" style="color:rgba(255,255,255,0.8)">Proyección Fin Año</div>
+        <div class="kpi-value" id="k-proj" style="color:white">Analizando...</div>
+        <div class="kpi-sub" style="color:rgba(255,255,255,0.8)">IA ARIMA+</div>
+      </div>
     </div>
-
-    <p class="section-title">Evolución de Ventas (S/)</p>
-    <div class="card">
-      <div class="ch-wrap" style="height:240px"><canvas id="c-sales-yr"></canvas></div>
-    </div>
-
-    <div class="charts-2">
+    <div class="charts-2" style="margin-top: 24px; margin-bottom: 16px; align-items: stretch;">
+      <!-- Annual Evolution (Now on the left) -->
       <div class="card">
-        <div class="card-title">Estacionalidad Mensual</div>
-        <div class="ch-wrap" style="height:200px"><canvas id="c-seasonal"></canvas></div>
+        <div class="section-title" style="margin:0; margin-bottom: 12px;">Evolución de Ventas Anuales (S/)</div>
+        <div class="ch-wrap" style="height:260px"><canvas id="c-annual-sales"></canvas></div>
+        <div style="font-size:10px; color:var(--text-muted); text-align:right; margin-top:10px; font-style:italic;">* Año actual en fase de cierre en curso.</div>
+      </div>
+
+      <!-- Monthly Evolution (Now on the right) -->
+      <div class="card">
+        <div class="card-hdr" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; margin-bottom: 12px;">
+          <div class="section-title" style="margin:0;">Evolución de Ventas (S/)</div>
+          <div class="ytabs" id="btn-group-overview-yoy">
+            <button class="ytab active" onclick="setSalesMetricOverview('venta_neta', this)">Venta Neta</button>
+            <button class="ytab" onclick="setSalesMetricOverview('pct_margen', this)">% Margen</button>
+            <button class="ytab" onclick="setSalesMetricOverview('unidades', this)">Unidades</button>
+            <button class="ytab" onclick="setSalesMetricOverview('pedidos', this)">Pedidos</button>
+            <button class="ytab" onclick="setSalesMetricOverview('pedido_promedio', this)">AOV</button>
+          </div>
+        </div>
+        <div class="ch-wrap" style="height:260px"><canvas id="c-overview-yoy"></canvas></div>
+      </div>
+    </div>
+    
+    <div class="charts-2" style="align-items: stretch;">
+      <div class="card">
+        <div class="card-hdr" style="margin-bottom:0">
+          <div class="card-title" style="margin-bottom:0">Top Clientes por Revenue</div>
+          <span class="badge b-blue" id="top-cli-count">0 total</span>
+        </div>
+        <div style="font-size:10px; color:var(--text-muted); margin-bottom:10px">Ranking por venta neta</div>
+        <div class="table-wrap">
+          <table class="data-table">
+            <thead><tr>
+              <th>#</th>
+              <th><i data-lucide="user" style="width:12px; vertical-align:middle; margin-right:4px"></i>Cliente</th>
+              <th class="col-num">Pedidos</th>
+              <th class="col-num">Venta Neta</th>
+              <th style="width:100px">Share %</th>
+              <th>Última</th>
+              <th>Ausencia</th>
+              <th>Seg. RFM</th>
+            </tr></thead>
+            <tbody id="top-cli-table-overview"></tbody>
+          </table>
+        </div>
+        <div id="top-cli-pagination" class="pag-row"></div>
       </div>
       <div class="card">
-        <div class="card-title">Mix por Tipo de Vino (Valor S/)</div>
-        <div class="ch-wrap" style="height:200px"><canvas id="c-type-mix"></canvas></div>
+        <div class="card-hdr" style="margin-bottom:0">
+          <div class="card-title" style="margin-bottom:0">Top Productos más vendidos</div>
+          <span class="badge b-blue" id="top-prd-count">0 total</span>
+        </div>
+        <div style="font-size:10px; color:var(--text-muted); margin-bottom:10px">Ranking por volumen de venta</div>
+        <div class="table-wrap">
+          <table class="data-table">
+            <thead><tr><th>#</th><th>Producto</th><th>Marca</th><th>Tipo</th><th>Venta (S/)</th><th>% Margen</th></tr></thead>
+            <tbody id="top-prd-table-overview"></tbody>
+          </table>
+        </div>
+        <div id="top-prd-pagination" class="pag-row"></div>
       </div>
     </div>
   </div>
 
-  <!-- CLIENTS -->
+  <!-- TAB CLIENTS (NEW) -->
   <div id="tab-clients" class="tab-content" style="display:none">
-    <p class="section-desc">Segmentación RFM (Recencia · Frecuencia · Valor) — clasificación automatizada para accionar clientes.</p>
+    <p class="section-desc">Análisis detallado de la base de clientes mediante segmentación RFM (Recencia, Frecuencia, Valor).</p>
+    
+    <!-- Matriz 1x2 de Gráficas RFM -->
     <div class="charts-2">
       <div class="card">
-        <div class="card-title">Distribución por Frecuencia de Compra</div>
-        <div class="ch-wrap" style="height:200px"><canvas id="c-freq"></canvas></div>
+        <div class="card-title"><i data-lucide="users" style="width:18px"></i> Segmentos RFM por N° de clientes</div>
+        <div class="ch-wrap" style="height:220px"><canvas id="c-rfm-qty"></canvas></div>
       </div>
       <div class="card">
-        <div class="card-title">Segmentos RFM Clientes Top (Valor S/)</div>
-        <div class="ch-wrap" style="height:200px"><canvas id="c-rfm-val"></canvas></div>
+        <div class="card-title"><i data-lucide="banknote" style="width:18px"></i> Valor S/ por segmento</div>
+        <div class="ch-wrap" style="height:220px"><canvas id="c-rfm-usd"></canvas></div>
       </div>
     </div>
 
-    <p class="section-title" style="margin-top:2rem">Directorio de Clientes Top</p>
-    <div class="card">
+    <!-- TABLA DETALLADA RFM (NUEVA) -->
+    <div class="card" style="margin-top:24px">
+      <div class="card-title" style="display:flex; justify-content:space-between; align-items:center">
+        <span><i data-lucide="list" style="width:18px"></i> Detalle de Clientes por Segmento: <b id="rfm-sel-label">Todos</b></span>
+        <div style="display:flex; gap:10px">
+          <input type="text" id="rfm-search" placeholder="Buscar cliente..." class="search-input" onkeyup="renderRFMTable()" style="width:200px">
+          <button class="pag-btn" onclick="clearRFMFilter()">Ver todos</button>
+        </div>
+      </div>
       <div class="table-wrap">
-        <table>
-          <thead><tr><th>#</th><th>Cliente</th><th>Venta Neta (S/)</th><th>Pedidos</th><th>Última Compra</th><th>Días Ausente</th><th>Status RFM</th></tr></thead>
-          <tbody id="top-cli-table"></tbody>
+        <table id="tbl-rfm-details">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Cliente</th>
+              <th class="col-num">Ventas (S/)</th>
+              <th class="col-num">Pedidos</th>
+              <th class="col-num">Días sin compra</th>
+              <th>Segmento</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
         </table>
       </div>
-    </div>
-  </div>
-
-  <!-- PRODUCTS -->
-  <div id="tab-products" class="tab-content" style="display:none">
-    <div class="charts-2">
-      <div class="card">
-        <div class="card-title">Top Productos (Valor)</div>
-        <div id="top-prod-bars"></div>
-      </div>
-      <div class="card">
-        <div class="card-title">Top Marcas (Valor)</div>
-        <div id="top-brand-bars"></div>
-      </div>
+      <div id="rfm-pagination" class="pagination"></div>
     </div>
 
-    <p class="section-title" style="margin-top:2rem">Mix por País de Origen & Rentabilidad</p>
-    <div class="card">
-      <div class="ch-wrap" style="height:240px"><canvas id="c-country-sales"></canvas></div>
+    <!-- TABLA ESTRATEGIA POR TIPO (NUEVA) -->
+    <div class="card" style="margin-top:24px">
+      <div class="card-title">
+        <i data-lucide="target" style="width:18px"></i> Estrategia por tipo de producto: <b id="rfm-mix-label">Todos</b>
+      </div>
+      <div class="table-wrap">
+        <table id="tbl-rfm-mix">
+          <thead>
+            <tr>
+              <th>Cliente</th>
+              <th class="col-num">Total Soles</th>
+              <th>Segmento</th>
+              <th class="col-num">Tinto</th>
+              <th class="col-num">Blanco</th>
+              <th class="col-num">Espumoso</th>
+              <th>Oportunidad</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+      <div id="rfm-mix-pagination" class="pagination"></div>
     </div>
-  </div>
 
-  <!-- MARGINS -->
-  <div id="tab-margins" class="tab-content" style="display:none">
-    <p class="section-desc">Márgenes operativos por país de origen. Permite priorizar la estrategia de portafolio.</p>
-
-    <div class="charts-2">
+    <!-- OPORTUNIDADES DE CROSS-SELLING (NUEVA SECCIÓN) -->
+    <div class="card-title" style="margin-top:32px; font-weight:bold; color:var(--text-main); font-size:1.1rem; border-bottom:2px solid var(--accent-main); width:fit-content; padding-bottom:4px">
+      OPORTUNIDADES DE CROSS-SELL
+    </div>
+    <div class="charts-2" style="margin-top:16px">
       <div class="card">
-        <div class="card-title">Margen Neto % por País</div>
-        <div class="ch-wrap" style="height:240px"><canvas id="c-margin-pct"></canvas></div>
+        <div class="card-title"><i data-lucide="shuffle" style="width:16px"></i> Análisis de Mix y Brechas</div>
+        <div class="ch-wrap" style="height:250px"><canvas id="c-cross-sell"></canvas></div>
+        <div id="cross-sell-insight" style="margin-top:12px; font-size:0.9rem; color:var(--text-muted); font-style:italic; padding:10px; background:rgba(79, 70, 229, 0.05); border-radius:6px; border-left:4px solid var(--accent-main)">
+          Analizando potencial de venta cruzada...
+        </div>
+        <!-- TABLA DETALLE MIX -->
+        <div style="margin-top:20px">
+          <div class="card-title" style="font-size:0.85rem; border-bottom:1px solid #edf2f7; padding-bottom:4px; margin-bottom:8px">
+            Lista: <b id="cs-type-label">Seleccione una barra</b>
+          </div>
+          <div class="table-wrap" style="font-size:0.75rem">
+            <table id="tbl-cs-detail">
+              <thead><tr><th>Cliente</th><th class="col-num">Venta S/</th><th>Segmento</th></tr></thead>
+              <tbody></tbody>
+            </table>
+          </div>
+          <div id="cs-detail-pagination" class="pagination" style="margin-top:10px"></div>
+        </div>
       </div>
       <div class="card">
-        <div class="card-title">Rendimiento Detallado por Origen</div>
-        <div class="table-wrap">
-          <table style="margin-top:10px">
-            <thead><tr><th>País</th><th>Venta (S/)</th><th>Mgn Neto (S/)</th><th>Margen %</th><th>Unidades</th></tr></thead>
-            <tbody id="tbl-rentabilidad-origen"></tbody>
-          </table>
+        <div class="card-title"><i data-lucide="bar-chart-3" style="width:16px"></i> Distribución de frecuencia de compra</div>
+        <div class="ch-wrap" style="height:250px"><canvas id="c-freq"></canvas></div>
+        <!-- TABLA DETALLE FRECUENCIA -->
+        <div style="margin-top:20px">
+          <div class="card-title" style="font-size:0.85rem; border-bottom:1px solid #edf2f7; padding-bottom:4px; margin-bottom:8px">
+            Lista: <b id="freq-type-label">Seleccione una barra</b>
+          </div>
+          <div class="table-wrap" style="font-size:0.75rem">
+            <table id="tbl-freq-detail">
+              <thead><tr><th>Cliente</th><th class="col-num">Soles</th><th class="col-num">Pedidos</th></tr></thead>
+              <tbody></tbody>
+            </table>
+          </div>
+          <div id="freq-detail-pagination" class="pagination" style="margin-top:10px"></div>
         </div>
       </div>
     </div>
+
   </div>
 
-  <!-- RETENTION -->
-  <div id="tab-retention" class="tab-content" style="display:none">
-    <p class="section-desc">Dinámica de pérdida y adquisición de clientes por año histórico (basado en año vs año anterior).</p>
+  <!-- TAB PRODUCTS (NEW) -->
+  <div id="tab-products" class="tab-content" style="display:none">
     
-    <div class="charts-2">
+    <!-- 1. KPI Cards -->
+    <div class="kpi-grid" style="grid-template-columns: repeat(4, 1fr); margin-bottom: 20px;">
+      <div class="kpi" style="background:#f0fdf4; border-color:#bbf7d0">
+        <div class="kpi-label">País con mejor margen</div>
+        <div class="kpi-value" id="pr-kpi-best-margin" style="color:#166534">-</div>
+        <div class="kpi-sub" id="pr-kpi-best-margin-sub" style="color:#14532d">-</div>
+      </div>
+      <div class="kpi" style="background:#fef2f2; border-color:#fecaca">
+        <div class="kpi-label">País con peor margen</div>
+        <div class="kpi-value" id="pr-kpi-worst-margin" style="color:#991b1b">-</div>
+        <div class="kpi-sub" id="pr-kpi-worst-margin-sub" style="color:#7f1d1d">-</div>
+      </div>
+      <div class="kpi" style="background:#eff6ff; border-color:#bfdbfe">
+        <div class="kpi-label">País con mayor venta S/</div>
+        <div class="kpi-value" id="pr-kpi-top-sales" style="color:#1e40af">-</div>
+        <div class="kpi-sub" id="pr-kpi-top-sales-sub" style="color:#1e3a8a">-</div>
+      </div>
+      <div class="kpi" style="background:#fefce8; border-color:#fef08a">
+        <div class="kpi-label">País mayor vta. unidades</div>
+        <div class="kpi-value" id="pr-kpi-top-units" style="color:#854d0e">-</div>
+        <div class="kpi-sub" id="pr-kpi-top-units-sub" style="color:#713f12">-</div>
+      </div>
+    </div>
+
+    <!-- 2 & 3. Gráficas por país (2x1 grid) -->
+    <div class="charts-2" style="margin-bottom: 20px;">
       <div class="card">
-        <div class="card-title">Dinámica de Clientes (Nuevos vs Perdidos)</div>
-        <div class="ch-wrap" style="height:250px"><canvas id="c-retention"></canvas></div>
+        <div class="card-title">Margen bruto % por país de origen</div>
+        <div class="ch-wrap" style="height:280px"><canvas id="c-prod-margin-country"></canvas></div>
       </div>
       <div class="card">
-        <div class="card-title">Pérdida Económica por Clientes Inactivos (S/)</div>
+        <div class="card-title">Venta vs Costo total por país (S/)</div>
+        <div class="ch-wrap" style="height:280px"><canvas id="c-prod-sales-cost-country"></canvas></div>
+      </div>
+    </div>
+
+    <!-- 4. Tabla estratégica por país -->
+    <div class="card" style="margin-bottom: 20px;">
+      <div class="card-title">Análisis Estratégico por País de Origen</div>
+      <div class="table-wrap">
+        <table style="margin-top:10px; width: 100%;">
+          <thead>
+            <tr>
+              <th>País de origen</th>
+              <th class="col-num">Venta S/</th>
+              <th class="col-num">Costo S/</th>
+              <th class="col-num">Margen S/</th>
+              <th class="col-num">Margen %</th>
+              <th class="col-num">Líneas</th>
+              <th class="col-num">SKUs</th>
+              <th style="padding-left:15px">Acción</th>
+            </tr>
+          </thead>
+          <tbody id="tbl-prod-country-strategy"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- 5 & 6. Gráficas horizontales paginadas (Productos y Marcas) (1x2 grid o 2x1) -->
+    <div class="charts-2" style="margin-bottom: 20px;">
+      <div class="card" style="display:flex; flex-direction:column;">
+        <div class="card-title">Venta por producto y Share %</div>
+        <div class="ch-wrap" style="height:250px; flex:1;"><canvas id="c-prod-all-products"></canvas></div>
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-top:10px;">
+          <button class="btn btn-outline btn-sm" onclick="changeProdPage(-1)" id="btn-prod-prev" style="padding:4px 10px">&lt; Ant</button>
+          <span style="font-size:12px; color:#64748b" id="lbl-prod-page">Pág 1</span>
+          <button class="btn btn-outline btn-sm" onclick="changeProdPage(1)" id="btn-prod-next" style="padding:4px 10px">Sig &gt;</button>
+        </div>
+      </div>
+      <div class="card" style="display:flex; flex-direction:column;">
+        <div class="card-title">Venta por marca y Share %</div>
+        <div class="ch-wrap" style="height:250px; flex:1;"><canvas id="c-prod-all-brands"></canvas></div>
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-top:10px;">
+          <button class="btn btn-outline btn-sm" onclick="changeBrandPage(-1)" id="btn-brand-prev" style="padding:4px 10px">&lt; Ant</button>
+          <span style="font-size:12px; color:#64748b" id="lbl-brand-page">Pág 1</span>
+          <button class="btn btn-outline btn-sm" onclick="changeBrandPage(1)" id="btn-brand-next" style="padding:4px 10px">Sig &gt;</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 7. Segmentos de precio (2x1 grid) -->
+    <div class="section-title">Segmentos de precio — tickets y volumen</div>
+    <div class="charts-2">
+      <div class="card">
+        <div class="card-title">Ventas S/ por rango de precio unitario</div>
+        <div class="ch-wrap" style="height:280px"><canvas id="c-prod-price-sales"></canvas></div>
+      </div>
+      <div class="card">
+        <div class="card-title">Cantidad de botellas por segmento</div>
+        <div class="ch-wrap" style="height:280px"><canvas id="c-prod-price-units"></canvas></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB MARGINS (NEW) -->
+  <div id="tab-margins" class="tab-content" style="display:none">
+    <p class="section-desc">Márgenes operativos por país de origen. Permite priorizar la estrategia de portafolio.</p>
+    <div class="charts-2">
+      <div class="card"><div class="card-title">Margen Neto % por País</div><div class="ch-wrap" style="height:240px"><canvas id="c-margin-pct"></canvas></div></div>
+      <div class="card">
+        <div class="card-title">Rendimiento Detallado por Origen</div>
+        <div class="table-wrap"><table style="margin-top:10px">
+          <thead><tr><th>País</th><th>Venta (S/)</th><th>Mgn Neto (S/)</th><th>Margen %</th><th>Unidades</th></tr></thead>
+          <tbody id="tbl-rentabilidad-origen-new"></tbody>
+        </table></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB RETENTION (UPDATED) -->
+  <div id="tab-retention" class="tab-content" style="display:none">
+    <p class="section-desc">Análisis de clientes ganados, retenidos y perdidos por año, con impacto económico estimado.</p>
+    
+    <!-- KPI CARDS RETENTION (Style from imagen200) -->
+    <div class="kpi-grid" id="retention-kpis" style="grid-template-columns: repeat(4, 1fr); margin-bottom: 30px;">
+        <div class="kpi" style="background:#fefce8; border-color:#fef08a">
+            <div class="kpi-label" id="ret-kpi-1-label">Pérdida 2023→2024</div>
+            <div class="kpi-value" id="ret-kpi-1-val" style="color:#991b1b">S/ 0</div>
+            <div class="kpi-sub" id="ret-kpi-1-sub" style="color:#7f1d1d">0 clientes perdidos</div>
+        </div>
+        <div class="kpi" style="background:#fefce8; border-color:#fef08a">
+            <div class="kpi-label" id="ret-kpi-2-label">Pérdida 2024→2025</div>
+            <div class="kpi-value" id="ret-kpi-2-val" style="color:#991b1b">S/ 0</div>
+            <div class="kpi-sub" id="ret-kpi-2-sub" style="color:#7f1d1d">0 clientes perdidos</div>
+        </div>
+        <div class="kpi" style="background:#fefce8; border-color:#fef08a">
+            <div class="kpi-label" id="ret-kpi-3-label">Pérdida 2025→2026*</div>
+            <div class="kpi-value" id="ret-kpi-3-val" style="color:#991b1b">S/ 0</div>
+            <div class="kpi-sub" id="ret-kpi-3-sub" style="color:#7f1d1d">0 clientes inactivos*</div>
+        </div>
+        <div class="kpi" style="background:#fefce8; border-color:#fef08a">
+            <div class="kpi-label">Pérdida total acum.</div>
+            <div class="kpi-value" id="ret-kpi-total-val" style="color:#991b1b">S/ 0</div>
+            <div class="kpi-sub" style="color:#7f1d1d">Clientes no retenidos</div>
+        </div>
+    </div>
+    <p style="font-size:11px; color:#64748b; margin-top:-20px; margin-bottom:20px;">* 2025→2026 incluye clientes que aún no han comprado en 2026 (año en curso) — probable sobreestimación.</p>
+
+    <!-- MATRIZ 2x1: Dinámica + Tabla Detalle -->
+    <div class="charts-2" style="grid-template-columns: 1.5fr 1fr; align-items: stretch;">
+      <div class="card">
+        <div class="card-title">Dinámica de clientes por año</div>
+        <div style="display:flex; gap:15px; font-size:12px; margin-bottom:10px;">
+            <span style="display:flex; align-items:center; gap:5px"><span style="width:12px; height:12px; background:#3b82f6; border-radius:2px"></span> Retenidos</span>
+            <span style="display:flex; align-items:center; gap:5px"><span style="width:12px; height:12px; background:#10b981; border-radius:2px"></span> Nuevos</span>
+            <span style="display:flex; align-items:center; gap:5px"><span style="width:12px; height:12px; background:#ef4444; border-radius:2px"></span> Perdidos</span>
+        </div>
+        <div class="ch-wrap" style="height:300px"><canvas id="c-retention"></canvas></div>
+      </div>
+      
+      <div class="card">
+        <div class="card-title" style="display:flex; justify-content:space-between; align-items:center">
+            <span><i data-lucide="list" style="width:16px"></i> Detalle: <b id="ret-list-label">Seleccione barra</b></span>
+        </div>
+        <div class="table-wrap" style="flex:1">
+          <table style="font-size:12px">
+            <thead>
+              <tr>
+                <th>Cliente</th>
+                <th class="col-num">Venta S/</th>
+              </tr>
+            </thead>
+            <tbody id="tbl-retention-detail">
+              <tr><td colspan="2" style="text-align:center; padding:40px; color:#94a3b8">Haga clic en una barra para ver el listado</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div id="ret-detail-pagination" class="pag-row" style="padding-top:10px"></div>
+      </div>
+    </div>
+
+    <!-- MATRIZ 1x2: Tasa de Retención -->
+    <div class="section-title" style="margin-top:30px">TASA DE RETENCIÓN POR AÑO</div>
+    <div class="charts-2">
+      <div class="card">
+        <div class="card-title">% retención año a año</div>
+        <div class="ch-wrap" style="height:250px"><canvas id="c-ret-pct"></canvas></div>
+      </div>
+      <div class="card">
+        <div class="card-title">Pérdida económica acumulada (S/)</div>
         <div class="ch-wrap" style="height:250px"><canvas id="c-ret-loss"></canvas></div>
       </div>
     </div>
-    
-    <div class="card" style="margin-top:16px;">
-      <div class="card-title">Resumen de Retención Anual</div>
+
+    <!-- ANÁLISIS EXPERTO Y ESTRATEGIAS DE CRECIMIENTO (NUEVA SECCIÓN EXPERTA) -->
+    <div class="section-title" style="margin-top:40px; color:var(--primary); border-bottom: 2px solid var(--primary); width: fit-content; padding-bottom: 5px;">
+      ANÁLISIS EXPERTO Y ESTRATEGIAS DE CRECIMIENTO
+    </div>
+    <div class="card" style="margin-top:20px; border-top: 4px solid var(--primary);">
+      <div class="card-title" style="margin-bottom:15px">
+        <i data-lucide="brain-circuit" style="width:20px; color:var(--primary)"></i> 
+        Acciones Prioritarias para el Impulso del Negocio
+      </div>
+      <p style="font-size:13px; color:var(--text-muted); margin-bottom:20px">
+        Basado en un análisis profundo de comportamiento de compra, recurrencia y valor histórico. Estas acciones están diseñadas para maximizar el Lifetime Value (LTV).
+      </p>
       <div class="table-wrap">
-        <table>
-          <thead><tr><th>Año</th><th>Total Activos</th><th>Retenidos (vs A-1)</th><th>Nuevos</th><th>Perdidos (de A-1)</th><th>Lucro Cesante</th></tr></thead>
-          <tbody id="tbl-retencion"></tbody>
+        <table id="tbl-expert-analysis">
+          <thead>
+            <tr>
+              <th style="width:250px">Segmento Estratégico</th>
+              <th style="width:100px" class="col-num">Clientes</th>
+              <th>Acción Sugerida (Plan de Intervención)</th>
+              <th style="width:120px">Prioridad</th>
+            </tr>
+          </thead>
+          <tbody id="tbody-expert-analysis">
+            <tr><td colspan="4" style="text-align:center; padding:40px; color:#94a3b8">Cargando análisis experto...</td></tr>
+          </tbody>
         </table>
       </div>
+    </div>
+
+    <!-- Tabla Resumen (Opcional, la mantengo al final) -->
+    <div class="card" style="margin-top:24px;">
+      <div class="card-title">Resumen de Retención Anual (Histórico)</div>
+      <div class="table-wrap"><table>
+        <thead><tr><th>Ciclo Comparativo</th><th>Total Activos Hist.</th><th>Retenidos (vs A-1)</th><th>Nuevos</th><th>Perdidos (de A-1)</th><th>Lucro Cesante S/</th></tr></thead>
+        <tbody id="tbl-retencion"></tbody>
+      </table></div>
     </div>
   </div>
 
-  <!-- COMPETITION (AI) -->
+  <!-- TAB COMPETITION (NEW) -->
   <div id="tab-competition" class="tab-content" style="display:none">
     <p class="section-desc">Análisis inteligente del mercado y estrategias recomendadas basadas en los indicadores de rendimiento.</p>
-
-    <p class="section-title">Panorama Competitivo (Mercado Alta Gama y Volúmenes)</p>
-    <div class="card" style="margin-bottom:24px">
-      <div class="table-wrap">
-        <table>
-          <thead><tr><th>Competidor</th><th>Enfoque</th><th>Fortaleza</th><th>Amenaza Estimada</th></tr></thead>
-          <tbody id="tbl-ai-competencia"></tbody>
-        </table>
-      </div>
+    <div class="section-title">Panorama Competitivo (Mercado Alta Gama y Volúmenes)</div>
+    <div class="card" style="margin-bottom:24px"><div class="table-wrap"><table>
+        <thead><tr><th>Competidor</th><th>Enfoque</th><th>Fortaleza</th><th>Amenaza Estimada</th></tr></thead>
+        <tbody id="tbl-ai-competencia"></tbody>
+      </table></div>
     </div>
-
-    <p class="section-title">10 Estrategias Recomendadas para Crecimiento</p>
+    <div class="section-title">10 Estrategias Recomendadas para Crecimiento</div>
     <div class="card">
+      <div class="table-wrap"><table>
+        <thead><tr><th>#</th><th>Estrategia</th><th>Data Pivot (Realtime)</th><th>Impacto Proyectado</th></tr></thead>
+        <tbody id="tbl-ai-estrategias"></tbody>
+      </table></div>
+    </div>
+  </div>
+
+
+  <!-- LEGAACY: TAB OLD PAGE 5 (ML) -->
+  <div id="tab-old-p5" class="tab-content" style="display:none">
+    <div class="card" style="margin-bottom:16px;">
+      <div class="card-title">ARIMA+ Forecast: Proyección Ventas Totales</div>
+      <div class="ch-wrap" style="height:300px"><canvas id="chart-forecast-main"></canvas></div>
+    </div>
+    <div class="card">
+      <div class="card-title">SKUs Trending con Mayor Crecimiento Predecido (Próximo Trimestre)</div>
       <div class="table-wrap">
-        <table>
-          <thead><tr><th>#</th><th>Estrategia</th><th>Data Pivot</th><th>Impacto Proyectado</th></tr></thead>
-          <tbody id="tbl-ai-estrategias"></tbody>
-        </table>
+        <table id="tbl-forecast-prd"><thead><tr><th>Producto</th><th>Impacto Predicho (Uds)</th><th>Banda de Confianza</th></tr></thead><tbody></tbody></table>
       </div>
     </div>
   </div>
 </div>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <script>
-// --- CORE & STATE ---
-const API = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' || window.location.protocol === 'file:') 
-            ? 'http://localhost:8000' 
-            : 'https://mi-dashboard-iconic.onrender.com';
-
-let state = {
-  year: 2026,
-  data: {}
+if (typeof ChartDataLabels !== 'undefined') Chart.register(ChartDataLabels);
+const API = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' || window.location.protocol === 'file:') ? 'http://localhost:8000' : 'https://mi-dashboard-iconic.onrender.com';
+let state = { 
+  year: 2026, 
+  oldMetric: 'venta_neta', 
+  data: {},
+  freqFilter: null,
+  csPage: 0,
+  freqPage: 0,
+  retPage: 0,
+  retList: [],
+  retCurrentLabel: ""
 };
-
-function showTab(name, btn) {
-  document.querySelectorAll('.tab-content').forEach(d => d.style.display = 'none');
-  document.querySelectorAll('.tab').forEach(b => b.classList.remove('active'));
-  document.getElementById('tab-' + name).style.display = '';
-  btn.classList.add('active');
-}
-
-async function changeYear() {
-  state.year = parseInt(document.getElementById('sel-year').value);
-  await init();
-}
-
-async function fetchJson(p) {
-  try { const r = await fetch(API + p); return r.ok ? await r.json() : null; } 
-  catch(e) { return null; }
-}
-
-const fmt = n => n ? Math.round(n).toLocaleString('es-PE') : '0';
-const fmtK = n => n > 1000 ? (n/1000).toFixed(1)+'K' : Math.round(n);
-
 let charts = {};
+
+function formatN(n) { return n ? Math.round(n).toLocaleString('es-PE') : '0'; }
+function formatK(n) { return n >= 1000 ? (n/1000).toFixed(1)+'K' : Math.round(n); }
+async function fetchJson(p) { try { const r=await fetch(API+p); return r.ok ? await r.json() : null; } catch(e){return null;} }
+function setHTML(id, html) { const el = document.getElementById(id); if (el) el.innerHTML = html; }
+function setVal(id, val) { const el = document.getElementById(id); if (el) el.innerText = val; }
+
+// Configuración global de Chart.js para el nuevo tema
+Chart.defaults.font.family = "'Outfit', sans-serif";
+Chart.defaults.color = '#64748b';
+Chart.defaults.plugins.tooltip.backgroundColor = 'rgba(15, 23, 42, 0.9)';
+Chart.defaults.plugins.tooltip.padding = 12;
+Chart.defaults.plugins.tooltip.cornerRadius = 8;
+
 function mkChart(id, type, data, opts) {
   if (charts[id]) charts[id].destroy();
   const ctx = document.getElementById(id);
   if (!ctx) return;
-  charts[id] = new Chart(ctx, { type, data, options: { responsive: true, maintainAspectRatio: false, ...opts } });
+  
+  const defaultOpts = {
+    responsive: true, 
+    maintainAspectRatio: false,
+    plugins: {
+      legend: { display: false }
+    },
+    scales: {
+      y: { grid: { color: 'rgba(226, 232, 240, 0.5)' }, border: { display: false } },
+      x: { grid: { display: false }, border: { display: false } }
+    }
+  };
+
+  charts[id] = new Chart(ctx, { 
+    type, 
+    data, 
+    options: { ...defaultOpts, ...opts } 
+  });
 }
 
-// --- DATA LOADING ---
+function showTab(name, btn) {
+  document.querySelectorAll('.tab-content').forEach(d => d.style.display = 'none');
+  document.querySelectorAll('.tab').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + name).style.display = 'block';
+  btn.classList.add('active');
+  
+  if(name === 'old-p5' && !state.data.fcMain) { loadForecast(); }
+  if(name === 'old-p3') { handleSearchCliOld(); }
+  if(name === 'old-p4') { handleSearchPrdOld(); }
+}
+
+async function changeYear() {
+  const v = document.getElementById('sel-year').value;
+  state.year = parseInt(v);
+  state.topCliPage = 0; // Reset paginación al cambiar filtro
+  state.topPrdPage = 0; 
+  await init();
+}
+
+function changeTopCliPage(delta) {
+  state.topCliPage = (state.topCliPage || 0) + delta;
+  renderNewTabs();
+}
+
+function changeTopPrdPage(delta) {
+  state.topPrdPage = (state.topPrdPage || 0) + delta;
+  renderNewTabs();
+}
+
 async function init() {
-  document.getElementById('loader').style.display = 'flex';
+  console.log("🚀 Dashboard: Iniciando proceso de carga...");
+  state.topCliPage = state.topCliPage || 0;
+  state.topPrdPage = state.topPrdPage || 0;
+  
+  const loader = document.getElementById('loader');
+  if (loader) loader.style.display = 'flex';
+  
+  // Timeout de seguridad: Ocultar loader tras 15s si algo falla
+  setTimeout(() => {
+    if (loader && loader.style.display !== 'none') {
+      console.warn("⚠️ Dashboard: El loader se ocultó por timeout de seguridad (15s). Posible bloqueo en init.");
+      loader.style.display = 'none';
+    }
+  }, 15000);
+
   const anno = state.year;
+  const anno_p = `anno=${anno}`;
   
-  // Launch all queries
-  const [
-    kpis, serie, actCli, actPrd, rentOri, typeMix, 
-    marcaMix, freq, retencion, aiStrats
-  ] = await Promise.all([
-    fetchJson(`/api/kpis?anno=${anno}`),
-    fetchJson(`/api/serie-mensual`), // get all series for chart 1
-    fetchJson(`/api/top-clientes-year?anno=${anno}&limit=20`),
-    fetchJson(`/api/por-marca?anno=${anno}`), // using as brand proxy
-    fetchJson(`/api/rentabilidad-origen?anno=${anno}`),
-    fetchJson(`/api/por-tipo?anno=${anno}`),
-    fetchJson(`/api/por-marca?anno=${anno}`),
-    fetchJson(`/api/frecuencia-compra?anno=${anno}`),
-    fetchJson(`/api/retencion`),
-    fetchJson(`/api/estrategias-ia`)
-  ]);
-
-  state.data = { kpis, serie, actCli, actPrd, rentOri, typeMix, marcaMix, freq, retencion, aiStrats };
-  
-  // Also get top productos for specific year
-  const rawTopPrd = await fetchJson(`/api/top-productos?anno=${anno}&limit=20`);
-  state.data.topPrd = rawTopPrd || [];
-
-  renderAll();
-  document.getElementById('loader').style.display = 'none';
+  try {
+    console.log("📡 Dashboard: Solicitando datos en paralelo...");
+    const [
+      kpis, serie, actCli, topPrdFull, rentOri, typeMix, 
+      marcaMix, freq, retencion, aiStrats, oldYoy, oldMst, oldDm, rfmStats, rfmDetails, rfmMix, rfmCross,
+      expertAnalysis, prodPais, prodAll, brandAll, prodPrice
+    ] = await Promise.all([
+      fetchJson(`/api/kpis?${anno_p}`),
+      fetchJson(`/api/serie-mensual?${anno_p}`),
+      fetchJson(`/api/top-clientes-year?${anno_p}&limit=50`),
+      fetchJson(`/api/top-productos-year?${anno_p}&limit=50`),
+      fetchJson(`/api/rentabilidad-origen?${anno_p}`),
+      fetchJson(`/api/por-tipo?${anno_p}`),
+      fetchJson(`/api/por-marca?${anno_p}`),
+      fetchJson(`/api/frecuencia-compra?${anno_p}`),
+      fetchJson(`/api/retencion`),
+      fetchJson(`/api/estrategias-ia?${anno_p}`),
+      fetchJson(`/api/serie-mensual`), // Full history for YoY
+      fetchJson(`/api/market-share-tipo?${anno_p}`),
+      fetchJson(`/api/dependencia-marca?${anno_p}`),
+      fetchJson(`/api/rfm-stats?${anno_p}`),
+      fetchJson(`/api/rfm-details?${anno_p}`),
+      fetchJson(`/api/rfm-mix-details?${anno_p}`),
+      fetchJson(`/api/rfm-cross-sell?${anno_p}`),
+      fetchJson(`/api/analisis-experto-clientes`),
+      fetchJson(`/api/productos-mix-pais?${anno_p}`),
+      fetchJson(`/api/productos-all?${anno_p}`),
+      fetchJson(`/api/marcas-all?${anno_p}`),
+      fetchJson(`/api/segmentos-precio-year?${anno_p}`)
+    ]);
+    
+    console.log("✅ Dashboard: Datos recibidos. Renderizando...");
+    state.data = { 
+      kpis, serie, actCli: actCli||[], topPrd: topPrdFull||[], rentOri: rentOri||[], 
+      typeMix: typeMix||[], marcaMix: marcaMix||[], freq: freq||[], 
+      retencion: retencion||[], aiStrats: aiStrats||{competencia:[], estrategias:[]}, 
+      oldYoy: oldYoy||[], oldMst: oldMst||[], oldDm: oldDm||[],
+      rfmStats: rfmStats||[],
+      rfmDetails: rfmDetails||[],
+      rfmMix: rfmMix||[],
+      rfmCross: rfmCross||[],
+      expertAnalysis: expertAnalysis || [],
+      prodPais: prodPais || [],
+      prodAll: prodAll || [],
+      brandAll: brandAll || [],
+      prodPrice: prodPrice || []
+    };
+    
+    state.rfmPage = 0; // Inicializar página RFM
+    state.prodAllPage = 0;
+    state.brandAllPage = 0;
+    
+    if (!window._overviewCurrentMetric) window._overviewCurrentMetric = 'venta_neta';
+    
+    renderNewTabs();
+    console.log("🎨 Dashboard: Tabs nuevas renderizadas.");
+    renderProductsTab();
+    console.log("🎨 Dashboard: Tab de productos renderizada.");
+    
+    // Cargar proyección para la tarjeta KPI
+    loadForecast();
+  } catch (e) {
+    console.error("❌ Dashboard ERROR durante la inicialización:", e);
+  } finally {
+    if (loader) loader.style.display = 'none';
+    console.log("🏁 Dashboard: Inicialización completa.");
+  }
+  if (typeof lucide !== 'undefined') lucide.createIcons();
 }
 
-// --- RENDERING ROUTINES ---
-function renderAll() {
-  renderOverview();
-  renderClients();
-  renderProducts();
-  renderMargins();
-  renderRetention();
-  renderAI();
-}
-
-function renderOverview() {
-  // KPIs
+// ---------------- NEW TABS RENDERING ----------------
+function renderNewTabs() {
   const k = state.data.kpis?.current || {};
   const p = state.data.kpis?.previous || {};
-  document.getElementById('k-rev').innerText = 'S/ ' + fmt(k.venta_neta);
-  document.getElementById('k-mgn').innerText = 'S/ ' + fmt(k.margen);
+  document.getElementById('k-rev').innerText = 'S/ ' + formatN(k.venta_neta);
+  document.getElementById('k-mgn').innerText = 'S/ ' + formatN(k.margen);
   document.getElementById('k-pct').innerText = (k.pct_margen || 0) + '%';
-  document.getElementById('k-u').innerText = fmt(k.unidades);
-  document.getElementById('k-cli').innerText = fmt(k.clientes);
-  document.getElementById('k-ped').innerText = fmt(k.pedidos);
-  document.getElementById('k-aov').innerText = 'S/ ' + fmt(k.pedido_promedio);
-  
+  document.getElementById('k-u').innerText = formatN(k.unidades);
+  document.getElementById('k-cli').innerText = formatN(k.clientes);
+  document.getElementById('k-ped').innerText = formatN(k.pedidos);
+  document.getElementById('k-aov').innerText = 'S/ ' + formatN(k.pedido_promedio);
+
   const setD = (id, cur, prev) => {
     const el = document.getElementById(id);
-    if (!prev || prev==0) { el.innerText='-'; el.className='kpi-sub'; return; }
+    if (state.year == 0) {
+      el.innerText = 'Todos los años';
+      el.className = 'kpi-sub';
+      return;
+    }
+    if (!prev || prev==0) { 
+      el.innerText = (state.year == 2022) ? 'Sin datos' : '-';
+      el.className = 'kpi-sub'; 
+      return; 
+    }
     const pct = ((cur-prev)/prev*100).toFixed(1);
-    el.innerText = (cur >= prev ? '▲ ' : '▼ ') + Math.abs(pct) + '% vs a-1';
+    el.innerText = (cur >= prev ? '▲ ' : '▼ ') + Math.abs(pct) + '% vs ' + (state.year - 1);
     el.className = 'kpi-sub ' + (cur >= prev ? 'kpi-up' : 'kpi-down');
   };
   setD('k-rev-d', k.venta_neta, p.venta_neta);
@@ -355,138 +1050,1088 @@ function renderOverview() {
   setD('k-cli-d', k.clientes, p.clientes);
   setD('k-ped-d', k.pedidos, p.pedidos);
 
-  // Evolucion Ventas Chart (All history)
-  const years = [2023, 2024, 2025, 2026];
-  const yearColors = ['#9ca3af', '#6b7280', '#3b82f6', '#111827'];
-  const mSeries = state.data.serie || [];
-  const ds = years.map((y, i) => {
-    let d = new Array(12).fill(null);
-    mSeries.filter(r => parseInt(r.anno) === y).forEach(r => d[r.mes-1] = r.venta_neta);
-    return { label: y.toString(), data: d, borderColor: yearColors[i], tension: 0.3, fill: false };
-  });
-  mkChart('c-sales-yr', 'line', { labels: ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'], datasets: ds });
+  renderOverviewYoY();
+  renderAnnualSales();
+  renderRFMCharts();
+  renderRFMTable();
+  renderRFMMixTable();
+  renderCrossSellCharts();
+  renderExpertAnalysis();
   
-  // Seasonal
-  if (state.data.serie) {
-     const curr = new Array(12).fill(0);
-     mSeries.filter(r => parseInt(r.anno) === state.year).forEach(r => curr[r.mes-1] = r.venta_neta);
-     mkChart('c-seasonal', 'line', { labels: ['E','F','M','A','M','J','J','A','S','O','N','D'], datasets: [{label: 'Vta', data: curr, borderColor: '#4F46E5', backgroundColor: 'rgba(79,70,229,0.1)', fill: true, tension: 0.4}] }, { plugins: {legend:{display:false}} });
+  state.csFilter = null;
+  state.freqFilter = null;
+  state.csPage = 0;
+  state.freqPage = 0;
+  document.getElementById('cs-type-label').innerText = 'Seleccione una barra';
+  document.getElementById('freq-type-label').innerText = 'Seleccione una barra';
+  renderCrossSellDetailTable();
+  renderFreqDetailTable();
+
+  const tCli = state.data.actCli || [];
+  if (tCli.length > 0) {
+    document.getElementById('top-cli-count').innerText = (tCli[0]?.total_clientes || tCli.length) + ' total';
+  } else {
+    document.getElementById('top-cli-count').innerText = '0 total';
   }
 
-  // Type Mix
-  const tMix = state.data.typeMix || [];
-  mkChart('c-type-mix', 'doughnut', {
-    labels: tMix.map(d => d.tipo), 
-    datasets: [{ data: tMix.map(d => d.venta_neta), backgroundColor: ['#4F46E5','#10B981','#F59E0B','#EF4444','#8B5CF6','#6B7280'] }]
-  });
-}
-
-function renderClients() {
-  // RFM Table & Frequency
-  const tCli = state.data.actCli || [];
-  document.getElementById('top-cli-table').innerHTML = tCli.slice(0, 15).map((c, i) => {
-    let bd = 'b-blue'; let st = 'Activo';
-    if(c.dias_sin_compra > 180) {bd = 'b-red'; st='Perdido';}
-    else if(c.dias_sin_compra > 90) {bd = 'b-amber'; st='En Riesgo';}
-    else if(c.venta_neta > 50000) {bd = 'b-purple'; st='VIP';}
-    else if(c.pedidos > 20) {bd = 'b-green'; st='Leal';}
-    return `<tr><td>${i+1}</td><td><b>${c.cliente}</b></td><td>S/ ${fmt(c.venta_neta)}</td><td>${c.pedidos}</td><td>${c.ultima_compra || '-'}</td><td>${c.dias_sin_compra} d</td><td><span class="badge ${bd}">${st}</span></td></tr>`;
-  }).join('');
-
-  const fq = state.data.freq || [];
-  mkChart('c-freq', 'bar', {
-    labels: fq.map(d => d.rango_frecuencia),
-    datasets: [{ label: 'Clientes', data: fq.map(d => d.cantidad_clientes), backgroundColor: '#4F46E5', borderRadius: 4 }]
-  });
-
-  // Calculate generic RFM value distribution for chart
-  const rfmVal = { 'VIP': 0, 'Leal': 0, 'Activo': 0, 'En Riesgo': 0, 'Perdido': 0 };
-  tCli.forEach(c => {
-    let st = 'Activo';
-    if(c.dias_sin_compra > 180) st='Perdido';
-    else if(c.dias_sin_compra > 90) st='En Riesgo';
-    else if(c.venta_neta > 50000) st='VIP';
-    else if(c.pedidos > 20) st='Leal';
-    rfmVal[st] += c.venta_neta;
-  });
-  mkChart('c-rfm-val', 'bar', {
-    labels: Object.keys(rfmVal),
-    datasets: [{ label: 'Valor S/', data: Object.values(rfmVal), backgroundColor: ['#8B5CF6','#10B981','#3B82F6','#F59E0B','#EF4444'], borderRadius: 4 }]
-  }, { plugins: {legend:{display:false}} });
-}
-
-function renderProducts() {
-  const prd = state.data.topPrd || [];
-  const maxP = prd.length > 0 ? prd[0].venta_neta : 1;
-  document.getElementById('top-prod-bars').innerHTML = prd.slice(0,10).map(p => `
-    <div class="bar-horiz"><div class="bar-label">${p.producto}</div><div class="bar-track"><div class="bar-fill" style="width:${Math.max(1, (p.venta_neta/maxP)*100)}%;background:#4F46E5"></div></div><div class="bar-val">S/${fmtK(p.venta_neta)}</div></div>
-  `).join('');
-
-  const b = state.data.marcaMix || [];
-  const maxB = b.length > 0 ? b[0].venta_neta : 1;
-  const bc = ['#D85A30','#1D9E75','#EF9F27','#534AB7','#3266ad','#888780','#E24B4A','#0C447C','#BA7517','#D85A30'];
-  document.getElementById('top-brand-bars').innerHTML = b.slice(0,10).map((p,i) => `
-    <div class="bar-horiz"><div class="bar-label">${p.marca}</div><div class="bar-track"><div class="bar-fill" style="width:${Math.max(1, (p.venta_neta/maxB)*100)}%;background:${bc[i%bc.length]}"></div></div><div class="bar-val">S/${fmtK(p.venta_neta)}</div></div>
-  `).join('');
-
-  const pOri = state.data.rentOri || [];
-  mkChart('c-country-sales', 'bar', {
-    labels: pOri.map(d => d.pais).slice(0,6),
-    datasets: [{ label: 'Venta S/', data: pOri.map(d => d.venta_neta).slice(0,6), backgroundColor: ['#4F46E5','#10B981','#F59E0B','#EF4444','#8B5CF6','#6B7280'] }]
-  }, { indexAxis: 'y' });
-}
-
-function renderMargins() {
-  const pOri = state.data.rentOri || [];
-  document.getElementById('tbl-rentabilidad-origen').innerHTML = pOri.map(d => {
-    let color = 'b-blue';
-    const pct = d.venta_neta > 0 ? (d.margen_neto/d.venta_neta*100) : 0;
-    if(pct >= 65) color = 'b-green'; else if(pct <= 55) color = 'b-red'; else color = 'b-amber';
-    return `<tr><td><b>${d.pais}</b></td><td>S/ ${fmt(d.venta_neta)}</td><td>S/ ${fmt(d.margen_neto)}</td><td><span class="badge ${color}">${pct.toFixed(1)}%</span></td><td>${fmt(d.unidades)}</td></tr>`;
-  }).join('');
-
-  mkChart('c-margin-pct', 'bar', {
-    labels: pOri.map(d => d.pais),
-    datasets: [{ label: 'Margen %', data: pOri.map(d => (d.margen_neto/d.venta_neta*100).toFixed(1)), backgroundColor: '#10B981', borderRadius: 4 }]
-  });
-}
-
-function renderRetention() {
-  const ret = state.data.retencion || [];
-  document.getElementById('tbl-retencion').innerHTML = ret.map(d => {
-    return `<tr><td><b>${d.anno}</b></td><td>${d.clientes_actuales}</td><td><span style="color:#059669;font-weight:600">${d.retenidos}</span></td><td><span style="color:#2563EB;font-weight:600">+${d.nuevos}</span></td><td><span style="color:#DC2626;font-weight:600">-${d.perdidos}</span></td><td>S/ ${fmt(d.perdida_usd)}</td></tr>`;
-  }).join('');
+  const pageSize = 6;
+  const totalPages = Math.ceil(tCli.length / pageSize);
+  const start = (state.topCliPage || 0) * pageSize;
+  const end = start + pageSize;
   
-  if(ret.length > 0) {
-    mkChart('c-retention', 'bar', {
-      labels: ret.map(d => d.anno),
-      datasets: [
-        { label: 'Retenidos', data: ret.map(d => d.retenidos), backgroundColor: '#10B981', stack: 'Stack 0' },
-        { label: 'Nuevos', data: ret.map(d => d.nuevos), backgroundColor: '#3B82F6', stack: 'Stack 0' },
-        { label: 'Perdidos (-)', data: ret.map(d => -d.perdidos), backgroundColor: '#EF4444', stack: 'Stack 0' }
-      ]
-    }, { scales: { x: { stacked: true }, y: { stacked: true } } });
+  setHTML('top-cli-table-overview', tCli.slice(start, end).map((c,idx)=>{
+    const i = start + idx;
+    let rfmClass = 'b-blue'; let rfmLabel = 'Activo';
+    if(c.dias_sin_compra > 180) { rfmClass = 'b-red'; rfmLabel = 'Perdido'; }
+    else if(c.dias_sin_compra > 90) { rfmClass = 'b-amber'; rfmLabel = 'En Riesgo'; }
+    else if(c.venta_neta > 50000) { rfmClass = 'b-purple'; rfmLabel = '💎 VIP'; }
+    else if(c.pedidos > 20) { rfmClass = 'b-green'; rfmLabel = '⭐ Leal'; }
     
+    return `<tr>
+      <td>${i+1}</td>
+      <td style="text-align:left">${c.cliente}</td>
+      <td class="col-num">${c.pedidos}</td>
+      <td class="col-num">S/ ${formatN(c.venta_neta)}</td>
+      <td>
+        <div style="font-size:10px; font-weight:600; text-align:left">${c.share_pct}%</div>
+        <div style="width:100%; height:4px; background:#E2E8F0; border-radius:2px; margin-top:2px">
+          <div style="width:${Math.min(100, c.share_pct * 5)}%; height:100%; background:#2563EB; border-radius:2px"></div>
+        </div>
+      </td>
+      <td>${c.ultima_compra||'-'}</td>
+      <td class="col-num">${c.dias_sin_compra} d</td>
+      <td><span class="badge ${rfmClass}">${rfmLabel}</span></td>
+    </tr>`;
+  }).join(''));
+
+  const pag = document.getElementById('top-cli-pagination');
+  if (tCli.length > pageSize) {
+    setHTML('top-cli-pagination', `
+      <button class="pag-btn" ${state.topCliPage === 0 ? 'disabled' : ''} onclick="changeTopCliPage(-1)">Anterior</button>
+      <span class="pag-info">Pág ${state.topCliPage + 1} de ${totalPages}</span>
+      <button class="pag-btn" ${state.topCliPage >= totalPages - 1 ? 'disabled' : ''} onclick="changeTopCliPage(1)">Siguiente</button>
+    `);
+  } else {
+    setHTML('top-cli-pagination', '');
+  }
+
+  const prd = state.data.topPrd || [];
+  if (prd.length > 0) {
+    document.getElementById('top-prd-count').innerText = (prd[0]?.total_productos || prd.length) + ' total';
+  } else {
+    document.getElementById('top-prd-count').innerText = '0 total';
+  }
+  
+  const prdPageSize = 6;
+  const totalPrdPages = Math.ceil(prd.length / prdPageSize);
+  const prdStart = (state.topPrdPage || 0) * prdPageSize;
+  const prdEnd = prdStart + prdPageSize;
+
+  setHTML('top-prd-table-overview', prd.slice(prdStart, prdEnd).map((p,idx)=>`<tr><td>${prdStart+idx+1}</td><td style="text-align:left">${p.producto}</td><td>${p.marca||'-'}</td><td>${p.tipo||'-'}</td><td>S/ ${formatN(p.venta_neta)}</td><td>${p.pct_margen}%</td></tr>`).join(''));
+
+  const prdPag = document.getElementById('top-prd-pagination');
+  if (prd.length > prdPageSize) {
+    setHTML('top-prd-pagination', `
+      <button class="pag-btn" ${state.topPrdPage === 0 ? 'disabled' : ''} onclick="changeTopPrdPage(-1)">Anterior</button>
+      <span class="pag-info">Pág ${state.topPrdPage + 1} de ${totalPrdPages}</span>
+      <button class="pag-btn" ${state.topPrdPage >= totalPrdPages - 1 ? 'disabled' : ''} onclick="changeTopPrdPage(1)">Siguiente</button>
+    `);
+  } else {
+    setHTML('top-prd-pagination', '');
+  }
+
+  const maxP = prd[0]?.venta_neta || 1;
+  setHTML('top-prod-bars', prd.slice(0,8).map(p=>`<div class="bar-horiz"><div class="bar-label">${p.producto}</div><div class="bar-track"><div class="bar-fill" style="width:${Math.max(1,(p.venta_neta/maxP)*100)}%;background:#4F46E5"></div></div><div class="bar-val">S/${formatK(p.venta_neta)}</div></div>`).join(''));
+  
+  const brnd = state.data.marcaMix || [];
+  const maxB = brnd[0]?.venta_neta || 1;
+  setHTML('top-brand-bars', brnd.slice(0,8).map((b,i)=>`<div class="bar-horiz"><div class="bar-label">${b.marca}</div><div class="bar-track"><div class="bar-fill" style="width:${Math.max(1,(b.venta_neta/maxB)*100)}%;background:${['#D85A30','#1D9E75','#EF9F27','#534AB7'][i%4]}"></div></div><div class="bar-val">S/${formatK(b.venta_neta)}</div></div>`).join(''));
+  
+  const pais = state.data.rentOri || [];
+  mkChart('c-country-sales', 'bar', {labels:pais.slice(0,6).map(d=>d.pais), datasets:[{label:'Venta S/', data:pais.slice(0,6).map(d=>d.venta_neta), backgroundColor:['#4F46E5','#10B981','#F59E0B','#EF4444','#8B5CF6','#6B7280']}]}, {indexAxis:'y'});
+  
+  document.getElementById('tbl-rentabilidad-origen-new').innerHTML = pais.map(p=>`<tr><td><b>${p.pais}</b></td><td>S/ ${formatN(p.venta_neta)}</td><td>S/ ${formatN(p.margen_neto)}</td><td><span class="badge ${p.venta_neta&&p.margen_neto/p.venta_neta>0.6?'b-green':'b-amber'}">${(p.venta_neta?p.margen_neto/p.venta_neta*100:0).toFixed(1)}%</span></td><td>${p.unidades}</td></tr>`).join('');
+  mkChart('c-margin-pct', 'bar', {labels:pais.map(d=>d.pais), datasets:[{label:'Margen %', data:pais.map(d=>(d.venta_neta?d.margen_neto/d.venta_neta*100:0).toFixed(1)), backgroundColor:'#10B981'}]});
+
+  // --- SECCIÓN RETENCIÓN ---
+  const ret = state.data.retencion || [];
+  document.getElementById('tbl-retencion').innerHTML = ret.map(d=>`<tr><td><b>${d.anno}</b></td><td>${formatN(d.clientes_actuales)}</td><td><span style="color:#059669;font-weight:600">${d.retenidos}</span></td><td><span style="color:#2563EB;font-weight:600">+${d.nuevos}</span></td><td><span style="color:#DC2626;font-weight:600">-${d.perdidos}</span></td><td>S/ ${formatN(d.perdida_usd)}</td></tr>`).join('');
+  
+  if (ret.length > 0) {
+    const last3 = ret.slice(-3);
+    const totalLoss = ret.reduce((acc, curr) => acc + curr.perdida_usd, 0);
+
+    last3.forEach((d, i) => {
+        const idx = i + 1;
+        const labelEl = document.getElementById(`ret-kpi-${idx}-label`);
+        const valEl = document.getElementById(`ret-kpi-${idx}-val`);
+        const subEl = document.getElementById(`ret-kpi-${idx}-sub`);
+        
+        if (labelEl) labelEl.innerText = `Pérdida ${d.anno}`;
+        if (valEl) valEl.innerText = `S/ ${formatN(d.perdida_usd)}`;
+        if (subEl) subEl.innerText = `${d.perdidos} clientes perdidos`;
+        
+        if (i === last3.length - 1 && subEl) {
+            subEl.innerText = `${d.perdidos} clientes inactivos*`;
+        }
+    });
+    document.getElementById('ret-kpi-total-val').innerText = `S/ ${formatK(totalLoss)}`;
+
+    mkChart('c-retention', 'bar', {
+      labels: ret.map(d=>d.anno),
+      datasets: [
+        {label: 'Retenidos', data: ret.map(d=>d.retenidos), backgroundColor:'#3b82f6', borderRadius: 4},
+        {label: 'Nuevos', data: ret.map(d=>d.nuevos), backgroundColor:'#10b981', borderRadius: 4},
+        {label: 'Perdidos', data: ret.map(d=>-d.perdidos), backgroundColor:'#ef4444', borderRadius: 4}
+      ]
+    }, {
+      plugins: { 
+        legend: { display: false },
+        datalabels: { 
+            anchor: (ctx) => ctx.dataset.data[ctx.dataIndex] >= 0 ? 'end' : 'start',
+            align: (ctx) => ctx.dataset.data[ctx.dataIndex] >= 0 ? 'top' : 'bottom',
+            font: { size: 9, weight: '600' },
+            formatter: (v) => Math.abs(v)
+        }
+      },
+      scales: { 
+        x: { grid: { display:false } },
+        y: { 
+            grid: { color: 'rgba(0,0,0,0.05)' },
+            suggestedMin: -Math.max(...ret.map(d=>d.perdidos)) * 1.2,
+            ticks: { callback: (v) => Math.abs(v) }
+        }
+      },
+      onClick: (e, active) => {
+        if (active.length > 0) {
+            const chartIdx = active[0].index;
+            const datasetIdx = active[0].datasetIndex;
+            const periodLabel = ret[chartIdx].anno;
+            const parts = periodLabel.split('→');
+            const p1 = parseInt(parts[0]);
+            const p2 = parseInt(parts[1].replace('*', ''));
+            const types = ['retenidos', 'nuevos', 'perdidos'];
+            const labels = ['Retenidos', 'Nuevos', 'Perdidos'];
+            const type = types[datasetIdx];
+            const label = `${labels[datasetIdx]} (${periodLabel})`;
+            fetchRetentionList(p1, p2, type, label);
+        }
+      }
+    });
+
+    const retPct = ret.map(d => (d.retenidos / (d.retenidos + d.perdidos) * 100).toFixed(1));
+    mkChart('c-ret-pct', 'line', {
+        labels: ret.map(d=>d.anno),
+        datasets: [{
+            label: '% Retención',
+            data: retPct,
+            borderColor: '#2563EB',
+            backgroundColor: 'rgba(37, 99, 235, 0.1)',
+            fill: true,
+            tension: 0.4,
+            pointRadius: 5,
+            pointBackgroundColor: '#fff',
+            pointBorderWidth: 2
+        }]
+    }, {
+        plugins: {
+            datalabels: { align: 'top', font: { weight: 'bold' }, formatter: (v) => v + '%' }
+        },
+        scales: {
+            y: { min: 0, max: 100, ticks: { callback: (v) => v + '%' } }
+        }
+    });
+
     mkChart('c-ret-loss', 'bar', {
-      labels: ret.map(d => d.anno),
-      datasets: [{ label: 'Pérdida (S/)', data: ret.map(d => d.perdida_usd), backgroundColor: '#DC2626', borderRadius: 4 }]
+      labels: ret.map(d=>d.anno),
+      datasets: [{
+        label: 'Pérdida S/',
+        data: ret.map(d=>d.perdida_usd),
+        backgroundColor: (ctx) => {
+            const idx = ctx.dataIndex;
+            return idx === ret.length - 1 ? '#991b1b' : (idx === 0 ? '#b45309' : '#ef4444');
+        },
+        borderRadius: 6
+      }]
+    }, {
+        plugins: {
+            datalabels: { anchor: 'end', align: 'top', formatter: (v) => formatK(v) }
+        }
     });
   }
+
+  const ai = state.data.aiStrats || {competencia:[], estrategias:[]};
+  if(ai.competencia) document.getElementById('tbl-ai-competencia').innerHTML = ai.competencia.map(c=>`<tr><td><b>${c.competidor}</b></td><td>${c.enfoque}</td><td>${c.fortaleza}</td><td><span class="badge b-${c.color}">${c.amenaza}</span></td></tr>`).join('');
+  if(ai.estrategias) document.getElementById('tbl-ai-estrategias').innerHTML = ai.estrategias.map(e=>`<tr><td>${e.id}</td><td><b>${e.nombre}</b><br><span style="font-size:10px;color:gray">${e.desc}</span></td><td>${e.palanca}</td><td><span class="badge b-${e.color}">${e.impacto}</span></td></tr>`).join('');
+  
+  if (typeof lucide !== 'undefined') lucide.createIcons();
 }
 
-function renderAI() {
-  const ia = state.data.aiStrats || { competencia: [], estrategias: [] };
+
+function renderRFMCharts() {
+  const data = state.data.rfmStats || [];
+  const segmentsMap = {
+    'Champions': { c: '#4f46e5' },
+    'Leales': { c: '#10b981' },
+    'Prometedores': { c: '#0ea5e9' },
+    'En Desarrollo': { c: '#8b5cf6' },
+    'En Riesgo': { c: '#f59e0b' },
+    'Perdidos': { c: '#ef4444' }
+  };
+
+  const order = ['Champions', 'Leales', 'Prometedores', 'En Desarrollo', 'En Riesgo', 'Perdidos'];
+  const labels = [];
+  const qtyData = [];
+  const usdData = [];
+  const bgColor = [];
+
+  order.forEach(s => {
+    const item = data.find(d => d.segmento === s) || { n_clientes: 0, valor_pen: 0 };
+    labels.push(s);
+    qtyData.push(item.n_clientes);
+    usdData.push(item.valor_pen);
+    bgColor.push(segmentsMap[s].c);
+  });
+
+  const commonOpts = {
+    onClick: (e, activeElements) => {
+      if (activeElements.length > 0) {
+        const seg = labels[activeElements[0].index];
+        state.rfmFilter = seg;
+        document.getElementById('rfm-sel-label').innerText = seg;
+        document.getElementById('rfm-mix-label').innerText = seg;
+        state.rfmPage = 0;
+        state.rfmMixPage = 0;
+        renderRFMTable();
+        renderRFMMixTable();
+      }
+    }
+  };
+
+  // 1. Segmentos por N° de Clientes
+  mkChart('c-rfm-qty', 'doughnut', {
+    labels,
+    datasets: [{
+      data: qtyData,
+      backgroundColor: bgColor,
+      borderWidth: 2,
+      borderColor: '#ffffff',
+      hoverOffset: 12
+    }]
+  }, {
+    ...commonOpts,
+    cutout: '65%',
+    plugins: {
+      legend: { display: true, position: 'bottom', labels: { usePointStyle: true, padding: 15, font: { size: 10 } } },
+      datalabels: {
+        color: '#fff',
+        font: { weight: 'bold', size: 11 },
+        formatter: (val) => val > 0 ? val : ''
+      }
+    }
+  });
+
+  // 2. Valor S/ por Segmento
+  mkChart('c-rfm-usd', 'bar', {
+    labels,
+    datasets: [{
+      label: 'Valor S/',
+      data: usdData,
+      backgroundColor: bgColor.map(c => c + 'BB'),
+      borderColor: bgColor,
+      borderWidth: 1,
+      borderRadius: 6
+    }]
+  }, {
+    ...commonOpts,
+    plugins: {
+      legend: { display: false },
+      datalabels: {
+        anchor: 'end',
+        align: 'top',
+        color: '#64748b',
+        font: { weight: '600', size: 10 },
+        formatter: (val) => val > 0 ? formatK(val) : ''
+      }
+    },
+    scales: {
+      y: { 
+        beginAtZero: true,
+        ticks: { callback: (v) => 'S/ ' + formatK(v), font: { size: 10 } },
+        grid: { color: 'rgba(226, 232, 240, 0.4)' }
+      },
+      x: { grid: { display: false }, ticks: { font: { size: 10 } } }
+    }
+  });
+}
+
+function clearRFMFilter() {
+  state.rfmFilter = null;
+  state.rfmPage = 0;
+  state.rfmMixPage = 0;
+  document.getElementById('rfm-sel-label').innerText = 'Todos';
+  document.getElementById('rfm-mix-label').innerText = 'Todos';
+  document.getElementById('rfm-search').value = '';
+  renderRFMTable();
+  renderRFMMixTable();
+}
+
+function changeRFMPage(delta) {
+  state.rfmPage = (state.rfmPage || 0) + delta;
+  renderRFMTable();
+}
+
+function renderRFMTable() {
+  const details = state.data.rfmDetails || [];
+  const searchInput = document.getElementById('rfm-search');
+  const search = searchInput ? searchInput.value.toLowerCase() : '';
   
-  document.getElementById('tbl-ai-competencia').innerHTML = ia.competencia.map(c => `
-    <tr><td><b>${c.competidor}</b></td><td>${c.enfoque}</td><td>${c.fortaleza}</td><td><span class="badge b-${c.color}">${c.amenaza}</span></td></tr>
+  let filtered = details;
+  if (state.rfmFilter) {
+    filtered = filtered.filter(d => d.segmento === state.rfmFilter);
+  }
+  if (search) {
+    filtered = filtered.filter(d => d.cliente.toLowerCase().includes(search));
+  }
+
+  // Paginación (5 filas por página)
+  const pageSize = 5;
+  const totalPages = Math.ceil(filtered.length / pageSize);
+  state.rfmPage = Math.max(0, Math.min(state.rfmPage || 0, totalPages - 1));
+  const start = state.rfmPage * pageSize;
+  const end = start + pageSize;
+  const displayed = filtered.slice(start, end);
+
+  const tbody = document.getElementById('tbl-rfm-details').querySelector('tbody');
+  if (displayed.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding:20px; color:gray">No se encontraron clientes para esta selección</td></tr>';
+    document.getElementById('rfm-pagination').innerHTML = '';
+    return;
+  }
+
+  tbody.innerHTML = displayed.map((c, i) => {
+    let bClass = 'b-blue';
+    if (c.segmento === 'Champions') bClass = 'b-indigo';
+    if (c.segmento === 'Leales') bClass = 'b-green';
+    if (c.segmento === 'En Riesgo') bClass = 'b-amber';
+    if (c.segmento === 'Perdidos') bClass = 'b-red';
+    if (c.segmento === 'En Desarrollo') bClass = 'b-purple';
+
+    return `
+      <tr>
+        <td>${start + i + 1}</td>
+        <td><b>${c.cliente}</b></td>
+        <td class="col-num">S/ ${formatN(c.total_pen)}</td>
+        <td class="col-num">${c.frecuencia}</td>
+        <td class="col-num">${c.dias_sin_compra} d</td>
+        <td><span class="badge ${bClass}">${c.segmento}</span></td>
+      </tr>
+    `;
+  }).join('');
+
+  // Render Paginación UI
+  const pag = document.getElementById('rfm-pagination');
+  if (totalPages > 1) {
+    pag.innerHTML = `
+      <div style="display:flex; align-items:center; gap:15px; margin-top:15px; font-size:13px">
+        <button class="pag-btn" ${state.rfmPage === 0 ? 'disabled' : ''} onclick="changeRFMPage(-1)">Anterior</button>
+        <span style="color:#64748b">Página <b>${state.rfmPage + 1}</b> de ${totalPages}</span>
+        <button class="pag-btn" ${state.rfmPage >= totalPages - 1 ? 'disabled' : ''} onclick="changeRFMPage(1)">Siguiente</button>
+        <span style="margin-left:auto; color:#94a3b8">${filtered.length} clientes totales</span>
+      </div>
+    `;
+  } else {
+    pag.innerHTML = `<div style="margin-top:10px; color:#94a3b8; font-size:12px">${filtered.length} clientes totales</div>`;
+  }
+}
+
+function changeRFMMixPage(delta) {
+  state.rfmMixPage = (state.rfmMixPage || 0) + delta;
+  renderRFMMixTable();
+}
+
+function renderRFMMixTable() {
+  const details = state.data.rfmMix || [];
+  
+  let filtered = details;
+  if (state.rfmFilter) {
+    filtered = filtered.filter(d => d.segmento === state.rfmFilter);
+  }
+
+  // Paginación (5 filas por página para consistencia)
+  const pageSize = 5;
+  const totalPages = Math.ceil(filtered.length / pageSize);
+  state.rfmMixPage = Math.max(0, Math.min(state.rfmMixPage || 0, totalPages - 1));
+  const start = state.rfmMixPage * pageSize;
+  const end = start + pageSize;
+  const displayed = filtered.slice(start, end);
+
+  const tbody = document.getElementById('tbl-rfm-mix').querySelector('tbody');
+  if (displayed.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; padding:20px; color:gray">No hay datos disponibles para esta selección</td></tr>';
+    document.getElementById('rfm-mix-pagination').innerHTML = '';
+    return;
+  }
+
+  tbody.innerHTML = displayed.map((c, i) => {
+    let bClass = 'b-blue';
+    if (c.segmento === 'Champions') bClass = 'b-indigo';
+    if (c.segmento === 'Leales') bClass = 'b-green';
+    if (c.segmento === 'En Riesgo') bClass = 'b-amber';
+    if (c.segmento === 'Perdidos') bClass = 'b-red';
+    if (c.segmento === 'En Desarrollo') bClass = 'b-purple';
+
+    // Lógica de "Oportunidad"
+    let oport = '<span style="color:#94a3b8">-</span>';
+    if (c.pct_espumoso < 5) oport = '<b style="color:#4f46e5">Ofrecer espumosos</b>';
+    else if (c.pct_blanco < 10) oport = '<b style="color:#0ea5e9">Ofrecer blancos</b>';
+    else if (c.pct_tinto < 15) oport = '<b style="color:#ef4444">Ofrecer tintos</b>';
+
+    return `
+      <tr>
+        <td><b>${c.cliente}</b></td>
+        <td class="col-num">S/ ${formatN(c.total_pen)}</td>
+        <td><span class="badge ${bClass}">${c.segmento}</span></td>
+        <td class="col-num">${c.pct_tinto}%</td>
+        <td class="col-num">${c.pct_blanco}%</td>
+        <td class="col-num">${c.pct_espumoso}%</td>
+        <td>${oport}</td>
+      </tr>
+    `;
+  }).join('');
+
+  // Render Paginación UI
+  const pag = document.getElementById('rfm-mix-pagination');
+  if (totalPages > 1) {
+    pag.innerHTML = `
+      <div style="display:flex; align-items:center; gap:15px; margin-top:15px; font-size:13px">
+        <button class="pag-btn" ${state.rfmMixPage === 0 ? 'disabled' : ''} onclick="changeRFMMixPage(-1)">Anterior</button>
+        <span style="color:#64748b">Página <b>${state.rfmMixPage + 1}</b> de ${totalPages}</span>
+        <button class="pag-btn" ${state.rfmMixPage >= totalPages - 1 ? 'disabled' : ''} onclick="changeRFMMixPage(1)">Siguiente</button>
+      </div>
+    `;
+  } else {
+    pag.innerHTML = '';
+  }
+}
+
+
+// Helpers para la tarjeta de Proyección
+function updateProjectionUI() {
+  const kVal = document.getElementById('k-proj');
+  if (!kVal) return;
+  const kCard = kVal.parentElement;
+  if (state.year == 2026) {
+    kVal.innerText = 'Analizando...';
+    kCard.querySelector('.kpi-label').innerText = 'Proyección';
+    kCard.querySelector('.kpi-sub').innerText = 'ARIMA+';
+    kCard.style.opacity = "1";
+  } else {
+    kVal.innerText = '-';
+    kCard.querySelector('.kpi-label').innerText = 'Proyección';
+    kCard.querySelector('.kpi-sub').innerText = 'Periodo Cerrado';
+    kCard.style.opacity = "0.5";
+  }
+}
+
+function renderProjectionData(fm) {
+  if (state.year != 2026) return;
+  const fcRows = fm.filter(d => d.tipo === 'pronóstico');
+  if (fcRows.length > 0) {
+    const totalForecast = fcRows.reduce((a, b) => a + (b.forecast || 0), 0);
+    const numMeses = fcRows.length;
+    document.getElementById('k-proj').innerText = 'S/ ' + formatN(totalForecast);
+    const kCard = document.getElementById('k-proj').parentElement;
+    kCard.querySelector('.kpi-label').innerText = `Proyección ${numMeses} meses`;
+    kCard.querySelector('.kpi-sub').innerText = 'Modelo ARIMA+';
+  }
+}
+
+async function loadForecast() {
+  updateProjectionUI();
+  if (state.year != 2026) return; // No pedir datos si es año cerrado
+  
+  try {
+    const fm = await fetchJson('/api/forecast-total');
+    if(fm) {
+       state.data.fcMain = fm;
+       renderProjectionData(fm);
+       
+       if (document.getElementById('chart-forecast-main')) {
+         mkChart('chart-forecast-main', 'line', {
+           labels: fm.map(d=>d.periodo.substring(0,7)),
+           datasets: [
+             {label:'Real', data:fm.map(d=>d.venta_real), borderColor:'#2563EB'},
+             {label:'Forecast', data:fm.map(d=>d.forecast), borderDash:[5,5], borderColor:'#F59E0B'}
+           ]
+         });
+       }
+    }
+    const fp = await fetchJson('/api/forecast-productos');
+    if(fp && document.getElementById('tbl-forecast-prd')) {
+      document.getElementById('tbl-forecast-prd').querySelector('tbody').innerHTML = fp.slice(0,10).map(x=>`<tr><td><b>${x.producto}</b></td><td>${Math.round(x.fc_uds||0)} uds</td><td>${Math.round(x.fc_lo)} - ${Math.round(x.fc_hi)}</td></tr>`).join('');
+    }
+  } catch(e) {}
+}
+
+function setSalesMetricOverview(m, btn) {
+  window._overviewCurrentMetric = m;
+  const parent = document.getElementById('btn-group-overview-yoy');
+  if (parent) {
+    parent.querySelectorAll('.ytab').forEach(b => b.classList.remove('active'));
+  }
+  if (btn) btn.classList.add('active');
+  renderOverviewYoY();
+}
+
+function renderOverviewYoY() {
+  const yoy = state.data.oldYoy || [];
+  const metric = window._overviewCurrentMetric || 'venta_neta';
+  const years = [2022, 2023, 2024, 2025, 2026];
+  const yc = ['#CBD5E1', '#94A3B8', '#64748B', '#3B82F6', '#0F172A']; // 2022-2026
+  
+  const dts = years.map((y, i) => {
+    let d = new Array(12).fill(null);
+    yoy.filter(r => parseInt(r.anno) === y).forEach(r => d[r.mes-1] = r[metric]);
+    return {
+      label: y.toString(),
+      data: d,
+      borderColor: yc[i],
+      backgroundColor: yc[i],
+      borderWidth: y === 2026 ? 3 : 2,
+      pointRadius: y === 2026 ? 4 : 2,
+      tension: 0.3,
+      fill: false,
+      datalabels: {
+        display: (context) => (y === 2026 && context.dataset.data[context.dataIndex] !== null),
+        align: 'top',
+        formatter: (v) => metric.includes('pct') ? v+'%' : formatK(v)
+      }
+    };
+  });
+
+  const chartId = 'c-overview-yoy';
+  const ctx = document.getElementById(chartId);
+  if (!ctx) return;
+  const labels = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+  
+  mkChart(chartId, 'line', { labels, datasets: dts }, {
+    plugins: {
+      datalabels: {
+        color: '#0F172A',
+        font: { weight: 'bold', size: 10 },
+        offset: 4
+      },
+      legend: { position: 'top', align: 'end' }
+    },
+    scales: {
+      y: { ticks: { callback: (v) => metric.includes('pct') ? v+'%' : formatK(v) } }
+    }
+  });
+}
+
+function renderAnnualSales() {
+  const yoy = state.data.oldYoy || [];
+  const years = [2022, 2023, 2024, 2025, 2026];
+  
+  const annualData = years.map(y => {
+    return yoy.filter(r => parseInt(r.anno) === y).reduce((a, b) => a + (b.venta_neta || 0), 0);
+  });
+
+  const chartId = 'c-annual-sales';
+  const ctx = document.getElementById(chartId);
+  if (!ctx) return;
+
+  mkChart(chartId, 'bar', {
+    labels: years.map(y => y === 2026 ? '2026*' : y.toString()),
+    datasets: [{
+      label: 'Ventas S/',
+      data: annualData,
+      backgroundColor: '#2563EB',
+      borderRadius: 10,
+      hoverBackgroundColor: '#1D4ED8'
+    }]
+  }, {
+    plugins: {
+      datalabels: {
+        labels: {
+          value: {
+            anchor: 'end',
+            align: 'top',
+            color: '#0F172A',
+            font: { weight: 'bold', size: 13 },
+            offset: 22,
+            formatter: (v) => formatK(v)
+          },
+          delta: {
+            anchor: 'end',
+            align: 'top',
+            offset: 2,
+            font: { weight: '600', size: 11 },
+            color: (ctx) => {
+              const idx = ctx.dataIndex;
+              if (idx === 0) return 'rgba(0,0,0,0)'; 
+              const v = annualData[idx];
+              const prev = annualData[idx-1];
+              return (v >= prev) ? '#2563EB' : '#DC2626';
+            },
+            formatter: (v, ctx) => {
+              const idx = ctx.dataIndex;
+              if (idx === 0) return '';
+              const prev = annualData[idx-1];
+              if (!prev) return '';
+              const diff = ((v-prev)/prev*100).toFixed(0);
+              return (v >= prev ? '+' : '') + diff + '%';
+            }
+          }
+        },
+        textAlign: 'center'
+      },
+      legend: { display: false }
+    },
+    layout: { padding: { top: 30 } },
+    scales: {
+      y: { 
+        beginAtZero: true,
+        ticks: { callback: (v) => formatK(v) },
+        grid: { color: 'rgba(226, 232, 240, 0.4)' }
+      }
+    }
+  });
+}
+
+function renderCrossSellCharts() {
+  const mix = state.data.rfmCross || [];
+  const freqData = state.data.freq || [];
+
+  // 1. Gráfica Cross-sell Mix (Horizontal)
+  const mixLabels = mix.map(d => d.mix_type);
+  const mixValues = mix.map(d => d.n_clientes);
+  const mixColors = ['#4F46E5', '#3B82F6', '#8B5CF6', '#10B981', '#F59E0B', '#6B7280'];
+
+  mkChart('c-cross-sell', 'bar', {
+    labels: mixLabels,
+    datasets: [{
+      label: 'N° Clientes',
+      data: mixValues,
+      backgroundColor: mixColors.map(c => c + 'CC'),
+      borderColor: mixColors,
+      borderWidth: 1,
+      borderRadius: 4
+    }]
+  }, {
+    indexAxis: 'y',
+    onClick: (e, active) => {
+      if (active.length > 0) {
+        const idx = active[0].index;
+        const cat = mixLabels[idx];
+        state.csFilter = cat;
+        state.csPage = 0;
+        document.getElementById('cs-type-label').innerText = cat;
+        renderCrossSellDetailTable();
+      }
+    },
+    plugins: {
+      legend: { display: false },
+      datalabels: { anchor: 'end', align: 'right', font: { weight: 'bold', size: 10 }, formatter: Math.round }
+    },
+    scales: { 
+      x: { grid: { display: false }, ticks: { display: false } },
+      y: { grid: { display: false }, ticks: { font: { size: 10 } } }
+    }
+  });
+
+  // Insight dinámico
+  const soloTinto = mix.find(d => d.mix_type === 'Solo Tinto');
+  const insightEl = document.getElementById('cross-sell-insight');
+  if (soloTinto && insightEl) {
+    const potencial = (soloTinto.n_clientes * (soloTinto.avg_pen * 0.3) / 1000).toFixed(0);
+    insightEl.innerHTML = `<i data-lucide="zap" style="width:14px; vertical-align:middle; margin-right:4px"></i> <b>${soloTinto.n_clientes} clientes</b> compran solo Tinto. El potencial de venta cruzada es de aprox. <b>+S/ ${potencial}K</b>.`;
+    if (typeof lucide !== 'undefined') lucide.createIcons();
+  }
+
+  // 2. Distribución de Frecuencia
+  mkChart('c-freq', 'bar', {
+    labels: freqData.map(d => d.rango_frecuencia),
+    datasets: [{
+      label: 'Clientes',
+      data: freqData.map(d => d.cantidad_clientes),
+      backgroundColor: '#3B82F6',
+      borderRadius: 6
+    }]
+  }, {
+    onClick: (e, active) => {
+      if (active.length > 0) {
+        const idx = active[0].index;
+        const range = freqData[idx].rango_frecuencia;
+        state.freqFilter = range;
+        state.freqPage = 0;
+        document.getElementById('freq-type-label').innerText = range;
+        renderFreqDetailTable();
+      }
+    },
+    plugins: {
+      legend: { display: false },
+      datalabels: { anchor: 'end', align: 'top', font: { weight: 'bold', size: 10 } }
+    },
+    scales: { 
+      x: { grid: { display: false }, ticks: { font: { size: 10 } } },
+      y: { beginAtZero: true, grid: { color: 'rgba(226, 232, 240, 0.4)' }, ticks: { font: { size: 10 } } }
+    }
+  });
+}
+
+function changeCSPage(delta) {
+  state.csPage = (state.csPage || 0) + delta;
+  renderCrossSellDetailTable();
+}
+
+function renderCrossSellDetailTable() {
+  const data = state.data.rfmMix || [];
+  let filtered = data;
+  if (state.csFilter) {
+    filtered = data.filter(d => d.mix_type === state.csFilter);
+  } else {
+    document.getElementById('tbl-cs-detail').querySelector('tbody').innerHTML = '<tr><td colspan="3" style="text-align:center; color:#94a3b8">Haga clic en una barra para ver detalles</td></tr>';
+    document.getElementById('cs-detail-pagination').innerHTML = '';
+    return;
+  }
+
+  const pageSize = 5;
+  const totalPages = Math.ceil(filtered.length / pageSize);
+  const start = state.csPage * pageSize;
+  const displayed = filtered.slice(start, start + pageSize);
+
+  document.getElementById('tbl-cs-detail').querySelector('tbody').innerHTML = displayed.map(d => `
+    <tr>
+      <td>${d.cliente}</td>
+      <td class="col-num">S/ ${formatN(d.total_pen)}</td>
+      <td><span class="badge b-blue" style="font-size:9px">${d.segmento}</span></td>
+    </tr>
   `).join('');
 
-  document.getElementById('tbl-ai-estrategias').innerHTML = ia.estrategias.map(e => `
-    <tr><td>${e.id}</td><td><b>${e.nombre}</b><br><span style="font-size:10px;color:gray">${e.desc}</span></td><td>${e.palanca}</td><td><span class="badge b-${e.color}">${e.impacto}</span></td></tr>
+  const pag = document.getElementById('cs-detail-pagination');
+  if (totalPages > 1) {
+    pag.innerHTML = `
+      <button class="pag-btn" ${state.csPage === 0 ? 'disabled' : ''} onclick="changeCSPage(-1)">Anterior</button>
+      <span class="pag-info">Pág ${state.csPage + 1} de ${totalPages}</span>
+      <button class="pag-btn" ${state.csPage >= totalPages - 1 ? 'disabled' : ''} onclick="changeCSPage(1)">Siguiente</button>
+    `;
+  } else { pag.innerHTML = ''; }
+}
+
+function changeFreqPage(delta) {
+  state.freqPage = (state.freqPage || 0) + delta;
+  renderFreqDetailTable();
+}
+
+function renderFreqDetailTable() {
+  const data = state.data.rfmDetails || [];
+  let filtered = [];
+  if (state.freqFilter) {
+    filtered = data.filter(d => {
+      const f = d.frecuencia;
+      if (state.freqFilter === '1 compra') return f === 1;
+      if (state.freqFilter === '2-3') return f >= 2 && f <= 3;
+      if (state.freqFilter === '4-10') return f >= 4 && f <= 10;
+      if (state.freqFilter === '11-50') return f >= 11 && f <= 50;
+      if (state.freqFilter === '>50') return f > 50;
+      return false;
+    });
+  } else {
+    document.getElementById('tbl-freq-detail').querySelector('tbody').innerHTML = '<tr><td colspan="3" style="text-align:center; color:#94a3b8">Haga clic en una barra para ver detalles</td></tr>';
+    document.getElementById('freq-detail-pagination').innerHTML = '';
+    return;
+  }
+
+  const pageSize = 5;
+  const totalPages = Math.ceil(filtered.length / pageSize);
+  const start = state.freqPage * pageSize;
+  const displayed = filtered.slice(start, start + pageSize);
+
+  document.getElementById('tbl-freq-detail').querySelector('tbody').innerHTML = displayed.map(d => `
+    <tr>
+      <td>${d.cliente}</td>
+      <td class="col-num">S/ ${formatN(d.total_pen)}</td>
+      <td class="col-num">${d.frecuencia}</td>
+    </tr>
   `).join('');
+
+  const pag = document.getElementById('freq-detail-pagination');
+  if (totalPages > 1) {
+    pag.innerHTML = `
+      <button class="pag-btn" ${state.freqPage === 0 ? 'disabled' : ''} onclick="changeFreqPage(-1)">Anterior</button>
+      <span class="pag-info">Pág ${state.freqPage + 1} de ${totalPages}</span>
+      <button class="pag-btn" ${state.freqPage >= totalPages - 1 ? 'disabled' : ''} onclick="changeFreqPage(1)">Siguiente</button>
+    `;
+  } else { pag.innerHTML = ''; }
+}
+
+// --- NUEVAS FUNCIONES DE RETENCIÓN ---
+async function fetchRetentionList(p1, p2, tipo, label) {
+  state.retPage = 0;
+  state.retCurrentLabel = label;
+  document.getElementById('ret-list-label').innerText = label;
+  document.getElementById('tbl-retention-detail').innerHTML = '<tr><td colspan="2" style="text-align:center; padding:40px;"><div class="spinner" style="width:20px; height:20px; margin:0 auto;"></div></td></tr>';
+  
+  const data = await fetchJson(`/api/retencion-listado?p1=${p1}&p2=${p2}&tipo=${tipo}`);
+  state.retList = data || [];
+  renderRetentionDetailTable();
+}
+
+function renderRetentionDetailTable() {
+  const pageSize = 5;
+  const filtered = state.retList;
+  const totalPages = Math.ceil(filtered.length / pageSize);
+  const start = state.retPage * pageSize;
+  const displayed = filtered.slice(start, start + pageSize);
+  
+  const tbody = document.getElementById('tbl-retention-detail');
+  if (displayed.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="2" style="text-align:center; padding:40px; color:#94a3b8">No hay datos disponibles</td></tr>';
+    return;
+  }
+  
+  tbody.innerHTML = displayed.map(c => `
+    <tr>
+      <td><b>${c.cliente}</b></td>
+      <td class="col-num">S/ ${formatN(c.venta)}</td>
+    </tr>
+  `).join('');
+  
+  const pag = document.getElementById('ret-detail-pagination');
+  if (totalPages > 1) {
+    pag.innerHTML = `
+      <button class="pag-btn" ${state.retPage === 0 ? 'disabled' : ''} onclick="changeRetPage(-1)">Anterior</button>
+      <span style="font-size:12px; color:#64748b">Pág ${state.retPage + 1} de ${totalPages}</span>
+      <button class="pag-btn" ${state.retPage >= totalPages - 1 ? 'disabled' : ''} onclick="changeRetPage(1)">Siguiente</button>
+    `;
+  } else {
+    pag.innerHTML = '';
+  }
+}
+
+function changeRetPage(delta) {
+  state.retPage += delta;
+  renderRetentionDetailTable();
+}
+
+function renderExpertAnalysis() {
+  const data = state.data.expertAnalysis || [];
+  const tbody = document.getElementById('tbody-expert-analysis');
+  if (!tbody) return;
+
+  if (data.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; padding:20px; color:#94a3b8">No hay datos de análisis estratégico disponibles en este momento.</td></tr>';
+    return;
+  }
+
+  tbody.innerHTML = data.map(d => {
+    let bClass = 'b-blue';
+    if (d.prioridad === 'Alta') bClass = 'b-red';
+    if (d.prioridad === 'Media') bClass = 'b-amber';
+
+    let icon = 'target';
+    if (d.segmento.includes('VIP')) icon = 'crown';
+    if (d.segmento.includes('Ballenas')) icon = 'anchor';
+    if (d.segmento.includes('Monocultivo')) icon = 'shuffle';
+    if (d.segmento.includes('Frecuencia')) icon = 'trending-down';
+    if (d.segmento.includes('Reactivación')) icon = 'zap';
+    if (d.segmento.includes('Margen')) icon = 'percent';
+
+    return `
+      <tr>
+        <td style="font-weight:600; color:var(--text-main)">
+          <div style="display:flex; align-items:center; gap:10px">
+            <i data-lucide="${icon}" style="width:16px; color:var(--primary)"></i>
+            ${d.segmento}
+          </div>
+        </td>
+        <td class="col-num" style="font-weight:700">${d.n_clientes}</td>
+        <td style="font-size:12.5px; color:#475569; line-height:1.4">${d.accion}</td>
+        <td><span class="badge ${bClass}" style="padding:4px 10px; font-size:11px">${d.prioridad}</span></td>
+      </tr>
+    `;
+  }).join('');
+  if (typeof lucide !== 'undefined') lucide.createIcons();
+}
+
+// ---------------- NUEVO TAB PRODUCTOS & MIX ----------------
+function changeProdPage(delta) {
+  const max = Math.ceil((state.data.prodAll?.length || 0) / 5) - 1;
+  state.prodAllPage = Math.max(0, Math.min(state.prodAllPage + delta, max));
+  renderProductsTab();
+}
+
+function changeBrandPage(delta) {
+  const max = Math.ceil((state.data.brandAll?.length || 0) / 5) - 1;
+  state.brandAllPage = Math.max(0, Math.min(state.brandAllPage + delta, max));
+  renderProductsTab();
+}
+
+function renderProductsTab() {
+  const pais = state.data.prodPais || [];
+  const prod = state.data.prodAll || [];
+  const brands = state.data.brandAll || [];
+  const prices = state.data.prodPrice || [];
+
+  // 1. KPI Cards Pais
+  if(pais && pais.length > 0) {
+    const byMargin = [...pais].sort((a,b)=>b.pct_margen - a.pct_margen);
+    if (byMargin.length > 0) {
+      const bestMgn = byMargin[0];
+      const worstMgn = byMargin[byMargin.length - 1];
+      const salesSorted = [...pais].sort((a, b) => b.venta_neta - a.venta_neta);
+      const bySales = salesSorted[0];
+      const unitsSorted = [...pais].sort((a, b) => (b.lineas + b.skus) - (a.lineas + a.skus));
+      const byUnits = unitsSorted[0];
+
+      if (document.getElementById('pr-kpi-best-margin')) {
+        if (bestMgn) {
+          document.getElementById('pr-kpi-best-margin').innerText = bestMgn.pais;
+          document.getElementById('pr-kpi-best-margin-sub').innerText = (bestMgn.pct_margen || 0) + '%';
+        }
+        if (worstMgn) {
+          document.getElementById('pr-kpi-worst-margin').innerText = worstMgn.pais;
+          document.getElementById('pr-kpi-worst-margin-sub').innerText = (worstMgn.pct_margen || 0) + '%';
+        }
+        if (bySales) {
+          document.getElementById('pr-kpi-top-sales').innerText = bySales.pais;
+          document.getElementById('pr-kpi-top-sales-sub').innerText = 'S/ ' + formatK(bySales.venta_neta);
+        }
+        if (byUnits) {
+          document.getElementById('pr-kpi-top-units').innerText = byUnits.pais;
+          document.getElementById('pr-kpi-top-units-sub').innerText = (byUnits.skus || 0) + ' SKUs vendidos';
+        }
+      }
+    }
+  }
+
+  // 2. Gráficas País
+  mkChart('c-prod-margin-country', 'bar', {
+    labels: pais.map(d=>d.pais),
+    datasets: [{
+      label: 'Margen %',
+      data: pais.map(d=>d.pct_margen),
+      backgroundColor: '#3B82F6',
+      borderRadius: 4
+    }]
+  }, {
+    plugins: {
+      datalabels: { anchor: 'end', align: 'top', font:{size:10, weight:'bold'}, formatter: v => v+'%' }
+    }
+  });
+
+  mkChart('c-prod-sales-cost-country', 'bar', {
+    labels: pais.map(d=>d.pais),
+    datasets: [
+      { label: 'Venta S/', data: pais.map(d=>d.venta_neta), backgroundColor: '#10B981', borderRadius: 4 },
+      { label: 'Costo S/', data: pais.map(d=>d.costo_total), backgroundColor: '#EF4444', borderRadius: 4 }
+    ]
+  }, {
+    plugins: { legend: { display:true, position:'top' }, datalabels: { display:false } }
+  });
+
+  // 3. Tabla Estratégica País
+  const tPais = document.getElementById('tbl-prod-country-strategy');
+  if(tPais) {
+    tPais.innerHTML = pais.map(d => `
+      <tr>
+        <td><b>${d.pais}</b></td>
+        <td class="col-num">S/ ${formatN(d.venta_neta)}</td>
+        <td class="col-num">S/ ${formatN(d.costo_total)}</td>
+        <td class="col-num">S/ ${formatN(d.margen_neto)}</td>
+        <td class="col-num" style="color:${d.pct_margen<20?'#ef4444':(d.pct_margen>40?'#10b981':'currentColor')}">${d.pct_margen}%</td>
+        <td class="col-num">${d.lineas}</td>
+        <td class="col-num">${d.skus}</td>
+        <td style="padding-left:15px"><span class="badge ${d.accion==='Estrella principal'?'b-green':(d.accion.includes('Revisar')?'b-red':'b-blue')}">${d.accion}</span></td>
+      </tr>
+    `).join('');
+  }
+
+  // 4 & 5. Paginación Marcas y Productos
+  const pSize = 5;
+  
+  // Productos paginado
+  const prodPage = state.prodAllPage || 0;
+  const prodMax = Math.ceil(prod.length / pSize);
+  const pDisp = prod.slice(prodPage * pSize, (prodPage + 1) * pSize);
+  
+  mkChart('c-prod-all-products', 'bar', {
+    labels: pDisp.map(d=>(d.producto.length > 20 ? d.producto.substring(0,18)+'...' : d.producto)),
+    datasets: [{
+      label: 'Venta S/',
+      data: pDisp.map(d=>d.venta_neta),
+      backgroundColor: '#6366F1',
+      borderRadius: 4
+    }]
+  }, {
+    indexAxis: 'y',
+    plugins: {
+      datalabels: { anchor: 'end', align: 'end', font:{size:10, weight:'bold'}, formatter: (v,ctx) => formatK(v) + ' (' + pDisp[ctx.dataIndex].share_pct + '%)' }
+    },
+    scales: { x: { display:false } }, layout: { padding: { right: 50 } }
+  });
+  if(document.getElementById('lbl-prod-page')){
+     document.getElementById('lbl-prod-page').innerText = `Pág ${prodPage+1} de ${prodMax}`;
+     document.getElementById('btn-prod-prev').disabled = prodPage === 0;
+     document.getElementById('btn-prod-next').disabled = prodPage >= prodMax - 1;
+  }
+
+  // Marcas paginado
+  const brandPage = state.brandAllPage || 0;
+  const brandMax = Math.ceil(brands.length / pSize);
+  const bDisp = brands.slice(brandPage * pSize, (brandPage + 1) * pSize);
+
+  mkChart('c-prod-all-brands', 'bar', {
+    labels: bDisp.map(d=>d.marca),
+    datasets: [{
+      label: 'Venta S/',
+      data: bDisp.map(d=>d.venta_neta),
+      backgroundColor: '#8B5CF6',
+      borderRadius: 4
+    }]
+  }, {
+    indexAxis: 'y',
+    plugins: {
+      datalabels: { anchor: 'end', align: 'end', font:{size:10, weight:'bold'}, formatter: (v,ctx) => formatK(v) + ' (' + bDisp[ctx.dataIndex].share_pct + '%)' }
+    },
+    scales: { x: { display:false } }, layout: { padding: { right: 50 } }
+  });
+  if(document.getElementById('lbl-brand-page')){
+     document.getElementById('lbl-brand-page').innerText = `Pág ${brandPage+1} de ${brandMax}`;
+     document.getElementById('btn-brand-prev').disabled = brandPage === 0;
+     document.getElementById('btn-brand-next').disabled = brandPage >= brandMax - 1;
+  }
+
+  // 6. Análisis Segmentos Precio
+  mkChart('c-prod-price-sales', 'bar', {
+    labels: prices.map(d=>d.segmento),
+    datasets: [{
+      label: 'Venta S/',
+      data: prices.map(d=>d.venta_neta),
+      backgroundColor: '#0EA5E9',
+      borderRadius: 4
+    }]
+  }, {
+    plugins: { datalabels: { anchor: 'end', align: 'top', font:{size:10, weight:'bold'}, formatter: formatK } }
+  });
+
+  mkChart('c-prod-price-units', 'bar', {
+    labels: prices.map(d=>d.segmento),
+    datasets: [{
+      label: 'Botellas',
+      data: prices.map(d=>d.botellas),
+      backgroundColor: '#EAB308',
+      borderRadius: 4
+    }]
+  }, {
+    plugins: { datalabels: { anchor: 'end', align: 'top', font:{size:10, weight:'bold'}, formatter: formatN } }
+  });
 }
 
 window.onload = () => { init(); };
+
 </script>
 </body>
 </html>
