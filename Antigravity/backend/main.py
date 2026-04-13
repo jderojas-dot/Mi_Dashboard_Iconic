@@ -11,13 +11,17 @@ from fastapi.responses import FileResponse
 from contextlib import asynccontextmanager
 from google.cloud import bigquery
 from google.oauth2 import service_account
-import os, json, datetime, time
+import os, json, datetime, time, sys
 import uvicorn
 from pathlib import Path
 from config import BQ_PROJECT, BQ_DATASET, CREDENTIALS_PATH, ALLOWED_ORIGINS
 from concurrent.futures import ThreadPoolExecutor
 
-# ── BigQuery client (inicializado una vez al arrancar) ──
+# ── Forzar UTF-8 en stdout para evitar errores de encoding en Windows ──
+if hasattr(sys.stdout, 'reconfigure'):
+    try: sys.stdout.reconfigure(encoding='utf-8')
+    except Exception: pass
+
 bq: bigquery.Client | None = None
 
 @asynccontextmanager
@@ -28,18 +32,18 @@ async def lifespan(app: FastAPI):
         "https://www.googleapis.com/auth/drive"
     ]
     if os.environ.get("GOOGLE_APPLICATION_CREDENTIALS_JSON"):
-        print("🔧 Iniciando BigQuery con credenciales de variable de entorno...")
+        print("[BQ] Iniciando BigQuery con credenciales de variable de entorno...")
         creds_json = json.loads(os.environ["GOOGLE_APPLICATION_CREDENTIALS_JSON"])
         creds = service_account.Credentials.from_service_account_info(creds_json, scopes=scopes)
         bq = bigquery.Client(project=BQ_PROJECT, credentials=creds)
     elif CREDENTIALS_PATH and Path(CREDENTIALS_PATH).exists():
-        print(f"🔧 Iniciando BigQuery con archivo: {CREDENTIALS_PATH}")
+        print(f"[BQ] Iniciando BigQuery con archivo: {CREDENTIALS_PATH}")
         creds = service_account.Credentials.from_service_account_file(CREDENTIALS_PATH, scopes=scopes)
         bq = bigquery.Client(project=BQ_PROJECT, credentials=creds)
     else:
-        print("⚠️ Iniciando BigQuery sin credenciales explícitas (usando gcloud ADC)...")
+        print("[BQ] Iniciando BigQuery sin credenciales explicitas (usando gcloud ADC)...")
         bq = bigquery.Client(project=BQ_PROJECT)
-    print(f"✅ BigQuery conectado → proyecto: {BQ_PROJECT}")
+    print(f"[BQ] BigQuery conectado -> proyecto: {BQ_PROJECT}")
     yield
     if bq: bq.close()
 
@@ -84,7 +88,7 @@ def run(sql: str) -> list[dict]:
     # 2. Consultar a BigQuery
     try:
         query_brief = sql.strip().split("\n")[0][:100] + "..."
-        print(f"🔍 Ejecutando BigQuery: {query_brief}")
+        print(f"[BQ] Ejecutando BigQuery: {query_brief}")
         start_t = time.time()
         
         query_job = bq.query(sql)
@@ -97,13 +101,13 @@ def run(sql: str) -> list[dict]:
             result.append(d)
         
         end_t = time.time()
-        print(f"✅ Query completada en {end_t - start_t:.2f}s ({len(result)} filas)")
+        print(f"[OK] Query completada en {end_t - start_t:.2f}s ({len(result)} filas)")
         
         # 3. Guardar en caché
         _query_cache[sql] = (result, now)
         return result
     except Exception as e:
-        print(f"❌ ERROR en BigQuery: {e}")
+        print(f"[ERROR] ERROR en BigQuery: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
 # ══════════════════════════════════════════════════════════════════
@@ -113,7 +117,7 @@ def run(sql: str) -> list[dict]:
 def get_dashboard_init(anno: int = 2025):
     """Retorna todos los datos necesarios para la carga inicial en una sola petición."""
     start_t = time.time()
-    print(f"🚀 Iniciando consolidado Dashboard para año {anno}...")
+    print(f"[INIT] Iniciando consolidado Dashboard para año {anno}...")
     
     with ThreadPoolExecutor(max_workers=10) as executor:
         f_kpis    = executor.submit(get_kpis, anno)
@@ -146,7 +150,7 @@ def get_dashboard_init(anno: int = 2025):
         }
     
     end_t = time.time()
-    print(f"⌛ Consolidado completado en {end_t - start_t:.2f}s")
+    print(f"[DONE] Consolidado completado en {end_t - start_t:.2f}s")
     return res
 
 # ══════════════════════════════════════════════════════════════════
@@ -857,13 +861,56 @@ def get_forecast_total():
     except Exception: return []
 
 @app.get("/api/forecast-productos")
-def get_forecast_productos():
+def get_forecast_productos(producto: str = None):
+    """Retorna datos de pronóstico por producto. Acepta filtro opcional por nombre de producto."""
     try:
-        sql = f"SELECT * FROM `{BQ_PROJECT}.{BQ_DATASET}.TB_FORECAST_PRODUCTOS` ORDER BY producto, periodo"
+        if producto:
+            # Sanitizar: escapar comillas simples
+            safe = producto.replace("'", "''")
+            where = f"WHERE producto = '{safe}'"
+        else:
+            where = ""
+        sql = f"SELECT * FROM `{BQ_PROJECT}.{BQ_DATASET}.TB_FORECAST_PRODUCTOS` {where} ORDER BY producto, periodo"
         rows = run(sql)
         for r in rows: r["periodo"] = str(r["periodo"])
         return rows
-    except Exception: return []
+    except Exception as e:
+        print(f"Error en forecast-productos: {e}")
+        return []
+
+@app.get("/api/forecast-catalogo")
+def get_forecast_catalogo():
+    """Retorna lista de marca+producto unicos para popular los filtros del dashboard.
+    Compatible con la tabla antigua (sin columna marca) y la nueva (con marca).
+    """
+    # Intentar con columna marca (tabla nueva generada por Chronos 2)
+    try:
+        sql = f"""
+        SELECT DISTINCT
+          IFNULL(marca, 'Sin Marca') AS marca,
+          producto
+        FROM `{BQ_PROJECT}.{BQ_DATASET}.TB_FORECAST_PRODUCTOS`
+        WHERE tipo = 'pronostico' OR tipo = 'pron\u00f3stico'
+        ORDER BY marca, producto
+        """
+        rows = run(sql)
+        if rows:
+            return rows
+    except Exception:
+        pass
+    # Fallback: tabla antigua sin columna marca
+    try:
+        sql2 = f"""
+        SELECT DISTINCT
+          'Sin Marca' AS marca,
+          producto
+        FROM `{BQ_PROJECT}.{BQ_DATASET}.TB_FORECAST_PRODUCTOS`
+        ORDER BY producto
+        """
+        return run(sql2)
+    except Exception as e:
+        print(f"Error en forecast-catalogo: {str(e)[:200]}")
+        return []
 
 @app.get("/api/productos-mix-pais")
 def get_productos_mix_pais(anno: int | None = None):
