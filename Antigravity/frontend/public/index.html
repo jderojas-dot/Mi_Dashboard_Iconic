@@ -118,6 +118,68 @@ body {
 .tab:hover:not(.active) { color: var(--primary); background: rgba(255,255,255,0.5); }
 .tab-divider { width: 1px; background: rgba(0,0,0,0.1); margin: 6px 4px; }
 
+/* DROPDOWN NAVIGATION */
+.dropdown {
+  position: relative;
+  display: inline-block;
+}
+.dropdown-trigger {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.dropdown-content {
+  display: none;
+  position: absolute;
+  background: white;
+  min-width: 240px;
+  box-shadow: var(--shadow-lg);
+  border-radius: 14px;
+  padding: 8px;
+  z-index: 1000;
+  border: 1px solid var(--border);
+  top: 100%;
+  left: 0;
+  margin-top: 8px;
+  backdrop-filter: blur(10px);
+  animation: dropdownFade 0.2s ease-out;
+}
+@keyframes dropdownFade {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.dropdown:hover .dropdown-content {
+  display: block;
+}
+.dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 10px 14px;
+  text-align: left;
+  border: none;
+  background: transparent;
+  border-radius: 10px;
+  cursor: pointer;
+  font-size: 13.5px;
+  font-family: 'Outfit';
+  color: var(--text-muted);
+  transition: all 0.2s;
+  font-weight: 500;
+}
+.dropdown-item:hover {
+  background: rgba(99, 102, 241, 0.08);
+  color: var(--primary);
+  transform: translateX(4px);
+}
+.dropdown-item.active {
+  background: var(--primary);
+  color: white;
+  font-weight: 600;
+}
+.dropdown-item.active i { color: white !important; }
+
 /* Sections */
 .section-title { 
   font-size: 14px; 
@@ -341,18 +403,52 @@ tr:hover td { background: #f8fafc; }
   </div>
 
   <div class="tab-row" id="main-tabs">
-    <!-- Nuevas -->
-    <button class="tab active" onclick="showTab('overview', this)">Resumen Ejecutivo</button>
-    <button class="tab" onclick="showTab('clients', this)">Clientes & RFM</button>
-    <button class="tab" onclick="showTab('retention', this)">Retención</button>
-    <button class="tab" onclick="showTab('products', this)">Productos & Mix</button>
-    <button class="tab" onclick="showTab('margins', this)">Márgenes & Países</button>
-    <button class="tab" onclick="showTab('competition', this)">Competencia & Estrategia</button>
-    
+    <!-- Menú Comercial -->
+    <div class="dropdown">
+      <button class="tab active dropdown-trigger" id="menu-comercial">
+        <i data-lucide="briefcase" style="width:16px"></i> Comercial <i data-lucide="chevron-down" style="width:14px"></i>
+      </button>
+      <div class="dropdown-content">
+        <button class="dropdown-item active" onclick="showTab('overview', this, 'Comercial')">
+          <i data-lucide="layout-dashboard" style="width:16px; color:var(--primary)"></i> Resumen Ejecutivo
+        </button>
+        <button class="dropdown-item" onclick="showTab('clients', this, 'Comercial')">
+          <i data-lucide="users" style="width:16px; color:var(--primary)"></i> Clientes & RFM
+        </button>
+        <button class="dropdown-item" onclick="showTab('retention', this, 'Comercial')">
+          <i data-lucide="user-minus" style="width:16px; color:var(--primary)"></i> Retención
+        </button>
+        <button class="dropdown-item" onclick="showTab('products', this, 'Comercial')">
+          <i data-lucide="package" style="width:16px; color:var(--primary)"></i> Productos & Mix
+        </button>
+        <button class="dropdown-item" onclick="showTab('margins', this, 'Comercial')">
+          <i data-lucide="percent" style="width:16px; color:var(--primary)"></i> Márgenes & Países
+        </button>
+        <button class="dropdown-item" onclick="showTab('competition', this, 'Comercial')">
+          <i data-lucide="swords" style="width:16px; color:var(--primary)"></i> Competencia & Estrategia
+        </button>
+        <button class="dropdown-item" onclick="showTab('old-p5', this, 'Comercial')">
+          <i data-lucide="trending-up" style="width:16px; color:var(--primary)"></i> Pronósticos
+        </button>
+      </div>
+    </div>
+
     <div class="tab-divider"></div>
-    
-    <!-- Legado -->
-    <button class="tab" onclick="showTab('old-p5', this)">Pronósticos</button>
+
+    <!-- Menú Financiero -->
+    <div class="dropdown">
+      <button class="tab dropdown-trigger" id="menu-financiero">
+        <i data-lucide="landmark" style="width:16px"></i> Financiero <i data-lucide="chevron-down" style="width:14px"></i>
+      </button>
+      <div class="dropdown-content">
+        <button class="dropdown-item" onclick="showTab('fin-states', this, 'Financiero')">
+          <i data-lucide="file-text" style="width:16px; color:var(--primary)"></i> Estados Financieros
+        </button>
+        <button class="dropdown-item" onclick="showTab('fin-indicators', this, 'Financiero')">
+          <i data-lucide="bar-chart-big" style="width:16px; color:var(--primary)"></i> Indicadores Financieros
+        </button>
+      </div>
+    </div>
   </div>
 
   <!-- TAB OVERVIEW (NEW) -->
@@ -829,6 +925,26 @@ tr:hover td { background: #f8fafc; }
     </div>
   </div>
 
+  <!-- TAB FINANCIAL STATES (NEW) -->
+  <div id="tab-fin-states" class="tab-content" style="display:none">
+    <div class="section-title">Estados Financieros (Consolidado)</div>
+    <div class="card" style="padding:60px; text-align:center; color:var(--text-muted)">
+      <i data-lucide="construction" style="width:48px; height:48px; margin:0 auto 20px; opacity:0.3"></i>
+      <h3>Módulo en Construcción</h3>
+      <p>Integrando con sistemas contables para visualización de PyL, Balance y Cashflow.</p>
+    </div>
+  </div>
+
+  <!-- TAB FINANCIAL INDICATORS (NEW) -->
+  <div id="tab-fin-indicators" class="tab-content" style="display:none">
+    <div class="section-title">Indicadores Financieros (KPIs de Salud)</div>
+    <div class="card" style="padding:60px; text-align:center; color:var(--text-muted)">
+      <i data-lucide="line-chart" style="width:48px; height:48px; margin:0 auto 20px; opacity:0.3"></i>
+      <h3>Módulo en Construcción</h3>
+      <p>Próximamente: ROE, ROA, EBITDA, Liquidez y Solvencia en tiempo real.</p>
+    </div>
+  </div>
+
 
   <!-- TAB PRONÓSTICOS (Chronos 2) -->
   <div id="tab-old-p5" class="tab-content" style="display:none">
@@ -966,11 +1082,23 @@ function mkChart(id, type, data, opts) {
   });
 }
 
-function showTab(name, btn) {
+function showTab(name, btn, menuLabel) {
   document.querySelectorAll('.tab-content').forEach(d => d.style.display = 'none');
+  document.querySelectorAll('.dropdown-item').forEach(b => b.classList.remove('active'));
   document.querySelectorAll('.tab').forEach(b => b.classList.remove('active'));
-  document.getElementById('tab-' + name).style.display = 'block';
-  btn.classList.add('active');
+  
+  const content = document.getElementById('tab-' + name);
+  if (content) content.style.display = 'block';
+  
+  if (btn) {
+    btn.classList.add('active');
+    // Update menu trigger style if needed
+    if (menuLabel === 'Comercial') {
+      document.getElementById('menu-comercial').classList.add('active');
+    } else if (menuLabel === 'Financiero') {
+      document.getElementById('menu-financiero').classList.add('active');
+    }
+  }
   
   if(name === 'old-p5') {
     if (!state.data.fcMain) {

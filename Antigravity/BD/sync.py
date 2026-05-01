@@ -32,6 +32,12 @@ ARCHIVOS = [
         "sheet_id":   "1a0zFpAbe48W0-JqITFFCNAlx0JQlDDNCiOCaCLWM7gU",
         "hoja":       "Hoja 1"
     },
+    {
+        "excel":      r"C:\Dashboard_Iconic\Antigravity\BD\Finanzas\TB_movimientos_contabilidad.xlsx",
+        "sheet_id":   "1MK8QvGDKJmAb3dJ-5HIx_lT_pLFCpCkYIdMaGcm0zPA",
+        "hoja":       "Hoja 1"
+    },
+
     # Agrega los que necesites...
 ]
 # ============================================================
