@@ -184,30 +184,51 @@ body {
 .fin-container { display: flex; flex-direction: column; gap: 24px; }
 .fin-tabs { display: flex; gap: 8px; margin-bottom: 8px; border-bottom: 2px solid var(--border); padding-bottom: 8px; }
 .fin-tab { 
-  padding: 8px 16px; border: none; background: transparent; cursor: pointer; 
-  font-weight: 600; color: var(--text-muted); border-radius: 8px; transition: all 0.2s;
+  padding: 8px 18px; border: none; background: transparent; cursor: pointer; 
+  font-weight: 600; font-size: 13px; color: var(--text-muted); border-radius: 8px; transition: all 0.2s;
 }
 .fin-tab.active { background: var(--primary); color: white; }
-.fin-table-container { overflow-x: auto; background: white; border-radius: 16px; border: 1px solid var(--border); box-shadow: var(--shadow-sm); }
-.fin-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.fin-table-container { overflow-x: auto; background: white; border-radius: 16px; border: 1px solid var(--border); box-shadow: var(--shadow-sm); max-height: 75vh; overflow-y: auto; }
+.fin-table { width: 100%; border-collapse: collapse; font-size: 12px; font-family: 'Inter', 'Outfit', sans-serif; }
 .fin-table th { 
-  background: #1e293b; color: white; text-align: left; padding: 12px 16px; 
-  font-weight: 600; font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em;
-  position: sticky; top: 0; z-index: 10;
+  background: #1e293b; color: white; text-align: left; padding: 10px 12px; 
+  font-weight: 700; font-size: 11px; text-transform: uppercase; letter-spacing: 0.04em;
+  position: sticky; top: 0; z-index: 20; white-space: nowrap;
 }
-.fin-table td { padding: 10px 16px; border-bottom: 1px solid var(--border); }
-.fin-table .row-group { background: #f1f5f9; font-weight: 700; color: #1e293b; }
-.fin-table .row-subgroup { background: #f8fafc; font-weight: 600; color: #334155; padding-left: 32px; }
-.fin-table .row-account { padding-left: 48px; cursor: pointer; }
-.fin-table .row-account:hover { background: rgba(99, 102, 241, 0.05); }
-.fin-table .col-num { text-align: right; font-family: 'Inter', monospace; font-variant-numeric: tabular-nums; }
-.fin-table .negative { color: var(--danger); }
-.fin-table .total-row { background: #e2e8f0; font-weight: 800; border-top: 2px solid #94a3b8; }
-.fin-table th.col-month-group { text-align: center; background: #334155; font-size: 10px; border-left: 1px solid rgba(255,255,255,0.1); }
-.fin-table .comp-header { font-size: 8.5px; background: #475569; color: #cbd5e1; text-align: right; padding: 4px 8px; font-weight: 700; }
-.fin-table .col-comp { width: 85px; }
-.fin-table .var-positive { color: var(--success); font-weight: 600; }
-.fin-table .var-negative { color: var(--danger); font-weight: 600; }
+.fin-table td { padding: 8px 12px; border-bottom: 1px solid #f1f5f9; font-size: 12px; white-space: nowrap; }
+
+/* PCGE hierarchical rows */
+.fin-table .row-section { background: #0f172a; color: white; font-weight: 800; font-size: 12px; letter-spacing: 0.06em; text-transform: uppercase; }
+.fin-table .row-section td { color: white; padding: 10px 14px; }
+.fin-table .row-group1 { background: #1e293b; color: #e2e8f0; font-weight: 700; font-size: 12px; cursor: pointer; }
+.fin-table .row-group1:hover { background: #334155; }
+.fin-table .row-group1 td { color: #e2e8f0; padding: 9px 12px; }
+.fin-table .row-subgroup { background: #f1f5f9; color: #334155; font-weight: 700; font-size: 12px; cursor: pointer; }
+.fin-table .row-subgroup:hover { background: #e2e8f0; }
+.fin-table .row-account { background: white; cursor: pointer; font-size: 12px; }
+.fin-table .row-account:hover { background: rgba(99,102,241,0.04); }
+.fin-table .row-account td:first-child { padding-left: 32px; color: #64748b; font-size: 11px; }
+
+.fin-table .col-num { 
+  text-align: right; font-family: 'Inter', monospace; 
+  font-variant-numeric: tabular-nums; font-size: 12px; 
+  min-width: 90px;
+}
+.fin-table .col-desc { min-width: 200px; max-width: 280px; }
+.fin-table .col-acct { min-width: 70px; font-weight: 700; }
+.fin-table .negative { color: #dc2626; }
+.fin-table .total-row { background: #e2e8f0 !important; font-weight: 800; border-top: 2px solid #94a3b8; }
+.fin-table .total-row td { font-weight: 800; font-size: 12px; }
+.fin-table .grand-total { background: #1e293b !important; }
+.fin-table .grand-total td { color: white; font-weight: 800; font-size: 12px; }
+
+/* Month group headers */
+.fin-table th.col-month-group { text-align: center; background: #334155; font-size: 11px; border-left: 2px solid rgba(255,255,255,0.15); letter-spacing: 0; }
+.fin-table th.comp-header { font-size: 10px; background: #475569; color: #cbd5e1; text-align: right; padding: 5px 10px; font-weight: 700; border-left: 1px solid rgba(255,255,255,0.08); white-space: nowrap; }
+.fin-table .var-positive { color: #16a34a; font-weight: 600; }
+.fin-table .var-negative { color: #dc2626; font-weight: 600; }
+.fin-table .col-prev { color: #94a3b8; }
+.toggle-icon { display: inline-block; width: 14px; margin-right: 6px; font-style: normal; transition: transform 0.2s; color: #94a3b8; }
 
 /* Modal Drill-down */
 .modal { 
@@ -2736,101 +2757,168 @@ async function loadFinData() {
   }
 }
 
-function renderBalanceTable(rows) {
-  const currentYear = state.year;
-  const prevYear = currentYear - 1;
-  const months = ['00', '01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12'];
-  const monthNames = ['INI', 'ENE', 'FEB', 'MAR', 'ABR', 'MAY', 'JUN', 'JUL', 'AGO', 'SET', 'OCT', 'NOV', 'DIC'];
-  
+// ── PCGE Level-1 account names (Balance) ────────────────────────────
+const PCGE_BALANCE = {
+  '10':'Efectivo y Equivalentes', '11':'Inversiones Financieras',
+  '12':'Cuentas por Cobrar Comerc.', '13':'Cuentas por Cobrar Relacionadas',
+  '14':'Cuentas por Cobrar al Personal', '16':'Cuentas por Cobrar Diversas',
+  '17':'Activos por Imptos. Diferidos', '18':'Servicios y Otros Pagados Anticipadamente',
+  '19':'Estimación de Cobranza Dudosa',
+  '20':'Mercaderías', '21':'Productos Terminados', '22':'Subproductos',
+  '23':'Productos en Proceso', '24':'Materias Primas', '25':'Materiales Auxiliares',
+  '26':'Envases y Embalajes', '27':'Activos No Corrientes Mantenidos para Venta',
+  '28':'Existencias por Recibir', '29':'Desvalorización de Existencias',
+  '30':'Inversiones Mobiliarias', '31':'Inversiones Inmobiliarias',
+  '32':'Activos Adquiridos en Arrendamiento',
+  '33':'Inmuebles, Maquinaria y Equipo', '34':'Intangibles',
+  '35':'Activos Biológicos', '36':'Desvalorización de Activo Inmovilizado',
+  '37':'Activos por Imptos. y Ganancias Diferidos',
+  '38':'Otros Activos', '39':'Deprec. y Amort. Acumulada',
+  '40':'Tributos, Contraprestaciones y Aportes',
+  '41':'Remuneraciones y Participaciones', '42':'Cuentas por Pagar Comerciales',
+  '43':'Cuentas por Pagar Relacionadas', '44':'Cuentas por Pagar a Directores',
+  '45':'Obligaciones Financieras', '46':'Cuentas por Pagar Diversas',
+  '47':'Cuentas por Pagar Relacionadas LP', '48':'Provisiones',
+  '49':'Pasivo Diferido',
+  '50':'Capital', '51':'Acciones de Inversión', '52':'Capital Adicional',
+  '56':'Resultados No Realizados', '57':'Excedente de Revaluación',
+  '58':'Reservas', '59':'Resultados Acumulados'
+};
+
+function buildAccMap(rows) {
   const accMap = {};
-  rows.forEach(r => {
+  (rows || []).forEach(r => {
     const p = String(r.periodo).padStart(2, '0');
     if (!accMap[r.cuenta]) accMap[r.cuenta] = { nombre: r.nombre, vals: {} };
     if (!accMap[r.cuenta].vals[p]) accMap[r.cuenta].vals[p] = {};
-    accMap[r.cuenta].vals[p][r.ejercicio] = { debe: r.debe, haber: r.haber };
+    accMap[r.cuenta].vals[p][r.ejercicio] = { debe: r.debe || 0, haber: r.haber || 0 };
   });
+  return accMap;
+}
 
-  const sortedAccounts = Object.keys(accMap).sort();
-  
-  let html = `<thead>
-    <tr>
-      <th rowspan="2" style="position:sticky; left:0; z-index:30; background:#1e293b">CUENTA</th>
-      <th rowspan="2" style="position:sticky; left:80px; z-index:30; background:#1e293b">DESCRIPCIÓN</th>`;
-  
-  monthNames.forEach(m => {
-    html += `<th colspan="4" class="col-month-group">${m}</th>`;
+function calcCumul(accData, upToMonth, type, year) {
+  let total = 0;
+  const mInt = parseInt(upToMonth);
+  Object.keys(accData.vals).forEach(m => {
+    if (parseInt(m) <= mInt) {
+      const v = accData.vals[m][year] || { debe: 0, haber: 0 };
+      total += type === 'deudora' ? (v.debe - v.haber) : (v.haber - v.debe);
+    }
   });
-  html += `<th colspan="4" class="col-month-group">TOTAL</th></tr>`;
-  
-  html += `<tr>`;
+  return total;
+}
+
+function calculateCumulative(accData, upToMonth, type, year) { return calcCumul(accData, upToMonth, type, year); }
+
+function buildCompHeader(months, monthNames, cy, py) {
+  let h = `<thead><tr>
+    <th rowspan="2" class="col-acct" style="position:sticky;left:0;z-index:25;background:#1e293b;min-width:70px">CTA</th>
+    <th rowspan="2" class="col-desc" style="position:sticky;left:70px;z-index:25;background:#1e293b;min-width:220px">DESCRIPCIÓN</th>`;
+  [...monthNames, 'TOTAL'].forEach(m => h += `<th colspan="4" class="col-month-group">${m}</th>`);
+  h += `</tr><tr>`;
   [...monthNames, 'TOTAL'].forEach(() => {
-    html += `<th class="comp-header">${currentYear}</th>
-             <th class="comp-header">${prevYear}</th>
-             <th class="comp-header">VAR</th>
-             <th class="comp-header">%</th>`;
+    h += `<th class="comp-header">${cy}</th><th class="comp-header">${py}</th><th class="comp-header">VAR S/</th><th class="comp-header">VAR %</th>`;
   });
-  html += `</tr></thead><tbody>`;
+  return h + `</tr></thead>`;
+}
 
-  const sections = [
-    { label: 'ACTIVO', filter: (c) => ['1', '2', '3'].includes(c[0]), type: 'deudora' },
-    { label: 'PASIVO Y PATRIMONIO', filter: (c) => ['4', '5'].includes(c[0]), type: 'acreedora' }
+function renderBalanceTable(rows) {
+  const cy = state.year, py = cy - 1;
+  const months = ['00','01','02','03','04','05','06','07','08','09','10','11','12'];
+  const monthNames = ['INI','ENE','FEB','MAR','ABR','MAY','JUN','JUL','AGO','SET','OCT','NOV','DIC'];
+  const accMap = buildAccMap(rows);
+  const sorted = Object.keys(accMap).sort();
+
+  const SECTIONS = [
+    { id: 'activo',    label: 'ACTIVO',             filter: c => ['1','2','3'].includes(c[0]), type: 'deudora' },
+    { id: 'pasivo',    label: 'PASIVO Y PATRIMONIO', filter: c => ['4','5'].includes(c[0]),    type: 'acreedora' }
   ];
 
-  sections.forEach(sec => {
-    html += `<tr class="row-group"><td colspan="${months.length * 4 + 6}">${sec.label}</td></tr>`;
-    const secAccounts = sortedAccounts.filter(sec.filter);
-    const totalsActual = new Array(months.length).fill(0);
-    const totalsPrev = new Array(months.length).fill(0);
+  let html = buildCompHeader(months, monthNames, cy, py) + `<tbody>`;
+  const totalCols = months.length + 1;
 
-    secAccounts.forEach(acc => {
-      const data = accMap[acc];
-      html += `<tr class="row-account" onclick="openDrillModal('${acc}', '${data.nombre}')">
-        <td style="position:sticky; left:0; background:white; z-index:5"><b>${acc}</b></td>
-        <td style="position:sticky; left:80px; background:white; z-index:5">${data.nombre}</td>`;
-      
-      months.forEach((m, idx) => {
-        const valActual = calculateCumulative(data, m, sec.type, currentYear);
-        const valPrev = calculateCumulative(data, m, sec.type, prevYear);
-        const diff = valActual - valPrev;
-        const pct = valPrev !== 0 ? (diff / Math.abs(valPrev) * 100) : 0;
-        
-        html += renderCompCells(valActual, valPrev, diff, pct);
-        totalsActual[idx] += valActual;
-        totalsPrev[idx] += valPrev;
+  SECTIONS.forEach(sec => {
+    html += `<tr class="row-section"><td colspan="${totalCols*4+2}">${sec.label}</td></tr>`;
+    const secA = new Array(months.length).fill(0), secP = new Array(months.length).fill(0);
+
+    // Group by 2-digit prefix
+    const groups = {};
+    sorted.filter(sec.filter).forEach(acc => {
+      const g = acc.substring(0,2);
+      if (!groups[g]) groups[g] = [];
+      groups[g].push(acc);
+    });
+
+    Object.keys(groups).sort().forEach(g => {
+      const gName = PCGE_BALANCE[g] || g;
+      const grpId = `grp_${sec.id}_${g}`;
+      const gA = new Array(months.length).fill(0), gP = new Array(months.length).fill(0);
+
+      // Pre-calculate group totals
+      groups[g].forEach(acc => {
+        months.forEach((m, idx) => {
+          gA[idx] += calcCumul(accMap[acc], m, sec.type, cy);
+          gP[idx] += calcCumul(accMap[acc], m, sec.type, py);
+        });
       });
-      
-      const valAFL = calculateCumulative(data, '12', sec.type, currentYear);
-      const valPFL = calculateCumulative(data, '12', sec.type, prevYear);
-      const dF = valAFL - valPFL;
-      const pF = valPFL !== 0 ? (dF / Math.abs(valPFL) * 100) : 0;
-      html += renderCompCells(valAFL, valPFL, dF, pF);
-      html += `</tr>`;
+
+      // Group subtotal row (collapsible header)
+      const gLastA = gA[months.length-1], gLastP = gP[months.length-1];
+      const gD = gLastA - gLastP, gPct = gLastP !== 0 ? (gD/Math.abs(gLastP)*100) : 0;
+      html += `<tr class="row-subgroup" onclick="toggleGroup('${grpId}')">
+        <td class="col-acct" style="position:sticky;left:0;background:#f1f5f9;z-index:5"><span class="toggle-icon" id="ico_${grpId}">▶</span>${g}</td>
+        <td class="col-desc" style="position:sticky;left:70px;background:#f1f5f9;z-index:5">${gName}</td>`;
+      months.forEach((m, idx) => {
+        const d = gA[idx] - gP[idx];
+        const pct = gP[idx] !== 0 ? (d/Math.abs(gP[idx])*100) : 0;
+        html += renderCompCells(gA[idx], gP[idx], d, pct);
+        secA[idx] += gA[idx]; secP[idx] += gP[idx];
+      });
+      html += renderCompCells(gLastA, gLastP, gD, gPct) + `</tr>`;
+
+      // Account detail rows (hidden by default)
+      groups[g].forEach(acc => {
+        const data = accMap[acc];
+        const aA = calcCumul(data, '12', sec.type, cy);
+        const aP = calcCumul(data, '12', sec.type, py);
+        const aD = aA - aP, aPct = aP !== 0 ? (aD/Math.abs(aP)*100) : 0;
+        html += `<tr class="row-account" id="${grpId}" style="display:none" onclick="openDrillModal('${acc}','${data.nombre.replace(/'/g,'&apos;')}')">
+          <td class="col-acct" style="position:sticky;left:0;background:white;z-index:5;padding-left:32px;color:#64748b;font-size:11px">${acc}</td>
+          <td class="col-desc" style="position:sticky;left:70px;background:white;z-index:5;font-size:11px">${data.nombre}</td>`;
+        months.forEach((m, idx) => {
+          const vA = calcCumul(data, m, sec.type, cy);
+          const vP = calcCumul(data, m, sec.type, py);
+          const d = vA - vP, pct = vP !== 0 ? (d/Math.abs(vP)*100) : 0;
+          html += renderCompCells(vA, vP, d, pct);
+        });
+        html += renderCompCells(aA, aP, aD, aPct) + `</tr>`;
+      });
     });
 
-    html += `<tr class="total-row"><td colspan="2" style="position:sticky; left:0; background:#e2e8f0; z-index:5">TOTAL ${sec.label}</td>`;
-    months.forEach((m, idx) => {
-      const ta = totalsActual[idx]; const tp = totalsPrev[idx]; const d = ta - tp;
-      const p = tp !== 0 ? (d / Math.abs(tp) * 100) : 0;
-      html += renderCompCells(ta, tp, d, p);
+    // Section total
+    const stA = secA[months.length-1], stP = secP[months.length-1];
+    const stD = stA - stP, stPct = stP !== 0 ? (stD/Math.abs(stP)*100) : 0;
+    html += `<tr class="total-row"><td colspan="2" style="position:sticky;left:0;background:#e2e8f0;z-index:5;font-weight:800">TOTAL ${sec.label}</td>`;
+    months.forEach((_, idx) => {
+      const d = secA[idx]-secP[idx], p = secP[idx]!==0?(d/Math.abs(secP[idx])*100):0;
+      html += renderCompCells(secA[idx], secP[idx], d, p);
     });
-    const gta = totalsActual[months.length-1]; const gtp = totalsPrev[months.length-1]; const gd = gta - gtp;
-    const gp = gtp !== 0 ? (gd / Math.abs(gtp) * 100) : 0;
-    html += renderCompCells(gta, gtp, gd, gp);
-    html += `</tr>`;
+    html += renderCompCells(stA, stP, stD, stPct) + `</tr>`;
   });
 
   html += `</tbody>`;
   document.getElementById('fin-data-table').innerHTML = html;
 }
 
-function renderCompCells(act, prev, varVal, pct) {
-  return `
-    <td class="col-num">${formatFin(act)}</td>
-    <td class="col-num" style="color:#94a3b8">${formatFin(prev)}</td>
-    <td class="col-num ${varVal < 0 ? 'var-negative' : 'var-positive'}">${formatFin(varVal)}</td>
-    <td class="col-num ${pct < 0 ? 'var-negative' : 'var-positive'}" style="font-size:9px">${pct === 0 ? '-' : pct.toFixed(1) + '%'}</td>
-  `;
+function toggleGroup(grpId) {
+  const rows = document.querySelectorAll(`tr[id="${grpId}"]`);
+  const ico = document.getElementById(`ico_${grpId}`);
+  const isHidden = rows.length > 0 && rows[0].style.display === 'none';
+  rows.forEach(r => r.style.display = isHidden ? 'table-row' : 'none');
+  if (ico) ico.textContent = isHidden ? '▼' : '▶';
 }
+
+
 
 function calculateCumulative(accData, upToMonth, type, year) {
   let total = 0;
@@ -2844,160 +2932,220 @@ function calculateCumulative(accData, upToMonth, type, year) {
   return total;
 }
 
+// PCGE Level-1 account names (P&L)
+const PCGE_PL = {
+  '60':'Compras', '61':'Variación de Existencias', '62':'Gastos de Personal',
+  '63':'Gastos de Servicios de Terceros', '64':'Gastos por Tributos',
+  '65':'Otros Gastos de Gestión', '66':'Pérdida por Medición a Valor Razonable',
+  '67':'Gastos Financieros', '68':'Valuación y Deterioro de Activos',
+  '69':'Costo de Ventas',
+  '70':'Ventas', '71':'Variación de Existencias (Ingresos)',
+  '72':'Producción de Activo Inmovilizado', '73':'Descuentos, Rebajas y Bonificaciones Obtenidos',
+  '74':'Descuentos, Rebajas y Bonificaciones Concedidos',
+  '75':'Otros Ingresos de Gestión', '76':'Ganancías por Med. a Valor Razonable',
+  '77':'Ingresos Financieros', '78':'Cargas Cubiertas por Provisiones',
+  '79':'Cargas Imputables a Cuentas de Costos'
+};
+
 function renderResultadosTable(rows) {
-  const currentYear = state.year;
-  const prevYear = currentYear - 1;
-  const months = ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12'];
-  const monthNames = ['ENE', 'FEB', 'MAR', 'ABR', 'MAY', 'JUN', 'JUL', 'AGO', 'SET', 'OCT', 'NOV', 'DIC'];
-  
-  const accMap = {};
-  rows.forEach(r => {
-    const p = String(r.periodo).padStart(2, '0');
-    if (!accMap[r.cuenta]) accMap[r.cuenta] = { nombre: r.nombre, vals: {} };
-    if (!accMap[r.cuenta].vals[p]) accMap[r.cuenta].vals[p] = {};
-    accMap[r.cuenta].vals[p][r.ejercicio] = { debe: r.debe, haber: r.haber };
-  });
+  const cy = state.year, py = cy - 1;
+  const months = ['01','02','03','04','05','06','07','08','09','10','11','12'];
+  const monthNames = ['ENE','FEB','MAR','ABR','MAY','JUN','JUL','AGO','SET','OCT','NOV','DIC'];
 
-  const sortedAccounts = Object.keys(accMap).sort();
-  
-  let html = `<thead>
-    <tr>
-      <th rowspan="2" style="position:sticky; left:0; z-index:30; background:#1e293b">CUENTA</th>
-      <th rowspan="2" style="position:sticky; left:80px; z-index:30; background:#1e293b">DESCRIPCIÓN</th>`;
-  
-  monthNames.forEach(m => {
-    html += `<th colspan="4" class="col-month-group">${m}</th>`;
-  });
-  html += `<th colspan="4" class="col-month-group">TOTAL</th></tr>`;
-  
-  html += `<tr>`;
-  [...monthNames, 'TOTAL'].forEach(() => {
-    html += `<th class="comp-header">${currentYear}</th>
-             <th class="comp-header">${prevYear}</th>
-             <th class="comp-header">VAR</th>
-             <th class="comp-header">%</th>`;
-  });
-  html += `</tr></thead><tbody>`;
+  const accMap = buildAccMap(rows);
+  const sorted = Object.keys(accMap).sort();
 
-  const groups = [
-    { label: 'INGRESOS', filter: (c) => c.startsWith('7'), type: 'acreedora' },
-    { label: 'GASTOS', filter: (c) => c.startsWith('6'), type: 'deudora' }
+  const GROUPS = [
+    { id: 'ingresos', label: 'INGRESOS (CLASE 7)', filter: c => c.startsWith('7'), type: 'acreedora', sign:  1 },
+    { id: 'gastos',   label: 'GASTOS (CLASE 6)',   filter: c => c.startsWith('6'), type: 'deudora',   sign: -1 }
   ];
 
-  let netActual = new Array(months.length).fill(0);
-  let netPrev = new Array(months.length).fill(0);
+  let html = buildCompHeader(months, monthNames, cy, py) + `<tbody>`;
+  const totalCols = months.length + 1;
 
-  groups.forEach(grp => {
-    html += `<tr class="row-group"><td colspan="${months.length * 4 + 6}">${grp.label}</td></tr>`;
-    const grpAccounts = sortedAccounts.filter(grp.filter);
-    const totalsActual = new Array(months.length).fill(0);
-    const totalsPrev = new Array(months.length).fill(0);
+  let netA = new Array(months.length).fill(0);
+  let netP = new Array(months.length).fill(0);
 
-    grpAccounts.forEach(acc => {
-      const data = accMap[acc];
-      html += `<tr class="row-account" onclick="openDrillModal('${acc}', '${data.nombre}')">
-        <td style="position:sticky; left:0; background:white; z-index:5"><b>${acc}</b></td>
-        <td style="position:sticky; left:80px; background:white; z-index:5">${data.nombre}</td>`;
-      
-      let rowTotalActual = 0;
-      let rowTotalPrev = 0;
+  GROUPS.forEach(grp => {
+    html += `<tr class="row-section"><td colspan="${totalCols*4+2}">${grp.label}</td></tr>`;
+    const grpA = new Array(months.length).fill(0), grpP = new Array(months.length).fill(0);
 
-      months.forEach((m, idx) => {
-        const vA = (data.vals[m] && data.vals[m][currentYear]) || { debe: 0, haber: 0 };
-        const vP = (data.vals[m] && data.vals[m][prevYear]) || { debe: 0, haber: 0 };
-        const sA = grp.type === 'deudora' ? (vA.debe - vA.haber) : (vA.haber - vA.debe);
-        const sP = grp.type === 'deudora' ? (vP.debe - vP.haber) : (vP.haber - vP.debe);
-        const diff = sA - sP;
-        const pct = sP !== 0 ? (diff / Math.abs(sP) * 100) : 0;
+    const subgroups = {};
+    sorted.filter(grp.filter).forEach(acc => {
+      const g = acc.substring(0,2);
+      if (!subgroups[g]) subgroups[g] = [];
+      subgroups[g].push(acc);
+    });
 
-        html += renderCompCells(sA, sP, diff, pct);
-        totalsActual[idx] += sA;
-        totalsPrev[idx] += sP;
-        rowTotalActual += sA;
-        rowTotalPrev += sP;
-        
-        if (grp.label === 'INGRESOS') {
-          netActual[idx] += sA;
-          netPrev[idx] += sP;
-        } else {
-          netActual[idx] -= sA;
-          netPrev[idx] -= sP;
-        }
+    Object.keys(subgroups).sort().forEach(g => {
+      const gName = PCGE_PL[g] || g;
+      const grpId = `grp_${grp.id}_${g}`;
+      const gA = new Array(months.length).fill(0), gP = new Array(months.length).fill(0);
+
+      subgroups[g].forEach(acc => {
+        months.forEach((m, idx) => {
+          const vA = (accMap[acc].vals[m] && accMap[acc].vals[m][cy]) || {debe:0,haber:0};
+          const vP = (accMap[acc].vals[m] && accMap[acc].vals[m][py]) || {debe:0,haber:0};
+          gA[idx] += grp.type==='deudora' ? (vA.debe-vA.haber) : (vA.haber-vA.debe);
+          gP[idx] += grp.type==='deudora' ? (vP.debe-vP.haber) : (vP.haber-vP.debe);
+        });
       });
-      
-      const rowDiff = rowTotalActual - rowTotalPrev;
-      const rowPct = rowTotalPrev !== 0 ? (rowDiff / Math.abs(rowTotalPrev) * 100) : 0;
-      html += renderCompCells(rowTotalActual, rowTotalPrev, rowDiff, rowPct);
-      html += `</tr>`;
+
+      const gLastA = gA[months.length-1], gLastP = gP[months.length-1];
+      const gD = gLastA - gLastP, gPct = gLastP!==0?(gD/Math.abs(gLastP)*100):0;
+      html += `<tr class="row-subgroup" onclick="toggleGroup('${grpId}')">
+        <td class="col-acct" style="position:sticky;left:0;background:#f1f5f9;z-index:5"><span class="toggle-icon" id="ico_${grpId}">▶</span>${g}</td>
+        <td class="col-desc" style="position:sticky;left:70px;background:#f1f5f9;z-index:5">${gName}</td>`;
+      months.forEach((m, idx) => {
+        const d = gA[idx]-gP[idx], p = gP[idx]!==0?(d/Math.abs(gP[idx])*100):0;
+        html += renderCompCells(gA[idx], gP[idx], d, p);
+        grpA[idx] += gA[idx]; grpP[idx] += gP[idx];
+      });
+      html += renderCompCells(gLastA, gLastP, gD, gPct) + `</tr>`;
+
+      subgroups[g].forEach(acc => {
+        const data = accMap[acc];
+        const totA = months.reduce((s,m) => { const v=(data.vals[m]&&data.vals[m][cy])||{debe:0,haber:0}; return s+(grp.type==='deudora'?(v.debe-v.haber):(v.haber-v.debe)); }, 0);
+        const totP = months.reduce((s,m) => { const v=(data.vals[m]&&data.vals[m][py])||{debe:0,haber:0}; return s+(grp.type==='deudora'?(v.debe-v.haber):(v.haber-v.debe)); }, 0);
+        const aD=totA-totP, aPct=totP!==0?(aD/Math.abs(totP)*100):0;
+        html += `<tr class="row-account" id="${grpId}" style="display:none" onclick="openDrillModal('${acc}','${data.nombre.replace(/'/g,'&apos;')}')">
+          <td class="col-acct" style="position:sticky;left:0;background:white;z-index:5;padding-left:32px;color:#64748b;font-size:11px">${acc}</td>
+          <td class="col-desc" style="position:sticky;left:70px;background:white;z-index:5;font-size:11px">${data.nombre}</td>`;
+        let rA=0, rP=0;
+        months.forEach((m, idx) => {
+          const vA=(data.vals[m]&&data.vals[m][cy])||{debe:0,haber:0};
+          const vP=(data.vals[m]&&data.vals[m][py])||{debe:0,haber:0};
+          const sA=grp.type==='deudora'?(vA.debe-vA.haber):(vA.haber-vA.debe);
+          const sP=grp.type==='deudora'?(vP.debe-vP.haber):(vP.haber-vP.debe);
+          rA+=sA; rP+=sP;
+          const d=sA-sP, p=sP!==0?(d/Math.abs(sP)*100):0;
+          html += renderCompCells(sA, sP, d, p);
+        });
+        html += renderCompCells(totA, totP, aD, aPct) + `</tr>`;
+      });
     });
 
-    html += `<tr class="total-row"><td colspan="2" style="position:sticky; left:0; background:#e2e8f0; z-index:5">TOTAL ${grp.label}</td>`;
-    months.forEach((m, idx) => {
-      const ta = totalsActual[idx]; const tp = totalsPrev[idx]; const d = ta - tp;
-      const p = tp !== 0 ? (d / Math.abs(tp) * 100) : 0;
-      html += renderCompCells(ta, tp, d, p);
+    // Group total + net accumulation
+    const gtA = grpA.reduce((a,b)=>a+b,0), gtP = grpP.reduce((a,b)=>a+b,0);
+    const gtD = gtA-gtP, gtPct = gtP!==0?(gtD/Math.abs(gtP)*100):0;
+    html += `<tr class="total-row"><td colspan="2" style="position:sticky;left:0;background:#e2e8f0;z-index:5;font-weight:800">TOTAL ${grp.label.split(' ')[0]}</td>`;
+    months.forEach((_, idx) => {
+      const d=grpA[idx]-grpP[idx], p=grpP[idx]!==0?(d/Math.abs(grpP[idx])*100):0;
+      html += renderCompCells(grpA[idx], grpP[idx], d, p);
+      netA[idx] += grp.sign * grpA[idx];
+      netP[idx] += grp.sign * grpP[idx];
     });
-    const gta = totalsActual.reduce((a,b)=>a+b,0);
-    const gtp = totalsPrev.reduce((a,b)=>a+b,0);
-    const gd = gta - gtp;
-    const gp = gtp !== 0 ? (gd / Math.abs(gtp) * 100) : 0;
-    html += renderCompCells(gta, gtp, gd, gp);
-    html += `</tr>`;
+    html += renderCompCells(gtA, gtP, gtD, gtPct) + `</tr>`;
   });
 
-  html += `<tr class="total-row" style="background:#1e293b; color:white"><td colspan="2" style="position:sticky; left:0; background:#1e293b; z-index:5">RESULTADO NETO</td>`;
-  netActual.forEach((na, idx) => {
-    const np = netPrev[idx]; const d = na - np;
-    const p = np !== 0 ? (d / Math.abs(np) * 100) : 0;
-    html += renderCompCells(na, np, d, p);
+  // Net result
+  const gNA = netA.reduce((a,b)=>a+b,0), gNP = netP.reduce((a,b)=>a+b,0);
+  const gND = gNA-gNP, gNPct = gNP!==0?(gND/Math.abs(gNP)*100):0;
+  html += `<tr class="grand-total"><td colspan="2" style="position:sticky;left:0;background:#1e293b;z-index:5">RESULTADO DEL EJERCICIO</td>`;
+  months.forEach((_, idx) => {
+    const d=netA[idx]-netP[idx], p=netP[idx]!==0?(d/Math.abs(netP[idx])*100):0;
+    html += renderCompCells(netA[idx], netP[idx], d, p);
   });
-  const gna = netActual.reduce((a,b)=>a+b,0);
-  const gnp = netPrev.reduce((a,b)=>a+b,0);
-  const gd = gna - gnp;
-  const gp = gnp !== 0 ? (gd / Math.abs(gnp) * 100) : 0;
-  html += renderCompCells(gna, gnp, gd, gp);
-  html += `</tr></tbody>`;
-
+  html += renderCompCells(gNA, gNP, gND, gNPct) + `</tr></tbody>`;
   document.getElementById('fin-data-table').innerHTML = html;
 }
 
+
 function renderFlujoTable(rows) {
-  const monthNames = ['ENE', 'FEB', 'MAR', 'ABR', 'MAY', 'JUN', 'JUL', 'AGO', 'SET', 'OCT', 'NOV', 'DIC'];
-  const months = ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12'];
-  
-  rows.forEach(r => {
+  const currentYear = state.year;
+  const monthNames = ['ENE','FEB','MAR','ABR','MAY','JUN','JUL','AGO','SET','OCT','NOV','DIC'];
+  const months     = ['01','02','03','04','05','06','07','08','09','10','11','12'];
+
+  // Build lookup: periodo → row (only current year, already filtered by backend)
+  const mData = {};
+  (rows || []).forEach(r => {
     const p = String(r.periodo).padStart(2, '0');
     mData[p] = r;
   });
 
-  let html = `<thead><tr><th>CONCEPTO</th>`;
-  monthNames.forEach(m => html += `<th class="col-num">${m}</th>`);
-  html += `<th class="col-num">TOTAL</th></tr></thead><tbody>`;
+  // Helper to get value for a month key
+  const getVal = (m, key, mult = 1) => ((mData[m] ? Number(mData[m][key]) : 0) || 0) * mult;
 
-  const rowsDef = [
-    { label: 'Ingresos de Efectivo', key: 'ingresos' },
-    { label: 'Egresos de Efectivo', key: 'egresos', multiplier: -1 },
-    { label: 'Flujo Neto Mensual', key: 'flujo_neto', isTotal: true }
+  // Build table structure — Peruvian PCGE indirect method layout
+  const sections = [
+    {
+      label: 'I. ACTIVIDADES DE OPERACIÓN',
+      rows: [
+        { label: 'Ingresos de Efectivo (Cobranzas)',    key: 'ingresos',  mult:  1 },
+        { label: 'Egresos de Efectivo (Pagos)',          key: 'egresos',   mult: -1 },
+      ],
+      totalLabel: 'FLUJO NETO DE ACTIVIDADES DE OPERACIÓN',
+      totalKey: 'flujo_neto',
+      highlight: false
+    }
   ];
 
-  rowsDef.forEach(rd => {
-    html += `<tr class="${rd.isTotal ? 'total-row' : ''}"><td>${rd.label}</td>`;
-    let total = 0;
-    months.forEach(m => {
-      const val = (mData[m] ? mData[m][rd.key] : 0) * (rd.multiplier || 1);
-      html += `<td class="col-num ${val < 0 ? 'negative' : ''}">${formatFin(val)}</td>`;
-      total += val;
+  // thead
+  let html = `<thead>
+    <tr>
+      <th class="col-desc" style="min-width:280px">CONCEPTO</th>`;
+  months.forEach((_,i) => html += `<th class="col-num">${monthNames[i]}</th>`);
+  html += `<th class="col-num" style="background:#334155">TOTAL ${currentYear}</th>
+    </tr>
+  </thead><tbody>`;
+
+  sections.forEach(sec => {
+    // Section header
+    html += `<tr class="row-section"><td colspan="${months.length + 2}">${sec.label}</td></tr>`;
+
+    const monthTotals = new Array(months.length).fill(0);
+
+    sec.rows.forEach(rd => {
+      let rowTotal = 0;
+      html += `<tr class="row-account"><td class="col-desc" style="padding-left:20px">${rd.label}</td>`;
+      months.forEach((m, idx) => {
+        const v = getVal(m, rd.key, rd.mult);
+        monthTotals[idx] += v;
+        rowTotal += v;
+        html += `<td class="col-num ${v < 0 ? 'negative' : ''}">${formatFin(v)}</td>`;
+      });
+      html += `<td class="col-num ${rowTotal < 0 ? 'negative' : ''}">${formatFin(rowTotal)}</td></tr>`;
     });
-    html += `<td class="col-num">${formatFin(total)}</td></tr>`;
+
+    // Section total
+    const secTotal = monthTotals.reduce((a,b)=>a+b,0);
+    html += `<tr class="total-row">
+      <td style="font-weight:800; padding-left:12px">${sec.totalLabel}</td>`;
+    monthTotals.forEach(v => {
+      html += `<td class="col-num ${v < 0 ? 'negative' : ''}">${formatFin(v)}</td>`;
+    });
+    html += `<td class="col-num ${secTotal < 0 ? 'negative' : ''}" style="font-weight:800">${formatFin(secTotal)}</td></tr>`;
   });
+
+  // Running balance row
+  let runBalance = 0;
+  html += `<tr class="grand-total"><td style="padding-left:12px">SALDO ACUMULADO DE EFECTIVO</td>`;
+  months.forEach(m => {
+    const v = getVal(m, 'flujo_neto');
+    runBalance += v;
+    html += `<td class="col-num ${runBalance < 0 ? 'negative' : ''}">${formatFin(runBalance)}</td>`;
+  });
+  html += `<td class="col-num">${formatFin(runBalance)}</td></tr>`;
 
   html += `</tbody>`;
   document.getElementById('fin-data-table').innerHTML = html;
 }
 
 function formatFin(n) {
-  if (n === 0) return '-';
-  return Math.round(n).toLocaleString('es-PE');
+  if (n === null || n === undefined || n === 0) return '—';
+  return Number(n).toLocaleString('es-PE', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+}
+
+function renderCompCells(act, prev, varVal, pct) {
+  const varClass = varVal < 0 ? 'var-negative' : (varVal > 0 ? 'var-positive' : '');
+  const pctClass = pct < 0 ? 'var-negative' : (pct > 0 ? 'var-positive' : '');
+  const pctStr = pct === 0 ? '—' : pct.toFixed(2) + '%';
+  return `
+    <td class="col-num">${formatFin(act)}</td>
+    <td class="col-num col-prev">${formatFin(prev)}</td>
+    <td class="col-num ${varClass}">${formatFin(varVal)}</td>
+    <td class="col-num ${pctClass}">${pctStr}</td>
+  `;
 }
 
 // DRILL-DOWN MODAL
