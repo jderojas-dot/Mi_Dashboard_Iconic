@@ -1111,6 +1111,92 @@ def get_analisis_experto():
       'Media' as prioridad
     FROM metrics
     """
+    """
+    return run(sql)
+
+# ══════════════════════════════════════════════════════════════════
+# MÓDULO FINANCIERO — PERÚ PCGE
+# ══════════════════════════════════════════════════════════════════
+
+@app.get("/api/fin-balance")
+def get_fin_balance(anno: int = 2026):
+    """Reporte de Situación Patrimonial (Balance General) mensualizado."""
+    sql = f"""
+    SELECT 
+      Nro_Cta as cuenta,
+      Nombre_Cuenta as nombre,
+      Periodo as periodo,
+      SUM(Mto_Debe) as debe,
+      SUM(Mto_Haber) as haber
+    FROM `{BQ_PROJECT}.{BQ_DATASET}.TB_movimientos_contabilidad`
+    WHERE Ejercicio = {anno}
+      AND (Nro_Cta LIKE '1%' OR Nro_Cta LIKE '2%' OR Nro_Cta LIKE '3%' OR Nro_Cta LIKE '4%' OR Nro_Cta LIKE '5%')
+    GROUP BY 1, 2, 3
+    ORDER BY 1, 3
+    """
+    rows = run(sql)
+    return {"rows": rows, "metadata": {"generacion": datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")}}
+
+@app.get("/api/fin-resultados")
+def get_fin_resultados(anno: int = 2026):
+    """Estado de Resultados por Naturaleza mensualizado."""
+    sql = f"""
+    SELECT 
+      Nro_Cta as cuenta,
+      Nombre_Cuenta as nombre,
+      Periodo as periodo,
+      SUM(Mto_Debe) as debe,
+      SUM(Mto_Haber) as haber
+    FROM `{BQ_PROJECT}.{BQ_DATASET}.TB_movimientos_contabilidad`
+    WHERE Ejercicio = {anno}
+      AND (Nro_Cta LIKE '6%' OR Nro_Cta LIKE '7%')
+      AND Periodo != '00'
+    GROUP BY 1, 2, 3
+    ORDER BY 1, 3
+    """
+    rows = run(sql)
+    return {"rows": rows, "metadata": {"generacion": datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")}}
+
+@app.get("/api/fin-flujo")
+def get_fin_flujo(anno: int = 2026):
+    """Estado de Flujo de Efectivo (Método Indirecto - Movimientos Cuenta 10)."""
+    sql = f"""
+    SELECT 
+      Periodo as periodo,
+      SUM(Mto_Debe) as ingresos,
+      SUM(Mto_Haber) as egresos,
+      SUM(Mto_Debe - Mto_Haber) as flujo_neto
+    FROM `{BQ_PROJECT}.{BQ_DATASET}.TB_movimientos_contabilidad`
+    WHERE Ejercicio = {anno}
+      AND Nro_Cta LIKE '10%'
+    GROUP BY 1
+    ORDER BY 1
+    """
+    rows = run(sql)
+    return {"rows": rows, "metadata": {"generacion": datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")}}
+
+@app.get("/api/fin-detalle")
+def get_fin_detalle(anno: int, cta: str, periodo: str | None = None):
+    """Drill-down: Detalle de transacciones para una cuenta y periodo."""
+    where_periodo = f"AND Periodo = '{periodo}'" if periodo else ""
+    sql = f"""
+    SELECT 
+      Fec_Mov as fecha,
+      Reg_Ctb as registro,
+      Glosa as glosa,
+      Tip_Doc as doc_tipo,
+      Nro_Doc as doc_numero,
+      IFNULL(Cliente, Proveedor) as entidad,
+      Mto_Debe as debe,
+      Mto_Haber as haber,
+      Mda_Origen as moneda
+    FROM `{BQ_PROJECT}.{BQ_DATASET}.TB_movimientos_contabilidad`
+    WHERE Ejercicio = {anno}
+      AND Nro_Cta = '{cta}'
+      {where_periodo}
+    ORDER BY Fec_Mov
+    LIMIT 1000
+    """
     return run(sql)
 
 frontend_path = Path(__file__).parent.parent / "frontend" / "public"

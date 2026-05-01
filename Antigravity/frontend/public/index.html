@@ -180,6 +180,43 @@ body {
 }
 .dropdown-item.active i { color: white !important; }
 
+/* FINANCIAL MODULE STYLES */
+.fin-container { display: flex; flex-direction: column; gap: 24px; }
+.fin-tabs { display: flex; gap: 8px; margin-bottom: 8px; border-bottom: 2px solid var(--border); padding-bottom: 8px; }
+.fin-tab { 
+  padding: 8px 16px; border: none; background: transparent; cursor: pointer; 
+  font-weight: 600; color: var(--text-muted); border-radius: 8px; transition: all 0.2s;
+}
+.fin-tab.active { background: var(--primary); color: white; }
+.fin-table-container { overflow-x: auto; background: white; border-radius: 16px; border: 1px solid var(--border); box-shadow: var(--shadow-sm); }
+.fin-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.fin-table th { 
+  background: #1e293b; color: white; text-align: left; padding: 12px 16px; 
+  font-weight: 600; font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em;
+  position: sticky; top: 0; z-index: 10;
+}
+.fin-table td { padding: 10px 16px; border-bottom: 1px solid var(--border); }
+.fin-table .row-group { background: #f1f5f9; font-weight: 700; color: #1e293b; }
+.fin-table .row-subgroup { background: #f8fafc; font-weight: 600; color: #334155; padding-left: 32px; }
+.fin-table .row-account { padding-left: 48px; cursor: pointer; }
+.fin-table .row-account:hover { background: rgba(99, 102, 241, 0.05); }
+.fin-table .col-num { text-align: right; font-family: 'Inter', monospace; font-variant-numeric: tabular-nums; }
+.fin-table .negative { color: var(--danger); }
+.fin-table .total-row { background: #e2e8f0; font-weight: 800; border-top: 2px solid #94a3b8; }
+
+/* Modal Drill-down */
+.modal { 
+  display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); 
+  backdrop-filter: blur(4px); z-index: 3000; align-items: center; justify-content: center; 
+}
+.modal-content { 
+  background: white; width: 90%; max-width: 1000px; max-height: 85vh; border-radius: 20px; 
+  display: flex; flex-direction: column; overflow: hidden; box-shadow: var(--shadow-lg); 
+}
+.modal-header { padding: 20px 24px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+.modal-body { padding: 24px; overflow-y: auto; flex: 1; }
+.modal-close { cursor: pointer; color: var(--text-muted); }
+
 /* Sections */
 .section-title { 
   font-size: 14px; 
@@ -927,11 +964,60 @@ tr:hover td { background: #f8fafc; }
 
   <!-- TAB FINANCIAL STATES (NEW) -->
   <div id="tab-fin-states" class="tab-content" style="display:none">
-    <div class="section-title">Estados Financieros (Consolidado)</div>
-    <div class="card" style="padding:60px; text-align:center; color:var(--text-muted)">
-      <i data-lucide="construction" style="width:48px; height:48px; margin:0 auto 20px; opacity:0.3"></i>
-      <h3>Módulo en Construcción</h3>
-      <p>Integrando con sistemas contables para visualización de PyL, Balance y Cashflow.</p>
+    <div class="header-top" style="margin-bottom:16px; border:none; padding-bottom:0">
+      <div style="display:flex; flex-direction:column">
+        <div class="section-title" style="margin:0">Reportes Financieros Consolidados</div>
+        <div id="fin-meta" style="font-size:11px; color:var(--text-muted); margin-top:4px">PCGE Perú · Moneda: Soles (PEN)</div>
+      </div>
+      <div style="display:flex; gap:10px">
+        <button class="pag-btn" onclick="exportFinTable('excel')"><i data-lucide="file-spreadsheet" style="width:14px; vertical-align:middle"></i> Excel</button>
+        <button class="pag-btn" onclick="window.print()"><i data-lucide="printer" style="width:14px; vertical-align:middle"></i> Imprimir PDF</button>
+      </div>
+    </div>
+
+    <div class="fin-container">
+      <div class="fin-tabs">
+        <button class="fin-tab active" id="btn-fin-balance" onclick="changeFinReport('balance')">Balance General</button>
+        <button class="fin-tab" id="btn-fin-resultados" onclick="changeFinReport('resultados')">Estado de Resultados</button>
+        <button class="fin-tab" id="btn-fin-flujo" onclick="changeFinReport('flujo')">Flujo de Efectivo</button>
+      </div>
+
+      <div class="fin-table-container" id="fin-table-wrap">
+        <table class="fin-table" id="fin-data-table">
+          <!-- Dinámico -->
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL DRILL-DOWN -->
+  <div class="modal" id="modal-drill">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div>
+          <h3 id="drill-title">Detalle de Movimientos</h3>
+          <div id="drill-subtitle" style="font-size:12px; color:var(--text-muted)">Cuenta Contable</div>
+        </div>
+        <i data-lucide="x" class="modal-close" onclick="closeDrillModal()"></i>
+      </div>
+      <div class="modal-body">
+        <div class="table-wrap">
+          <table id="tbl-drill-detail">
+            <thead>
+              <tr>
+                <th>Fecha</th>
+                <th>Registro</th>
+                <th>Glosa</th>
+                <th>Entidad</th>
+                <th class="col-num">Debe</th>
+                <th class="col-num">Haber</th>
+                <th class="col-num">Saldo</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -1098,6 +1184,10 @@ function showTab(name, btn, menuLabel) {
     } else if (menuLabel === 'Financiero') {
       document.getElementById('menu-financiero').classList.add('active');
     }
+  }
+
+  if (name === 'fin-states') {
+    loadFinData();
   }
   
   if(name === 'old-p5') {
@@ -2604,6 +2694,272 @@ function renderForecastProductoChart(data, producto) {
     `).join('');
   }
   if (typeof lucide !== 'undefined') lucide.createIcons();
+}
+
+// ─── MÓDULO FINANCIERO ──────────────────────────────────────────────────────
+let finCurrentReport = 'balance';
+
+function changeFinReport(type) {
+  finCurrentReport = type;
+  document.querySelectorAll('.fin-tab').forEach(b => b.classList.remove('active'));
+  document.getElementById('btn-fin-' + type).classList.add('active');
+  loadFinData();
+}
+
+async function loadFinData() {
+  const table = document.getElementById('fin-data-table');
+  table.innerHTML = `<tr><td colspan="15" style="text-align:center; padding:100px"><div class="spinner" style="margin:0 auto"></div></td></tr>`;
+  
+  try {
+    const endpoint = finCurrentReport === 'balance' ? '/api/fin-balance' : (finCurrentReport === 'resultados' ? '/api/fin-resultados' : '/api/fin-flujo');
+    const data = await fetchJson(`${endpoint}?anno=${state.year}`);
+    if (!data || !data.rows) {
+      table.innerHTML = `<tr><td colspan="15" style="text-align:center; padding:100px; color:var(--text-muted)">No se encontraron datos financieros para este periodo.</td></tr>`;
+      return;
+    }
+    
+    if (data.metadata) {
+      document.getElementById('fin-meta').innerText = `PCGE Perú · Moneda: Soles (PEN) · Generado: ${data.metadata.generacion}`;
+    }
+
+    if (finCurrentReport === 'balance') renderBalanceTable(data.rows);
+    else if (finCurrentReport === 'resultados') renderResultadosTable(data.rows);
+    else if (finCurrentReport === 'flujo') renderFlujoTable(data.rows);
+    
+  } catch (e) {
+    console.error('Error cargando fin-data:', e);
+  }
+}
+
+function renderBalanceTable(rows) {
+  const months = ['00', '01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12'];
+  const monthNames = ['INI', 'ENE', 'FEB', 'MAR', 'ABR', 'MAY', 'JUN', 'JUL', 'AGO', 'SET', 'OCT', 'NOV', 'DIC'];
+  
+  // Procesar datos: Agrupar por cuenta y mes
+  const accMap = {};
+  rows.forEach(r => {
+    if (!accMap[r.cuenta]) accMap[r.cuenta] = { nombre: r.nombre, vals: {} };
+    accMap[r.cuenta].vals[r.periodo] = { debe: r.debe, haber: r.haber };
+  });
+
+  const sortedAccounts = Object.keys(accMap).sort();
+  
+  let html = `<thead><tr><th>CUENTA</th><th>DESCRIPCIÓN</th>`;
+  monthNames.forEach(m => html += `<th class="col-num">${m}</th>`);
+  html += `<th class="col-num">TOTAL</th></tr></thead><tbody>`;
+
+  // Definir Estructura de Secciones
+  const sections = [
+    { label: 'ACTIVO', filter: (c) => ['1', '2', '3'].includes(c[0]), type: 'deudora' },
+    { label: 'PASIVO Y PATRIMONIO', filter: (c) => ['4', '5'].includes(c[0]), type: 'acreedora' }
+  ];
+
+  sections.forEach(sec => {
+    html += `<tr class="row-group"><td colspan="${months.length + 3}">${sec.label}</td></tr>`;
+    
+    const secAccounts = sortedAccounts.filter(sec.filter);
+    const totalsByMonth = new Array(months.length).fill(0);
+
+    secAccounts.forEach(acc => {
+      const data = accMap[acc];
+      html += `<tr class="row-account" onclick="openDrillModal('${acc}', '${data.nombre}')">
+        <td><b>${acc}</b></td>
+        <td>${data.nombre}</td>`;
+      
+      let rowTotal = 0;
+      months.forEach((m, idx) => {
+        const v = data.vals[m] || { debe: 0, haber: 0 };
+        const saldo = sec.type === 'deudora' ? (v.debe - v.haber) : (v.haber - v.debe);
+        // El balance es acumulativo
+        const cumulativeSaldo = calculateCumulative(accMap[acc], m, sec.type);
+        html += `<td class="col-num ${cumulativeSaldo < 0 ? 'negative' : ''}">${formatFin(cumulativeSaldo)}</td>`;
+        totalsByMonth[idx] += cumulativeSaldo;
+        if (idx === months.length - 1) rowTotal = cumulativeSaldo;
+      });
+      
+      html += `<td class="col-num">${formatFin(rowTotal)}</td></tr>`;
+    });
+
+    // Total sección
+    html += `<tr class="total-row"><td colspan="2">TOTAL ${sec.label}</td>`;
+    totalsByMonth.forEach(t => html += `<td class="col-num">${formatFin(t)}</td>`);
+    html += `<td class="col-num">${formatFin(totalsByMonth[months.length-1])}</td></tr>`;
+  });
+
+  html += `</tbody>`;
+  document.getElementById('fin-data-table').innerHTML = html;
+}
+
+function calculateCumulative(accData, upToMonth, type) {
+  let total = 0;
+  const mInt = parseInt(upToMonth);
+  Object.keys(accData.vals).forEach(m => {
+    if (parseInt(m) <= mInt) {
+      const v = accData.vals[m];
+      total += type === 'deudora' ? (v.debe - v.haber) : (v.haber - v.debe);
+    }
+  });
+  return total;
+}
+
+function renderResultadosTable(rows) {
+  const months = ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12'];
+  const monthNames = ['ENE', 'FEB', 'MAR', 'ABR', 'MAY', 'JUN', 'JUL', 'AGO', 'SET', 'OCT', 'NOV', 'DIC'];
+  
+  const accMap = {};
+  rows.forEach(r => {
+    if (!accMap[r.cuenta]) accMap[r.cuenta] = { nombre: r.nombre, vals: {} };
+    accMap[r.cuenta].vals[r.periodo] = { debe: r.debe, haber: r.haber };
+  });
+
+  const sortedAccounts = Object.keys(accMap).sort();
+  
+  let html = `<thead><tr><th>CUENTA</th><th>DESCRIPCIÓN</th>`;
+  monthNames.forEach(m => html += `<th class="col-num">${m}</th>`);
+  html += `<th class="col-num">TOTAL</th></tr></thead><tbody>`;
+
+  const groups = [
+    { label: 'INGRESOS', filter: (c) => c.startsWith('7'), type: 'acreedora' },
+    { label: 'GASTOS', filter: (c) => c.startsWith('6'), type: 'deudora' }
+  ];
+
+  let netResults = new Array(months.length).fill(0);
+
+  groups.forEach(grp => {
+    html += `<tr class="row-group"><td colspan="${months.length + 3}">${grp.label}</td></tr>`;
+    const grpAccounts = sortedAccounts.filter(grp.filter);
+    const totalsByMonth = new Array(months.length).fill(0);
+
+    grpAccounts.forEach(acc => {
+      const data = accMap[acc];
+      html += `<tr class="row-account" onclick="openDrillModal('${acc}', '${data.nombre}')">
+        <td><b>${acc}</b></td>
+        <td>${data.nombre}</td>`;
+      
+      let rowTotal = 0;
+      months.forEach((m, idx) => {
+        const v = data.vals[m] || { debe: 0, haber: 0 };
+        const saldo = grp.type === 'deudora' ? (v.debe - v.haber) : (v.haber - v.debe);
+        html += `<td class="col-num ${saldo < 0 ? 'negative' : ''}">${formatFin(saldo)}</td>`;
+        totalsByMonth[idx] += saldo;
+        rowTotal += saldo;
+        
+        if (grp.label === 'INGRESOS') netResults[idx] += saldo;
+        else netResults[idx] -= saldo;
+      });
+      html += `<td class="col-num">${formatFin(rowTotal)}</td></tr>`;
+    });
+
+    html += `<tr class="total-row"><td colspan="2">TOTAL ${grp.label}</td>`;
+    totalsByMonth.forEach(t => html += `<td class="col-num">${formatFin(t)}</td>`);
+    html += `<td class="col-num">${formatFin(totalsByMonth.reduce((a,b)=>a+b,0))}</td></tr>`;
+  });
+
+  // Utilidad Neta
+  html += `<tr class="total-row" style="background:#1e293b; color:white"><td colspan="2">RESULTADO NETO DEL EJERCICIO</td>`;
+  netResults.forEach(r => html += `<td class="col-num">${formatFin(r)}</td>`);
+  html += `<td class="col-num">${formatFin(netResults.reduce((a,b)=>a+b,0))}</td></tr>`;
+
+  html += `</tbody>`;
+  document.getElementById('fin-data-table').innerHTML = html;
+}
+
+function renderFlujoTable(rows) {
+  const monthNames = ['ENE', 'FEB', 'MAR', 'ABR', 'MAY', 'JUN', 'JUL', 'AGO', 'SET', 'OCT', 'NOV', 'DIC'];
+  const months = ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12'];
+  
+  const mData = {};
+  rows.forEach(r => mData[r.periodo] = r);
+
+  let html = `<thead><tr><th>CONCEPTO</th>`;
+  monthNames.forEach(m => html += `<th class="col-num">${m}</th>`);
+  html += `<th class="col-num">TOTAL</th></tr></thead><tbody>`;
+
+  const rowsDef = [
+    { label: 'Ingresos de Efectivo', key: 'ingresos' },
+    { label: 'Egresos de Efectivo', key: 'egresos', multiplier: -1 },
+    { label: 'Flujo Neto Mensual', key: 'flujo_neto', isTotal: true }
+  ];
+
+  rowsDef.forEach(rd => {
+    html += `<tr class="${rd.isTotal ? 'total-row' : ''}"><td>${rd.label}</td>`;
+    let total = 0;
+    months.forEach(m => {
+      const val = (mData[m] ? mData[m][rd.key] : 0) * (rd.multiplier || 1);
+      html += `<td class="col-num ${val < 0 ? 'negative' : ''}">${formatFin(val)}</td>`;
+      total += val;
+    });
+    html += `<td class="col-num">${formatFin(total)}</td></tr>`;
+  });
+
+  html += `</tbody>`;
+  document.getElementById('fin-data-table').innerHTML = html;
+}
+
+function formatFin(n) {
+  if (n === 0) return '-';
+  return Math.round(n).toLocaleString('es-PE');
+}
+
+// DRILL-DOWN MODAL
+async function openDrillModal(cta, nombre, periodo = null) {
+  const modal = document.getElementById('modal-drill');
+  const tbody = document.getElementById('tbl-drill-detail').querySelector('tbody');
+  
+  document.getElementById('drill-title').innerText = nombre;
+  document.getElementById('drill-subtitle').innerText = `Cuenta: ${cta} ${periodo ? '| Periodo: ' + periodo : ''}`;
+  
+  modal.style.display = 'flex';
+  tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; padding:40px"><div class="spinner" style="margin:0 auto"></div></td></tr>';
+  
+  try {
+    const data = await fetchJson(`/api/fin-detalle?anno=${state.year}&cta=${cta}${periodo ? '&periodo='+periodo : ''}`);
+    if (!data || data.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; padding:40px">No hay movimientos registrados.</td></tr>';
+      return;
+    }
+    
+    let runningSaldo = 0;
+    tbody.innerHTML = data.map(m => {
+      const saldo = m.debe - m.haber; // Simplificado
+      runningSaldo += saldo;
+      return `<tr>
+        <td>${m.fecha}</td>
+        <td><span class="badge b-blue">${m.registro}</span></td>
+        <td style="max-width:300px; font-size:11px">${m.glosa}</td>
+        <td>${m.entidad || '-'}</td>
+        <td class="col-num">${formatFin(m.debe)}</td>
+        <td class="col-num">${formatFin(m.haber)}</td>
+        <td class="col-num"><b>${formatFin(runningSaldo)}</b></td>
+      </tr>`;
+    }).join('');
+    
+  } catch (e) {
+    console.error('Error in drill-down:', e);
+  }
+}
+
+function closeDrillModal() {
+  document.getElementById('modal-drill').style.display = 'none';
+}
+
+function exportFinTable(format) {
+  const table = document.getElementById('fin-data-table');
+  let csv = [];
+  for (let i = 0; i < table.rows.length; i++) {
+    let row = [], cols = table.rows[i].cells;
+    for (let j = 0; j < cols.length; j++) row.push('"' + cols[j].innerText.replace(/"/g, '""') + '"');
+    csv.push(row.join(","));
+  }
+  const blob = new Blob([csv.join("\n")], { type: 'text/csv' });
+  const url = window.URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.setAttribute('hidden', '');
+  a.setAttribute('href', url);
+  a.setAttribute('download', `Reporte_Financiero_${finCurrentReport}_${state.year}.csv`);
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
 }
 
 window.onload = () => { init(); };
