@@ -1111,7 +1111,6 @@ def get_analisis_experto():
       'Media' as prioridad
     FROM metrics
     """
-    """
     return run(sql)
 
 # ══════════════════════════════════════════════════════════════════
@@ -1121,64 +1120,28 @@ def get_analisis_experto():
 @app.get("/api/fin-balance")
 def get_fin_balance(anno: int = 2026):
     """Reporte de Situación Patrimonial (Balance General) mensualizado."""
-    sql = f"""
-    SELECT 
-      Nro_Cta as cuenta,
-      Nombre_Cuenta as nombre,
-      Periodo as periodo,
-      SUM(Mto_Debe) as debe,
-      SUM(Mto_Haber) as haber
-    FROM `{BQ_PROJECT}.{BQ_DATASET}.TB_movimientos_contabilidad`
-    WHERE Ejercicio = {anno}
-      AND (Nro_Cta LIKE '1%' OR Nro_Cta LIKE '2%' OR Nro_Cta LIKE '3%' OR Nro_Cta LIKE '4%' OR Nro_Cta LIKE '5%')
-    GROUP BY 1, 2, 3
-    ORDER BY 1, 3
-    """
+    sql = f"SELECT * FROM `{BQ_PROJECT}.{BQ_DATASET}.VW_FIN_BALANCE` WHERE ejercicio = {anno}"
     rows = run(sql)
     return {"rows": rows, "metadata": {"generacion": datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")}}
 
 @app.get("/api/fin-resultados")
 def get_fin_resultados(anno: int = 2026):
     """Estado de Resultados por Naturaleza mensualizado."""
-    sql = f"""
-    SELECT 
-      Nro_Cta as cuenta,
-      Nombre_Cuenta as nombre,
-      Periodo as periodo,
-      SUM(Mto_Debe) as debe,
-      SUM(Mto_Haber) as haber
-    FROM `{BQ_PROJECT}.{BQ_DATASET}.TB_movimientos_contabilidad`
-    WHERE Ejercicio = {anno}
-      AND (Nro_Cta LIKE '6%' OR Nro_Cta LIKE '7%')
-      AND Periodo != '00'
-    GROUP BY 1, 2, 3
-    ORDER BY 1, 3
-    """
+    sql = f"SELECT * FROM `{BQ_PROJECT}.{BQ_DATASET}.VW_FIN_RESULTADOS` WHERE ejercicio = {anno}"
     rows = run(sql)
     return {"rows": rows, "metadata": {"generacion": datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")}}
 
 @app.get("/api/fin-flujo")
 def get_fin_flujo(anno: int = 2026):
     """Estado de Flujo de Efectivo (Método Indirecto - Movimientos Cuenta 10)."""
-    sql = f"""
-    SELECT 
-      Periodo as periodo,
-      SUM(Mto_Debe) as ingresos,
-      SUM(Mto_Haber) as egresos,
-      SUM(Mto_Debe - Mto_Haber) as flujo_neto
-    FROM `{BQ_PROJECT}.{BQ_DATASET}.TB_movimientos_contabilidad`
-    WHERE Ejercicio = {anno}
-      AND Nro_Cta LIKE '10%'
-    GROUP BY 1
-    ORDER BY 1
-    """
+    sql = f"SELECT * FROM `{BQ_PROJECT}.{BQ_DATASET}.VW_FIN_FLUJO` WHERE ejercicio = {anno}"
     rows = run(sql)
     return {"rows": rows, "metadata": {"generacion": datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")}}
 
 @app.get("/api/fin-detalle")
-def get_fin_detalle(anno: int, cta: str, periodo: str | None = None):
+def get_fin_detalle(anno: int, cta: str, periodo: int | None = None):
     """Drill-down: Detalle de transacciones para una cuenta y periodo."""
-    where_periodo = f"AND Periodo = '{periodo}'" if periodo else ""
+    where_periodo = f"AND Periodo = {periodo}" if periodo is not None else ""
     sql = f"""
     SELECT 
       Fec_Mov as fecha,
