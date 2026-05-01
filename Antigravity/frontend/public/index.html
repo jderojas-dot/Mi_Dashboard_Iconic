@@ -203,6 +203,11 @@ body {
 .fin-table .col-num { text-align: right; font-family: 'Inter', monospace; font-variant-numeric: tabular-nums; }
 .fin-table .negative { color: var(--danger); }
 .fin-table .total-row { background: #e2e8f0; font-weight: 800; border-top: 2px solid #94a3b8; }
+.fin-table th.col-month-group { text-align: center; background: #334155; font-size: 10px; border-left: 1px solid rgba(255,255,255,0.1); }
+.fin-table .comp-header { font-size: 8.5px; background: #475569; color: #cbd5e1; text-align: right; padding: 4px 8px; font-weight: 700; }
+.fin-table .col-comp { width: 85px; }
+.fin-table .var-positive { color: var(--success); font-weight: 600; }
+.fin-table .var-negative { color: var(--danger); font-weight: 600; }
 
 /* Modal Drill-down */
 .modal { 
@@ -2732,70 +2737,107 @@ async function loadFinData() {
 }
 
 function renderBalanceTable(rows) {
+  const currentYear = state.year;
+  const prevYear = currentYear - 1;
   const months = ['00', '01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12'];
   const monthNames = ['INI', 'ENE', 'FEB', 'MAR', 'ABR', 'MAY', 'JUN', 'JUL', 'AGO', 'SET', 'OCT', 'NOV', 'DIC'];
   
-  // Procesar datos: Agrupar por cuenta y mes
   const accMap = {};
   rows.forEach(r => {
+    const p = String(r.periodo).padStart(2, '0');
     if (!accMap[r.cuenta]) accMap[r.cuenta] = { nombre: r.nombre, vals: {} };
-    accMap[r.cuenta].vals[r.periodo] = { debe: r.debe, haber: r.haber };
+    if (!accMap[r.cuenta].vals[p]) accMap[r.cuenta].vals[p] = {};
+    accMap[r.cuenta].vals[p][r.ejercicio] = { debe: r.debe, haber: r.haber };
   });
 
   const sortedAccounts = Object.keys(accMap).sort();
   
-  let html = `<thead><tr><th>CUENTA</th><th>DESCRIPCIÓN</th>`;
-  monthNames.forEach(m => html += `<th class="col-num">${m}</th>`);
-  html += `<th class="col-num">TOTAL</th></tr></thead><tbody>`;
+  let html = `<thead>
+    <tr>
+      <th rowspan="2" style="position:sticky; left:0; z-index:30; background:#1e293b">CUENTA</th>
+      <th rowspan="2" style="position:sticky; left:80px; z-index:30; background:#1e293b">DESCRIPCIÓN</th>`;
+  
+  monthNames.forEach(m => {
+    html += `<th colspan="4" class="col-month-group">${m}</th>`;
+  });
+  html += `<th colspan="4" class="col-month-group">TOTAL</th></tr>`;
+  
+  html += `<tr>`;
+  [...monthNames, 'TOTAL'].forEach(() => {
+    html += `<th class="comp-header">${currentYear}</th>
+             <th class="comp-header">${prevYear}</th>
+             <th class="comp-header">VAR</th>
+             <th class="comp-header">%</th>`;
+  });
+  html += `</tr></thead><tbody>`;
 
-  // Definir Estructura de Secciones
   const sections = [
     { label: 'ACTIVO', filter: (c) => ['1', '2', '3'].includes(c[0]), type: 'deudora' },
     { label: 'PASIVO Y PATRIMONIO', filter: (c) => ['4', '5'].includes(c[0]), type: 'acreedora' }
   ];
 
   sections.forEach(sec => {
-    html += `<tr class="row-group"><td colspan="${months.length + 3}">${sec.label}</td></tr>`;
-    
+    html += `<tr class="row-group"><td colspan="${months.length * 4 + 6}">${sec.label}</td></tr>`;
     const secAccounts = sortedAccounts.filter(sec.filter);
-    const totalsByMonth = new Array(months.length).fill(0);
+    const totalsActual = new Array(months.length).fill(0);
+    const totalsPrev = new Array(months.length).fill(0);
 
     secAccounts.forEach(acc => {
       const data = accMap[acc];
       html += `<tr class="row-account" onclick="openDrillModal('${acc}', '${data.nombre}')">
-        <td><b>${acc}</b></td>
-        <td>${data.nombre}</td>`;
+        <td style="position:sticky; left:0; background:white; z-index:5"><b>${acc}</b></td>
+        <td style="position:sticky; left:80px; background:white; z-index:5">${data.nombre}</td>`;
       
-      let rowTotal = 0;
       months.forEach((m, idx) => {
-        const v = data.vals[m] || { debe: 0, haber: 0 };
-        const saldo = sec.type === 'deudora' ? (v.debe - v.haber) : (v.haber - v.debe);
-        // El balance es acumulativo
-        const cumulativeSaldo = calculateCumulative(accMap[acc], m, sec.type);
-        html += `<td class="col-num ${cumulativeSaldo < 0 ? 'negative' : ''}">${formatFin(cumulativeSaldo)}</td>`;
-        totalsByMonth[idx] += cumulativeSaldo;
-        if (idx === months.length - 1) rowTotal = cumulativeSaldo;
+        const valActual = calculateCumulative(data, m, sec.type, currentYear);
+        const valPrev = calculateCumulative(data, m, sec.type, prevYear);
+        const diff = valActual - valPrev;
+        const pct = valPrev !== 0 ? (diff / Math.abs(valPrev) * 100) : 0;
+        
+        html += renderCompCells(valActual, valPrev, diff, pct);
+        totalsActual[idx] += valActual;
+        totalsPrev[idx] += valPrev;
       });
       
-      html += `<td class="col-num">${formatFin(rowTotal)}</td></tr>`;
+      const valAFL = calculateCumulative(data, '12', sec.type, currentYear);
+      const valPFL = calculateCumulative(data, '12', sec.type, prevYear);
+      const dF = valAFL - valPFL;
+      const pF = valPFL !== 0 ? (dF / Math.abs(valPFL) * 100) : 0;
+      html += renderCompCells(valAFL, valPFL, dF, pF);
+      html += `</tr>`;
     });
 
-    // Total sección
-    html += `<tr class="total-row"><td colspan="2">TOTAL ${sec.label}</td>`;
-    totalsByMonth.forEach(t => html += `<td class="col-num">${formatFin(t)}</td>`);
-    html += `<td class="col-num">${formatFin(totalsByMonth[months.length-1])}</td></tr>`;
+    html += `<tr class="total-row"><td colspan="2" style="position:sticky; left:0; background:#e2e8f0; z-index:5">TOTAL ${sec.label}</td>`;
+    months.forEach((m, idx) => {
+      const ta = totalsActual[idx]; const tp = totalsPrev[idx]; const d = ta - tp;
+      const p = tp !== 0 ? (d / Math.abs(tp) * 100) : 0;
+      html += renderCompCells(ta, tp, d, p);
+    });
+    const gta = totalsActual[months.length-1]; const gtp = totalsPrev[months.length-1]; const gd = gta - gtp;
+    const gp = gtp !== 0 ? (gd / Math.abs(gtp) * 100) : 0;
+    html += renderCompCells(gta, gtp, gd, gp);
+    html += `</tr>`;
   });
 
   html += `</tbody>`;
   document.getElementById('fin-data-table').innerHTML = html;
 }
 
-function calculateCumulative(accData, upToMonth, type) {
+function renderCompCells(act, prev, varVal, pct) {
+  return `
+    <td class="col-num">${formatFin(act)}</td>
+    <td class="col-num" style="color:#94a3b8">${formatFin(prev)}</td>
+    <td class="col-num ${varVal < 0 ? 'var-negative' : 'var-positive'}">${formatFin(varVal)}</td>
+    <td class="col-num ${pct < 0 ? 'var-negative' : 'var-positive'}" style="font-size:9px">${pct === 0 ? '-' : pct.toFixed(1) + '%'}</td>
+  `;
+}
+
+function calculateCumulative(accData, upToMonth, type, year) {
   let total = 0;
   const mInt = parseInt(upToMonth);
   Object.keys(accData.vals).forEach(m => {
     if (parseInt(m) <= mInt) {
-      const v = accData.vals[m];
+      const v = accData.vals[m][year] || { debe: 0, haber: 0 };
       total += type === 'deudora' ? (v.debe - v.haber) : (v.haber - v.debe);
     }
   });
@@ -2803,64 +2845,119 @@ function calculateCumulative(accData, upToMonth, type) {
 }
 
 function renderResultadosTable(rows) {
+  const currentYear = state.year;
+  const prevYear = currentYear - 1;
   const months = ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12'];
   const monthNames = ['ENE', 'FEB', 'MAR', 'ABR', 'MAY', 'JUN', 'JUL', 'AGO', 'SET', 'OCT', 'NOV', 'DIC'];
   
   const accMap = {};
   rows.forEach(r => {
+    const p = String(r.periodo).padStart(2, '0');
     if (!accMap[r.cuenta]) accMap[r.cuenta] = { nombre: r.nombre, vals: {} };
-    accMap[r.cuenta].vals[r.periodo] = { debe: r.debe, haber: r.haber };
+    if (!accMap[r.cuenta].vals[p]) accMap[r.cuenta].vals[p] = {};
+    accMap[r.cuenta].vals[p][r.ejercicio] = { debe: r.debe, haber: r.haber };
   });
 
   const sortedAccounts = Object.keys(accMap).sort();
   
-  let html = `<thead><tr><th>CUENTA</th><th>DESCRIPCIÓN</th>`;
-  monthNames.forEach(m => html += `<th class="col-num">${m}</th>`);
-  html += `<th class="col-num">TOTAL</th></tr></thead><tbody>`;
+  let html = `<thead>
+    <tr>
+      <th rowspan="2" style="position:sticky; left:0; z-index:30; background:#1e293b">CUENTA</th>
+      <th rowspan="2" style="position:sticky; left:80px; z-index:30; background:#1e293b">DESCRIPCIÓN</th>`;
+  
+  monthNames.forEach(m => {
+    html += `<th colspan="4" class="col-month-group">${m}</th>`;
+  });
+  html += `<th colspan="4" class="col-month-group">TOTAL</th></tr>`;
+  
+  html += `<tr>`;
+  [...monthNames, 'TOTAL'].forEach(() => {
+    html += `<th class="comp-header">${currentYear}</th>
+             <th class="comp-header">${prevYear}</th>
+             <th class="comp-header">VAR</th>
+             <th class="comp-header">%</th>`;
+  });
+  html += `</tr></thead><tbody>`;
 
   const groups = [
     { label: 'INGRESOS', filter: (c) => c.startsWith('7'), type: 'acreedora' },
     { label: 'GASTOS', filter: (c) => c.startsWith('6'), type: 'deudora' }
   ];
 
-  let netResults = new Array(months.length).fill(0);
+  let netActual = new Array(months.length).fill(0);
+  let netPrev = new Array(months.length).fill(0);
 
   groups.forEach(grp => {
-    html += `<tr class="row-group"><td colspan="${months.length + 3}">${grp.label}</td></tr>`;
+    html += `<tr class="row-group"><td colspan="${months.length * 4 + 6}">${grp.label}</td></tr>`;
     const grpAccounts = sortedAccounts.filter(grp.filter);
-    const totalsByMonth = new Array(months.length).fill(0);
+    const totalsActual = new Array(months.length).fill(0);
+    const totalsPrev = new Array(months.length).fill(0);
 
     grpAccounts.forEach(acc => {
       const data = accMap[acc];
       html += `<tr class="row-account" onclick="openDrillModal('${acc}', '${data.nombre}')">
-        <td><b>${acc}</b></td>
-        <td>${data.nombre}</td>`;
+        <td style="position:sticky; left:0; background:white; z-index:5"><b>${acc}</b></td>
+        <td style="position:sticky; left:80px; background:white; z-index:5">${data.nombre}</td>`;
       
-      let rowTotal = 0;
+      let rowTotalActual = 0;
+      let rowTotalPrev = 0;
+
       months.forEach((m, idx) => {
-        const v = data.vals[m] || { debe: 0, haber: 0 };
-        const saldo = grp.type === 'deudora' ? (v.debe - v.haber) : (v.haber - v.debe);
-        html += `<td class="col-num ${saldo < 0 ? 'negative' : ''}">${formatFin(saldo)}</td>`;
-        totalsByMonth[idx] += saldo;
-        rowTotal += saldo;
+        const vA = (data.vals[m] && data.vals[m][currentYear]) || { debe: 0, haber: 0 };
+        const vP = (data.vals[m] && data.vals[m][prevYear]) || { debe: 0, haber: 0 };
+        const sA = grp.type === 'deudora' ? (vA.debe - vA.haber) : (vA.haber - vA.debe);
+        const sP = grp.type === 'deudora' ? (vP.debe - vP.haber) : (vP.haber - vP.debe);
+        const diff = sA - sP;
+        const pct = sP !== 0 ? (diff / Math.abs(sP) * 100) : 0;
+
+        html += renderCompCells(sA, sP, diff, pct);
+        totalsActual[idx] += sA;
+        totalsPrev[idx] += sP;
+        rowTotalActual += sA;
+        rowTotalPrev += sP;
         
-        if (grp.label === 'INGRESOS') netResults[idx] += saldo;
-        else netResults[idx] -= saldo;
+        if (grp.label === 'INGRESOS') {
+          netActual[idx] += sA;
+          netPrev[idx] += sP;
+        } else {
+          netActual[idx] -= sA;
+          netPrev[idx] -= sP;
+        }
       });
-      html += `<td class="col-num">${formatFin(rowTotal)}</td></tr>`;
+      
+      const rowDiff = rowTotalActual - rowTotalPrev;
+      const rowPct = rowTotalPrev !== 0 ? (rowDiff / Math.abs(rowTotalPrev) * 100) : 0;
+      html += renderCompCells(rowTotalActual, rowTotalPrev, rowDiff, rowPct);
+      html += `</tr>`;
     });
 
-    html += `<tr class="total-row"><td colspan="2">TOTAL ${grp.label}</td>`;
-    totalsByMonth.forEach(t => html += `<td class="col-num">${formatFin(t)}</td>`);
-    html += `<td class="col-num">${formatFin(totalsByMonth.reduce((a,b)=>a+b,0))}</td></tr>`;
+    html += `<tr class="total-row"><td colspan="2" style="position:sticky; left:0; background:#e2e8f0; z-index:5">TOTAL ${grp.label}</td>`;
+    months.forEach((m, idx) => {
+      const ta = totalsActual[idx]; const tp = totalsPrev[idx]; const d = ta - tp;
+      const p = tp !== 0 ? (d / Math.abs(tp) * 100) : 0;
+      html += renderCompCells(ta, tp, d, p);
+    });
+    const gta = totalsActual.reduce((a,b)=>a+b,0);
+    const gtp = totalsPrev.reduce((a,b)=>a+b,0);
+    const gd = gta - gtp;
+    const gp = gtp !== 0 ? (gd / Math.abs(gtp) * 100) : 0;
+    html += renderCompCells(gta, gtp, gd, gp);
+    html += `</tr>`;
   });
 
-  // Utilidad Neta
-  html += `<tr class="total-row" style="background:#1e293b; color:white"><td colspan="2">RESULTADO NETO DEL EJERCICIO</td>`;
-  netResults.forEach(r => html += `<td class="col-num">${formatFin(r)}</td>`);
-  html += `<td class="col-num">${formatFin(netResults.reduce((a,b)=>a+b,0))}</td></tr>`;
+  html += `<tr class="total-row" style="background:#1e293b; color:white"><td colspan="2" style="position:sticky; left:0; background:#1e293b; z-index:5">RESULTADO NETO</td>`;
+  netActual.forEach((na, idx) => {
+    const np = netPrev[idx]; const d = na - np;
+    const p = np !== 0 ? (d / Math.abs(np) * 100) : 0;
+    html += renderCompCells(na, np, d, p);
+  });
+  const gna = netActual.reduce((a,b)=>a+b,0);
+  const gnp = netPrev.reduce((a,b)=>a+b,0);
+  const gd = gna - gnp;
+  const gp = gnp !== 0 ? (gd / Math.abs(gnp) * 100) : 0;
+  html += renderCompCells(gna, gnp, gd, gp);
+  html += `</tr></tbody>`;
 
-  html += `</tbody>`;
   document.getElementById('fin-data-table').innerHTML = html;
 }
 
@@ -2868,8 +2965,10 @@ function renderFlujoTable(rows) {
   const monthNames = ['ENE', 'FEB', 'MAR', 'ABR', 'MAY', 'JUN', 'JUL', 'AGO', 'SET', 'OCT', 'NOV', 'DIC'];
   const months = ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12'];
   
-  const mData = {};
-  rows.forEach(r => mData[r.periodo] = r);
+  rows.forEach(r => {
+    const p = String(r.periodo).padStart(2, '0');
+    mData[p] = r;
+  });
 
   let html = `<thead><tr><th>CONCEPTO</th>`;
   monthNames.forEach(m => html += `<th class="col-num">${m}</th>`);

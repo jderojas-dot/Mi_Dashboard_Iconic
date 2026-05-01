@@ -1119,15 +1119,15 @@ def get_analisis_experto():
 
 @app.get("/api/fin-balance")
 def get_fin_balance(anno: int = 2026):
-    """Reporte de Situación Patrimonial (Balance General) mensualizado."""
-    sql = f"SELECT * FROM `{BQ_PROJECT}.{BQ_DATASET}.VW_FIN_BALANCE` WHERE ejercicio = {anno}"
+    """Reporte de Situación Patrimonial (Balance General) mensualizado con comparativo año anterior."""
+    sql = f"SELECT * FROM `{BQ_PROJECT}.{BQ_DATASET}.VW_FIN_BALANCE` WHERE ejercicio IN ({anno}, {anno-1})"
     rows = run(sql)
     return {"rows": rows, "metadata": {"generacion": datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")}}
 
 @app.get("/api/fin-resultados")
 def get_fin_resultados(anno: int = 2026):
-    """Estado de Resultados por Naturaleza mensualizado."""
-    sql = f"SELECT * FROM `{BQ_PROJECT}.{BQ_DATASET}.VW_FIN_RESULTADOS` WHERE ejercicio = {anno}"
+    """Estado de Resultados por Naturaleza mensualizado con comparativo año anterior."""
+    sql = f"SELECT * FROM `{BQ_PROJECT}.{BQ_DATASET}.VW_FIN_RESULTADOS` WHERE ejercicio IN ({anno}, {anno-1})"
     rows = run(sql)
     return {"rows": rows, "metadata": {"generacion": datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")}}
 
