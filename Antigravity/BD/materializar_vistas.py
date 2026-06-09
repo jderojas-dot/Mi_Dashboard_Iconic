@@ -11,8 +11,28 @@ import sys
 import time
 import datetime
 from pathlib import Path
+
+# Configurar terminal en Windows para soportar UTF-8 (evita caídas por emojis)
+if sys.platform.startswith("win"):
+    try:
+        sys.stdout.reconfigure(encoding="utf-8")
+    except Exception:
+        pass
+
 from google.cloud import bigquery
 from google.oauth2 import service_account
+
+# Auto-recuperacion imports
+try:
+    from recreate_external_tables import main as run_recreate_tables
+    from recreate_all_views import main as run_recreate_views
+except ImportError:
+    try:
+        from BD.recreate_external_tables import main as run_recreate_tables
+        from BD.recreate_all_views import main as run_recreate_views
+    except ImportError:
+        run_recreate_tables = None
+        run_recreate_views = None
 
 # Importar config del backend
 sys.path.append(str(Path(__file__).parent.parent / "backend"))
@@ -180,6 +200,24 @@ def materializar():
         print(f"❌ FALLO CRÍTICO DE CONEXIÓN: {e}")
         print("\n💡 Sugerencia: ejecuta:  gcloud auth application-default login")
         return
+
+    # Auto-recuperacion automatica antes de la materializacion
+    print("\n🔍 Verificando integridad de la base de datos BigQuery...")
+    needs_recovery = False
+    try:
+        client.get_table(f"{BQ_PROJECT}.{BQ_DATASET}.VW_VENTAS_DASHBOARD")
+        print("✅ Vista base VW_VENTAS_DASHBOARD encontrada.")
+    except Exception:
+        print("⚠️ No se encontró la vista base VW_VENTAS_DASHBOARD. Activando auto-recuperación...")
+        needs_recovery = True
+
+    if needs_recovery:
+        if run_recreate_tables:
+            print("🔄 Recreando tablas externas...")
+            run_recreate_tables()
+        if run_recreate_views:
+            print("🔄 Recreando vistas dependent...")
+            run_recreate_views()
 
     print(f"🚀 Iniciando materialización en {BQ_PROJECT}.{BQ_DATASET}...")
     start_total = time.time()

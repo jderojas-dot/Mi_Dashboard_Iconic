@@ -249,21 +249,36 @@ def pronosticar_chronos(serie, pipeline, meses_fc=3, num_samples=50):
 
     context = torch.tensor(y, dtype=torch.float32).unsqueeze(0)  # [1, T]
 
+    is_bolt = "Bolt" in pipeline.__class__.__name__
+
     with torch.no_grad():
-        # samples: tensor de forma [1, num_samples, meses_fc]
-        samples = pipeline.predict(
-            context=context,
-            prediction_length=meses_fc,
-            num_samples=num_samples,
-        )
+        if is_bolt:
+            # ChronosBoltPipeline returns quantiles directly: [batch_size, num_quantiles, prediction_length]
+            # official Bolt model has 9 quantiles: 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9
+            quantiles = pipeline.predict(
+                inputs=context,
+                prediction_length=meses_fc,
+            )
+            q = quantiles[0].float().numpy()  # [9, meses_fc]
+            return {
+                'forecast': np.maximum(0.0, q[4]),  # P50 (index 4)
+                'fc_lo':    np.maximum(0.0, q[0]),  # P10 (index 0)
+                'fc_hi':    np.maximum(0.0, q[8]),  # P90 (index 8)
+            }
+        else:
+            # ChronosPipeline returns samples: [batch_size, num_samples, prediction_length]
+            samples = pipeline.predict(
+                context=context,
+                prediction_length=meses_fc,
+                num_samples=num_samples,
+            )
+            s = samples[0].float().numpy()  # [num_samples, meses_fc]
+            return {
+                'forecast': np.maximum(0.0, np.percentile(s, 50, axis=0)),
+                'fc_lo':    np.maximum(0.0, np.percentile(s, 10, axis=0)),
+                'fc_hi':    np.maximum(0.0, np.percentile(s, 90, axis=0)),
+            }
 
-    s = samples[0].float().numpy()  # [num_samples, meses_fc]
-
-    return {
-        'forecast': np.maximum(0.0, np.percentile(s, 50, axis=0)),
-        'fc_lo':    np.maximum(0.0, np.percentile(s, 10, axis=0)),
-        'fc_hi':    np.maximum(0.0, np.percentile(s, 90, axis=0)),
-    }
 
 
 # ─────────────────────────────────────────────
